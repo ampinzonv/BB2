@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+
+      SHML &middot; $(shell markup language)
+
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/shml/public/css/poole.css">
+  <link rel="stylesheet" href="/shml/public/css/syntax-new.css">
+  <link rel="stylesheet" href="/shml/public/css/hyde.css">
+  <link rel="stylesheet" href="/shml/public/css/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/shml/public/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/shml/public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+</head>
+
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <img src="/shml/public/images/logo.png">
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="/shml/">Home</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <a class="sidebar-nav-item" href="getting-started/">Getting Started</a>
+
+
+
+
+
+
+
+      <a class="sidebar-nav-item sidebar-nav-indent" href="getting-started/#Install">Install</a>
+      <a class="sidebar-nav-item sidebar-nav-indent" href="getting-started/#Sourcing">Sourcing</a>
+      <a class="sidebar-nav-item sidebar-nav-indent" href="getting-started/#Foreground">Foreground</a>
+      <a class="sidebar-nav-item sidebar-nav-indent" href="getting-started/#Background">Background</a>
+      <a class="sidebar-nav-item sidebar-nav-indent" href="getting-started/#Attributes">Attributes</a>
+      <a class="sidebar-nav-item sidebar-nav-indent" href="getting-started/#Elements">Elements</a>
+      <a class="sidebar-nav-item sidebar-nav-indent" href="getting-started/#Icons">Icons</a>
+      <a class="sidebar-nav-item sidebar-nav-indent" href="getting-started/#Emojis">Emojis</a>
+      <a class="sidebar-nav-item sidebar-nav-indent" href="getting-started/#Color-Bar">Color Bar</a>
+      <a class="sidebar-nav-item" href="https://github.com/odb/shml" target="_blank">GitHub</a>
+    </nav>
+    <span class="sidebar-nav">&copy; 2013-2017 <a href="http://www.maxcdn.com/open-source?utm_source=SHML&utm_medium=footer-link">MaxCDN</a> | v1.0.4</span>
+  </div>
+</div>
+
+
+
+    <div class="content container">
+      <div class="message" align="center">
+      <b>SHML</b> is a shell framework for faster and easier script development.
+      </div>
+      <div align="center">
+        <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://odb.github.io/shml/" data-via="jdorfman" data-size="large" data-related="mervinej">Tweet</a>&nbsp;&nbsp;&nbsp;
+        <a href="https://twitter.com/MaxCDN" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @MaxCDN</a>&nbsp;&nbsp;&nbsp;
+        <a href="https://twitter.com/MaxCDNDeveloper" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @MaxCDNDeveloper</a>&nbsp;&nbsp;&nbsp;
+        <iframe src="https://ghbtns.com/github-btn.html?user=odb&repo=shml&type=watch&count=true&size=large" frameborder="0" scrolling="0" width="135px" height="30px"></iframe>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </div>
+      <hr>
+      <h3 id="why">Why</h3>
+<p>HTML has CSS, Unix-like shells have ANSI/VT100 Control Sequences. SHML makes is easy to apply style to your shell scripts without trying to remember that <strong>yellow</strong> is <code class="highlighter-rouge">\033[33m</code> instead it’s <code class="highlighter-rouge">$(color yellow)</code>.</p>
+
+<h3 id="liner-install">1-liner Install</h3>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c"># Unix-like</span>
+<span class="gp">$ </span>sudo bash -c <span class="s1">'curl -L https://raw.githubusercontent.com/odb/shml/1.1.0/shml.sh -o /usr/local/bin/shml &amp;&amp; chmod +x /usr/local/bin/shml'</span>
+
+<span class="c"># Homebrew</span>
+<span class="gp">$ </span>brew install shml
+
+<span class="c"># npm</span>
+<span class="gp">$ </span>npm install -g shml
+</code></pre>
+</div>
+
+<div align="center">
+<small>Currently v1.0.4
+<br /><a href="getting-started/">Please be responsible &amp; RTFM</a>
+</small>
+<br /><br />
+<iframe src="slideshow.html" width="100%" height="250" frameborder="0"></iframe>
+<br /><br /><center><a href="http://code.runnable.com/u/jdorfman" target="_blank"><img src="public/images/demo-on-runnable.png" border="0" /></a></center>
+</div>
+<hr />
+
+<div align="center">
+<small>
+Designed and built by <a href="https://twitter.com/jdorfman">@jdorfman</a> and <a href="https://twitter.com/mervinej">mervinej</a>.<br />
+Code licensed under <a href="https://github.com/odb/shml/blob/master/LICENSE">MIT</a>, documentation under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+</small>
+</div>
+
+
+    </div>
+
+  </body>
+</html>

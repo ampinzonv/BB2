@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+# @file bb_get_fasta_headers 
+# @brief Extracts headers from a single/multiple fasta file.
+# @description 
+#	Outputs a list of all fasta headers without the ">"in a fasta file.
+#	It can be a single or multiple fasta file.
+# @example 
+#	bb_get_fasta_headers -i sequence.fasta 
+# @arg $1 A valid fasta file.
+# @exitcode 0 if succesful
+# @exitcode 1 if unsuccesful
+#
+# Since sometimes remembering how exactly getopts work, this can be handy:
+# https://www.tutorialspoint.com/unix_commands/getopt.htm
+# getopt returns error code 0 for succesful parsing, 1 if getopt(3) returns errors, 
+# 2 if it does not understand its own parameters, 3 if an internal error occurs like out-of-memory, 
+# and 4 if it is called with -T.
+
+
+# Source the whole BB native library.
+# source "$BIOBASH_NATIVE_LIB_PATH/bb_native.sh"; 
+
+# Only source libraries needed.
+source "$BIOBASH_NATIVE_LIB_PATH/io.sh"; 
+source "$BIOBASH_NATIVE_LIB_PATH/file.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/feedback.sh";
+
+
+#--------------------------------------------------------------------------
+#						Validate Input
+#--------------------------------------------------------------------------
+# Thanks to @barmar in Stackoverflow. 
+# All explanation for this section can be found here:
+# https://github.com/ampinzonv/biobash2/wiki/Blog::File-Descriptors
+# https://github.com/ampinzonv/biobash2/wiki/Blog::BB-input-behavior
+hasArgs=$(io::script_has_args "$#")
+#echo "has arguments?: $hasArgs"
+isPipe=$(io::input_is_pipe)
+#echo "is pipe?: $isPipe"
+
+# If script is called without arguments and is not part of a pipe,
+# means that we should show help.
+if [[ $hasArgs = 1 && $isPipe = 1 ]]; then
+
+	helpDesc="Retrieves all fasta headers in a (single/multiple) fasta file."
+	helpUsage="bb_get_fasta_headers -i [fasta file]"
+
+	feedback::help  "$helpDesc" "$helpUsage"
+	exit 0
+fi	
+
+# Since the most common case is to call the script with an argument. We'll
+# evaluate that one first. 
+# It is important to note that this evaluation is very case especific, and depends
+# on the amount of arguments each script needs. In this case I onlñy evaluate "-i"
+# because bb_get_fasta_headers only receives one argument (-i).
+# Therefore EVEN WHEN $hasArgs = 1 sometimes it'd be necessary to evalute arguments apart from the
+# input file or whatever comes via a pipe in a specific script.
+if [ $hasArgs = 0 ];then
+	while getopts i: option; 
+	do
+		case "${option}" in
+			i)
+				fastaFile="$OPTARG";;	
+				#echo $fastaFile
+			\?)
+				feedback::sayfrom "Unknown parameter option." "error"
+				echo "${help}"
+				exit;;
+		esac
+	done
+elif [ $hasArgs = 1 ];then
+	# otherwise if we are here it means that BB is expecting data NOT FROM TERMINAL
+	# but from STDOUT via a pipe or redirection.
+	data=$(cat -- "$@")
+
+	#Create a tmp file to hold data.
+	# NOTE: Not sure if it is better to work with data on memory or write to a file.
+	# This is something to maybe improve?
+	fastaFile=$(file::make_temp_file)
+	#This is  hack used to clean the environment. The only reason we will erase user data
+	# is because we created, as this temporary file.  This flag will let us know that
+	# we can safely erase this file.
+	tmpFastaFile=0
+
+	# write to file	
+	echo "$data" > $fastaFile
+
+fi
+
+# To this point we have a file. Wether recently created from STDOUT or defined by the
+# user with the "-i" option. We have to make sure file exists.
+# NOTE that it possible to be here because there is ANY STRING after the script (i.e. script foo.txt)
+# so here $hasArgs = 1 is still valid but NOT FUNCTIONAL. 
+fileExists=$(file::file_exists $fastaFile)
+if [[ $fileExists -eq 1 ]];then
+	feedback::sayfrom "Unable to find file: ${fastaFile}. Maybe missing -i option?" "error"
+	echo "$help"
+	exit 1
+fi
+
+# Uncomment on debugging
+# echo $fastaFile
+
+# To this point we have a file. Now let's check that it is the kind we need.
+# In this aprticular case we expect a fasta file.
+isFasta=$(file::is_fasta $fastaFile) 
+if [[ $isFasta == "0" ]];then
+
+	#--- THIS IS THE CORE OF THE SCRIPT
+	grep "^>" "$fastaFile"  | sed -e "s/>//"
+
+	#An alternative option:
+	#awk '/^>/ {print; next; }' $fastaFile | sed -e 's/>//'
+	#---
+
+	# ONLY EXECUTED when data comes from a pipe and temp file was created above.
+	# Note here that $tmpFastaFile is quoted and that we are using "==" instead of"
+	# "-eq". This is because BB was complaining about a unary operator expected.
+	# The whole theory here: https://codefather.tech/blog/bash-unary-operator-expected/
+	if [ "$tmpFastaFile" == 0 ];then
+		rm $fastaFile
+	fi
+
+else
+	feedback::sayfrom "Provided $fastaFile file, is not a valid Fasta file." "error"
+	exit 1
+fi
+
+exit 0	

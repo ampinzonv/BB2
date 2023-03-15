@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+# @file bb_extract_subset_from_list
+# @brief Gets a subset of items from a longer list.
+# @description 
+#	Given a one column list of redundant items, outputs a list with the items defined by user using a pattern.
+#   When used with the -r option removes items that match [pattern] and outputs remaining items.
+# @example 
+#	bb_extract_subset_from_list -i [fileWithRedundantItems] -p [pattern] -r (remove. Optional)
+# @arg -i A one column file.
+# @arg -p regular expression (pattern) used to identify the items to extract
+# @arg -r (optional) remove items that match [pattern] and outputs remaining ones.
+
+# Only source libraries needed.
+source "$BIOBASH_NATIVE_LIB_PATH/io.sh"; 
+source "$BIOBASH_NATIVE_LIB_PATH/file.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/feedback.sh";
+
+
+#Input validation
+hasArgs=$(io::script_has_args "$#")
+isPipe=$(io::input_is_pipe)
+
+# If there are no arguments and not data stream.
+if [[ $hasArgs = 1 && $isPipe = 1 ]]; then
+
+	helpUsage="bb_extract_subset_from_list -i [file] -p [pattern] -r (optional)
+	Where [file] is a redundant one column (sorted or unsorted) simple text file. 
+       The  -p is a regular expression (pattern) used to identify the items to extract.
+       When used with the -r option, removes items that match [pattern] and outputs remaining items.
+       
+    NOTE: Original input file is never edited by the script. All operations take place on memory."
+
+	helpDesc="Retrieves a subset of items from a list."
+
+	# DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+	exit 0
+fi
+
+
+if [[ $hasArgs = 0 && $isPipe = 1 ]]; then
+	while getopts i:p:r option; 
+	do
+		case "${option}" in
+			i)
+				inputFile="$OPTARG";;
+            p)
+                pattern="$OPTARG";;	
+            r)
+                remove=TRUE;;	    
+				
+			\?)
+				feedback::sayfrom "Unknown parameter option." "error"
+				echo "${help}"
+				exit;;
+		esac
+	done
+fi
+
+
+
+
+#######################################################
+# DEALING WITH DATA STREAM STDIN == STDOUT (terminal)
+#######################################################
+
+if [[ $isPipe = 0 ]]; then
+
+	# It is key to capture the data stream using $(cat -) and not: $(cat -- "$@")
+    # The latter cuases a lot of problems during pipes with arguments such as:
+    # cat "hola" | bb_get_list -f
+    #check: https://stackoverflow.com/questions/2746553/read-values-into-a-shell-variable-from-a-pipe
+    # 
+    data=$(cat -)
+	inputFile=$(file::make_temp_file)
+    # write to file	
+	echo "$data" > $inputFile
+
+	#This is  hack used to clean the environment. The only reason we will erase user data
+	# is because we created, as this temporary file.  This flag will let us know that
+	# we can safely erase this file.
+	eraseFile=0
+
+
+    while getopts p:r option; 
+    do
+        case "${option}" in
+                
+        p)
+            pattern="$OPTARG";;
+        r)
+            remove=TRUE;;
+                    
+        \?)
+            feedback::sayfrom "Unknown parameter option." "error"
+            echo "${help}"
+            exit;;
+        esac
+    done 
+
+fi
+
+# To this point we want both parameters (-i and -p ) to be present, if not exit.
+# thanks to: https://unix.stackexchange.com/questions/621004/bash-getopts-mandatory-arguments
+shift "$(( OPTIND - 1 ))"
+if [ -z "$inputFile" ] || [ -z "$pattern" ]; then
+        feedback::sayfrom "Missing -i or -p option"  "error"
+        exit 1
+fi
+
+# Now let's check if file exists.
+fileExists=$(file::file_exists $inputFile)
+if [[ $fileExists -eq 1 ]];then
+	feedback::sayfrom "Unable to find file: ${inputFile}. Maybe missing -i option?" "error"
+	echo "$help"
+	exit 1
+fi
+
+#-------------------------------- SCRIPT'S CORE --------------------------
+
+if [ "$remove" == TRUE ];then
+
+    sed "/$pattern/d" $inputFile
+
+else
+
+    grep -e $pattern $inputFile
+
+fi
+#-------------------------------------------------------------------------
+
+
+#Cleaning up!
+if [ "$eraseFile" == 0 ];then
+        rm $inputFile
+fi
+
+exit 0;

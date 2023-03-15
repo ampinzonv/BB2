@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# @file bb_sequence_info
+# @brief Displays general information from every entry in a FASTA (Nucleotide) file.
+# @description 
+#	This function displays statistics from every entry in a fasta/fastq  files holding nucleotide  information.
+# @example 
+#	bb_sequence_info -i [FILE] 
+# @arg -i (mandatory) path to FASTA or FASTQ file.
+# @arg 
+# @arg 
+
+# NOTICE
+# This script has a different behaviour from bb_file_info. Hereby we report
+# general stats for every single sequence in a FASTA file (wether single or multiple).
+
+
+# A nice discussion on how to do this using awk can be found here: 
+# https://stackoverflow.com/questions/23992646/sequence-length-of-fasta-file
+# It seems this solution was implemented by swdfrost here: 
+# https://github.com/sdwfrost/biobash/blob/master/lenseq.sh
+
+# The --only_id flag is key. Because it allow us to override the whole fasta header description
+# and therefore is easier to retrieve only lengths. This is the output:
+# ID1   sequence-length1
+# ID2   sequence-length2
+# IDn   sequence-lengthn
+
+# then we sort by second field: -k2 (from higher to lower)
+$BIOBASH_BIN_OS/seqkit fx2tab --length --name --only-id "$1" | sort -k2 | head -n 1
+
+exit 0

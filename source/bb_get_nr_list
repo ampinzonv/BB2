@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+# @file bb_get_list
+# @brief Gets a non redundant list of items or displays its frequency.
+# @description 
+#	Given a one column list of redundant items, generates a new non redundant list with or without frequencies.
+# @example 
+#	bb_get_nr_list -f -i fileWithRedundantItems 
+# @arg -i A one column file.
+# @arg -f [optional] 
+
+
+# Only source libraries needed.
+source "$BIOBASH_NATIVE_LIB_PATH/io.sh"; 
+source "$BIOBASH_NATIVE_LIB_PATH/file.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/feedback.sh";
+
+#Input validation
+hasArgs=$(io::script_has_args "$#")
+isPipe=$(io::input_is_pipe)
+
+# If there are no arguments and not data stream.
+if [[ $hasArgs = 1 && $isPipe = 1 ]]; then
+
+	helpUsage="bb_get_nr_list -i [file] -f
+	Where [file] is a redundant one column (sorted or unsorted) simple text file. 
+       The  -f is optional and displays items frequencies."
+
+	helpDesc="Retrieves a sorted and non redundant list of items. Optionally displays items frequencies."
+
+	# DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+	exit 0
+fi
+
+# We continue with the section where data is not coming from a stream of data.
+# In this case there are arguments but data must come from a input file.
+# Hereby inputFile becomes $OPTARG.
+if [[ $hasArgs = 0 && $isPipe = 1 ]]; then
+	while getopts i:f option; 
+	do
+		case "${option}" in
+			i)
+				inputFile="$OPTARG";;
+            f)
+                freq=TRUE;;	#Show items frequencies.
+				
+			\?)
+				feedback::sayfrom "Unknown parameter option." "error"
+				echo "${help}"
+				exit;;
+		esac
+	done
+fi
+
+
+# DEALING WITH DATA STREAM STDIN == STDOUT (terminal)
+if [[ $isPipe = 0 ]]; then
+
+	# It is key to capture the data stream using $(cat -) and not: $(cat -- "$@")
+    # The latter cuases a lot of problems during pipes with arguments such as:
+    # cat "hola" | bb_get_list -f
+    #check: https://stackoverflow.com/questions/2746553/read-values-into-a-shell-variable-from-a-pipe
+    # 
+    data=$(cat -)
+	inputFile=$(file::make_temp_file)
+    # write to file	
+	echo "$data" > $inputFile
+
+	#This is  hack used to clean the environment. The only reason we will erase user data
+	# is because we created, as this temporary file.  This flag will let us know that
+	# we can safely erase this file.
+	eraseFile=0
+
+    
+    if [[ $hasArgs = 0 ]]; then
+
+        while getopts f option; 
+        do
+            case "${option}" in
+                
+                f)
+                    freq=TRUE;;	#Show items frequencies.
+                    
+                \?)
+                    feedback::sayfrom "Unknown parameter option." "error"
+                    echo "${help}"
+                    exit;;
+            esac
+        done 
+
+    fi
+
+fi
+
+# To this point we should have a valid file to work with.
+fileExists=$(file::file_exists $inputFile)
+if [[ $fileExists -eq 1 ]];then
+	feedback::sayfrom "Unable to find file: ${inputFile}. Maybe missing -i option?" "error"
+	echo "$help"
+	exit 1
+fi
+
+# To this point we have a file to work with. No need to check if it FASTA. 
+# Still we do not have a function: "isList" as in "isFASTA" or "isFASTQ".
+
+
+
+
+#-------------------------------- SCRIPT'S CORE ---------------------------
+
+if [ "$freq" == TRUE ]; then
+
+    FILE=$(file::make_temp_file)
+    FILE2=$(file::make_temp_file) 
+    
+    cat $inputFile | sort | uniq -c  > "$FILE"
+
+
+    #Get the total number of items in the input file.
+    numCat=$(wc -l "$inputFile" | awk '{print $1}') #number of items in list
+
+    
+    #Here one we are going to iterate through the file just created above
+    while read line
+    do	
+        # get first colum: frequency. At this point each row in FILEA variable looks like:
+        # 2 itemA
+        # 6 itemB
+        # ...
+        # So we will get the first column (2) and second one (itemA),
+        freq=$(echo $line | awk '{print $1}') 
+        freq=$(echo $freq "	") #put a tab after the column
+        col2=$(echo $line | cut -d " " -f2-) #get everything from second column on.
+        #More on the "scale" special variable and other bc stuff:
+        #https://www.gnu.org/software/bc/manual/html_mono/bc.html
+        perc=$(echo "scale=2;($freq*100)/$numCat" | bc -l)
+        perc=$(echo $perc "	")
+        echo "$freq" "$perc" "$col2" >> $FILE2
+
+    done < $FILE
+
+    sort -gr $FILE2 #gr numerical sort in reverse order.
+
+    rm $FILE $FILE2
+
+else
+
+    FILEA=$(file::make_temp_file)
+    FILEB=$(file::make_temp_file)
+    FILEC=$(file::make_temp_file)
+	
+    cat $inputFile | sort  > $FILEA
+    uniq -u $FILEA > $FILEB   #Only lines that are not repeated
+    uniq -d $FILEA > $FILEC   #Only lines that are repeated.
+    cat $FILEB $FILEC | sort
+
+    #Cleaning UP
+    # ONLY EXECUTED when data comes from a pipe and temp file was created above.
+    # Note here that $tmpFastaFile is quoted and that we are using "==" instead of"
+    # "-eq". This is because BB was complaining about a unary operator expected.
+    # The whole theory here: https://codefather.tech/blog/bash-unary-operator-expected/
+    if [ "$eraseFile" == 0 ];then
+        rm $inputFile
+    fi
+
+        rm $FILEA $FILEB $FILEC
+
+fi
+#-------------------------------------------------------------------------
+
+
+exit

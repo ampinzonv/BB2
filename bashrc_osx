@@ -1,0 +1,39 @@
+
+#                          - BIOBASH -
+# This section was automatically added to your .bashrc file by the
+# BIOBASH installer on: 05-07-2022.
+# A copy of your original .bashrc file was created with name: .bashrc_BB.backup.05-07-2022
+
+# DO NOT modify below unless you are completely sure what you are doing
+# otherwise BIOBASH may not function at all.
+#
+
+BIOBASH_HOME=/Users/andres/Dev/repo/BB2
+BIOBASH_LIB=/Users/andres/Dev/repo/BB2/lib 
+BIOBASH_BIN=/Users/andres/Dev/repo/BB2/source
+BIOBASH_OS=osx
+BIOBASH_BIN_OS=/Users/andres/Dev/repo/BB2/bin/osx/64
+
+SHML_LIB=/Users/andres/Dev/repo/BB2/lib/shml/shml.sh
+BASHUTILITY_LIB_PATH=/Users/andres/Dev/repo/BB2/lib/bash-utility
+BASHUTILITY_LIB=/Users/andres/Dev/repo/BB2/lib/bash-utility/bash_utility.sh
+BIOBASH_NATIVE_LIB_PATH=/Users/andres/Dev/repo/BB2/lib/bb_native
+BIOBASH_NATIVE_LIB=/Users/andres/Dev/repo/BB2/lib/bb_native/bb_native.sh
+
+
+export BIOBASH_HOME
+export BIOBASH_LIB
+export BIOBASH_BIN
+export BIOBASH_OS
+export BIOBASH_BIN_OS
+export SHML_LIB
+export BASHUTILITY_LIB_PATH
+export BASHUTILITY_LIB
+export BIOBASH_NATIVE_LIB_PATH
+export BIOBASH_NATIVE_LIB
+
+
+export PATH=/Users/andres/Dev/repo/BB2:/Users/andres/Dev/repo/BB2/bin/osx:/Users/andres/Dev/repo/BB2/bin//Users/andres/BB/biobash-0.1:/Users/andres/Applications/0.1/bin/linux:/Users/andres/Applications/0.1/bin/osx:/Users/andres/BB/biobash-0.1:/Users/andres/Applications/0.1/bin/linux:/Users/andres/Applications/0.1/bin/osx:/Users/andres/BB/biobash-0.1:/Users/andres/Applications/0.1/bin/linux:/Users/andres/Applications/0.1/bin/osx:/Users/andres/Applications/0.1:/Users/andres/Applications/0.1/bin/linux:/Users/andres/Applications/0.1/bin/osx:/Users/andres/Applications/0.1/bin/osx:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+
+

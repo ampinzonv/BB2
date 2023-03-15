@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+#
+# Uninstalls BIOBASH.
+#
+source $BIOBASH_LIB/shml/shml.sh
+
+
+#--------------------------------------------------------------------
+#                             FUNCTIONS
+#--------------------------------------------------------------------
+# This pice of code was taken from: 
+#  https://unix.stackexchange.com/questions/108873/removing-a-directory-from-path
+# A response from: https://unix.stackexchange.com/users/1655/amphetamachine
+remove_from_path(){
+
+    echo "Removing $1 from PATH."
+    dir_to_remove=$1
+    PATH=:$PATH:
+    while [[ $PATH = *":$dir_to_remove:"* ]]; do
+        PATH=${PATH//":$dir_to_remove:"/:}
+    done
+    # Trim off ":" from the beginning and end.
+    PATH=${PATH#:}
+    PATH=${PATH%:}
+}
+
+
+
+echo "
+"
+
+echo "
+$(hr)
+$(emoji fire) $(attribute bold)You are about to UNINSTALL BioBash from your system.$(attribute end) $(emoji fire)
+$(hr)
+
+  If you decide to continue, the following directory: 
+
+  $(attribute invert) $BIOBASH_HOME $(attribute end)
+
+  and all its contents will be $(attribute bold)completely erased$(attribute end).
+
+  Your .bashrc file will be also edited and all variables that were appended to it
+  during BioBash installation will be erased. This is a safe procedure and your bashrc file
+  will still hold all other configurations.
+"
+#Flow control. Answer should be "y" or "n"
+continue=0
+until [ $continue  == "y" ] || [ $continue == "n" ]
+do
+    read -p 'Proceed? [y/n]: ' continue
+done
+
+if [[ $continue == "n" ]]; then
+    
+    echo "
+    $(emoji =p) Good decision! BioBash Rocks!!!!.
+    
+    Nothing done. Keep enjoying BioBash.
+    
+    "
+    exit 0
+    
+elif [[ $continue == "y" ]];then
+
+    #################################################################
+    #
+    #  ACTUALLY REMOVING BIOBASH
+    #
+    #################################################################
+    # Before removing BIOBASH_HOME clean path. Since installation appends BB install dir to
+    # PATH after several installs it is cluttered.
+
+    echo " 
+$(emoji check) Cleaning up PATH: 
+    "
+    remove_from_path "$BIOBASH_HOME"
+    remove_from_path "$BIOBASH_BIN"
+    remove_from_path "$BIOBASH_BIN_OS"
+
+    # Edit bashrc file
+    # This line of code will erase anything between #BIOBASH-BEGIN and #BIOBASH-END
+    # tags.
+    sed -ie "/^#BIOBASH-BEGIN/,/^#BIOBASH-END/d" ~/.bashrc
+
+    echo "
+$(emoji check) Removing: $BIOBASH_HOME"
+    rm -Rf $BIOBASH_HOME
+    
+    #Check that directory was actually removed from system.
+    #-e means directory exist
+    if [[ -e $BIOBASH_HOME ]];then
+    
+        echo "Unable to erase $BIOBASH_HOME.
+        Are you sure you have the right permissions to perform this action?
+        
+        Unisntalling was NOT succesful."
+        exit 1
+        
+    elif [[ ! -e $BIOBASH_HOME ]];then
+        echo "
+        Uninstall was succesful. Thank you for using BioBash
+        Bye. $(emoji wave)
+    
+        "
+        exit 0
+    else
+        echo "[UNKNOWN UNINSTALL ERROR CODE 1]
+        "
+    exit 1
+    fi
+else
+    
+    echo "[UNKNOWN UNINSTALL ERROR CODE 2]
+    "
+    exit 1
+fi

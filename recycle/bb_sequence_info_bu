@@ -1,0 +1,292 @@
+#!/usr/bin/env bash
+# @file bb_fasta_info
+# @brief Displays general information from a FASTA (Nucleotide or protein) or FASTQ file.
+# @description 
+#	This function displays statistics from a fasta/fastq  files holding nucleotide or protein information.
+# @example 
+#	bb_seq_info -i [FILE] -t [type]
+# @arg -i FASTA/FASTQ file.
+# @arg -t Sequence type: N or P (nucleotide or protein)
+
+# Only source libraries needed.
+source "$BIOBASH_NATIVE_LIB_PATH/io.sh"; 
+source "$BIOBASH_NATIVE_LIB_PATH/file.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/feedback.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/string.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/array.sh";
+
+hasArgs=$(io::script_has_args "$#")
+isPipe=$(io::input_is_pipe)
+
+# If there are no arguments and not data stream.
+if [[ $hasArgs = 1 && $isPipe = 1 ]]; then
+
+	helpUsage="bb_fasta_info -i [file] -t [sequence type]
+	Where [file] is  FASTA/FASTQ file. 
+       Sequence type (-t) can be wether P|p for protein sequence or N|n for nucleotide sequence."
+       
+
+	helpDesc="Displays general information from a FASTA (Nucleotide or protein) or FASTQ file."
+
+	# DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+	exit 0
+fi
+
+
+if [[ $hasArgs = 0 && $isPipe = 1 ]]; then
+	while getopts i:t: option; 
+	do
+		case "${option}" in
+
+			i) 
+                inputFile="$OPTARG";;
+            t) 
+                type="$OPTARG";;
+			\?)
+				feedback::sayfrom "Unknown parameter option." "error"
+				exit;;
+		esac
+	done
+fi
+
+#######################################################
+# DEALING WITH DATA STREAM STDIN == STDOUT (terminal)
+#
+# Since we have mandatory arguments this is necessary, hwe are here because data
+# comes from a pipe and it should have arguments.
+#######################################################
+
+if [[ $isPipe = 0 ]]; then
+
+
+	# It is key to capture the data stream using $(cat -) and not: $(cat -- "$@")
+    # The latter cuases a lot of problems during pipes with arguments such as:
+    # cat "hola" | bb_get_list -f
+    #check: https://stackoverflow.com/questions/2746553/read-values-into-a-shell-variable-from-a-pipe
+    # 
+    data=$(cat -)
+	inputFile=$(file::make_temp_file)
+	
+    # write to file	
+	echo "$data" > $inputFile
+	
+	#Used to clean up environment
+	eraseFile=0
+
+	#This is  hack used to clean the environment. The only reason we will erase user data
+	# is because we created, as this temporary file.  This flag will let us know that
+	# we can safely erase this file.
+	eraseFile=0
+
+
+    while getopts t: option; 
+    do
+        case "${option}" in
+                
+        t)
+            type="$OPTARG";;
+                    
+        \?)
+            feedback::sayfrom "Unknown parameter option." "error"
+            echo "${help}"
+            exit;;
+        esac
+    done 
+fi
+
+# To this point we want both parameters (-i and -p ) to be present, if not then exit.
+# thanks to: https://unix.stackexchange.com/questions/621004/bash-getopts-mandatory-arguments
+shift "$(( OPTIND - 1 ))"
+if [ -z "$inputFile" ] || [ -z "$type" ]; then
+        feedback::sayfrom "Missing -i or -t option"  "error"
+        exit 1
+fi
+
+# Asses data type. In future version we could implement the function
+# file::guess_sequence_type() By now we have to rely on user definition of data type.
+if [[ "$type" == "P"  || "$type" == "p" ]]; then 
+    
+    dataType="prot"
+    
+elif [[ "$type" == "N"  || "$type" == "n" ]]; then 
+
+    dataType="nuc"
+
+else
+
+    feedback::sayfrom "-t option should be P,p, N or n." "error"
+	exit 1
+
+fi
+
+#####################################################################
+# To this point we have a file and a valid data type.
+#####################################################################
+
+# ------ Check if file exists -------
+fileExists=$(file::file_exists $inputFile)
+if [[ $fileExists -eq 1 ]];then
+	feedback::sayfrom "Unable to find file: ${inputFile}." "error"
+	exit 1
+fi
+
+# ------ Check if it is a valid fasta file -------
+isFasta=$(file::is_fasta $inputFile) 
+if [[ $isFasta == "0" ]]; then
+	true
+fi
+
+#####################################################################
+#                       SCRIPT'S CORE
+#####################################################################
+
+# ---- Working on nucleotide data
+seqNumber=$($BIOBASH_HOME/source/bb_count_seqs -i $inputFile)
+echo "File            : $(file::name $inputFile)"
+echo "Sequences       : $seqNumber"
+
+
+if [[ $dataType = "nuc" ]]; then
+
+	# FASTQ?
+	isFastq=$(file::is_fastq $inputFile)
+	if [[  $isFastq -eq 0  ]];then
+		
+		outFile=$(file::make_temp_file)
+		eraseOutFile=0
+
+		# We can head -n 3 for short outputs
+		#seqtk fqchk $inputFile | head -n 3 | sed -e 's/;//g' > $outFile
+		seqtk fqchk $inputFile | head -n 3 | sed -e 's/;//g' > $outFile
+		
+		minL=$(head -n 1 $outFile | awk '{ print $2 }')
+		maxL=$(head -n 1 $outFile | awk '{ print $4 }')
+
+		G=$(cat $outFile | sed 1,2d | awk '{ print $5 }')
+		C=$(cat $outFile | sed 1,2d | awk '{ print $4 }')
+		N=$(cat $outFile | sed 1,2d | awk '{ print $7 }')
+		T=$(cat $outFile | sed 1,2d | awk '{ print $2 }')
+		
+
+		echo "Total residues  : ${T}"
+		echo "Length (min-max): ${minL}-${maxL}"
+		echo "%G              : ${G}"
+		echo "%C              : ${C}"
+		echo "%N              : ${N}"
+		#echo "--"
+		#cat $outFile | sed 1d
+		
+
+	else
+
+		outFile=$(file::make_temp_file)
+		eraseOutFile=0
+		#infoseq -sequence $inputFile -auto -stdout -only -name -length -pgc -desc
+		infoseq -sequence ${inputFile} -auto -outfile ${outFile} -only -name -length -pgc -desc -noheading
+		
+		
+		# Maybe there is a more elegant way of obtaining max and min lengths, but for now...
+		# IMPORTANT to use "-n" on sort for numerical stuff.
+		maxL=$(awk '{ print $2 }' $outFile | sort -rn | head -n 1)
+		minL=$(awk '{ print $2 }' $outFile | sort -rn | tail -n 1)
+
+		#awk '{ print $2 }' $outFile | sort -h > A
+		#exit
+
+		minGC=$(awk '{ print $3 }' $outFile | sort -rn | tail -n 1)
+		maxGC=$(awk '{ print $3 }' $outFile | sort -rn | head -n 1)
+
+		total=$(grep -v  -e "^>" $inputFile | tr -d '\n' | wc -m | tr -d ' ')
+		N=$(grep -e "^>" -v  $inputFile | grep -o -e "N" | wc -l | tr -d ' ')
+		perc=$(echo "(($N)*100)/$total" | bc)
+		
+		# --- GET N50 ---
+		
+		#get all Lengths, sort from Max to min (key) and replace new lines by ";"
+		allL=$(cat $outFile | awk '{ print $2 }' | sort -rn | tr "\n" ";")
+		
+		#Remove last ";"
+		allL=$(string::rstrip ${allL} ';')
+
+		#Put everything into an array
+		seqLengths=( $(string::split $allL ";") )
+
+
+		sum=0
+		index=0
+		# For N50 threshold is the value that contains approximately the 50% of the assembly. 
+		threshold=$(echo "(50*${total})/100" | bc)
+		
+		for i in "${seqLengths[@]}"; do
+			let sum+=$i
+			
+			# If sum value equals or is greater than threshold, we have reached the N50.
+
+			# Nevertheless it is important to note that in some cases the contig that satisfies
+			# this condition can over pass the treshold and be far away from it, even more
+			# than the contig that did not satisfied the condition. For example:
+			# Assembly: 100
+			# Threshold: 50
+			# Contigs: 25, 20, 15, 5, 5, 5...
+			# Sum:
+			# 25  +  20 +  15  +  5  +  5  +  4  +  3 ...
+			#         |     |     |     |
+			#	      45    60    65    70 .....
+			#
+			#  45 is just 5 bases from 50
+			#  60 is 15 bases away from 50
+			#
+			# In this case, the N50 should be 45 or 60? I think 45, the latter (60)
+			# looks more like a N60 or so.
+			
+			if [[ $sum -ge $threshold ]]; then
+
+				n50="${seqLengths[$index]}"
+				break
+			fi
+
+			#Increment index
+			let index++
+
+		done
+
+
+		# --- OUTPUT ---
+		echo "Total residues  : ${total}"
+		echo "Length (min-max): ${minL}-${maxL}"
+		echo "%GC (min-max)   : ${minGC}-${maxGC}"
+		echo "Number of N's   : ${N}"
+		echo "%N's            : ${perc}"
+		echo "N50             : $n50"
+		
+		
+
+		#echo "--"
+		#echo "Name	Length	%GC	Description"
+		#cat $outFile
+
+	fi
+
+fi
+
+
+# ----  Working on protein data
+if [[ $dataType = "prot" ]]; then
+
+	pepstats -sequence $inputFile -auto -stdout
+
+fi
+
+
+##################
+# Clening up
+##################
+if [ "$eraseFile" == 0 ];then
+	rm $inputFile
+fi
+if [ "$eraseOutFile" == 0 ];then
+	rm $outFile
+fi
+
+exit 0

@@ -1,0 +1,233 @@
+#!/usr/bin/env bash
+#
+# Performs the installation of BIOBASH.
+#
+
+#Common libraries
+source lib/shml/shml.sh
+source lib/bb_native/check.sh
+source lib/bb_native/file.sh
+
+
+#----------------------------------------------------------------------------
+#
+#  FUNCTIONS
+#
+#----------------------------------------------------------------------------
+
+# Reads user input to define installation directory. Returns real path to dir.
+function define_install_dir() {
+    read -p "Install in (/usr/local): " dir
+
+    #If user hitted ENTER, $dir comes empty, so use default install dir.
+    #Otherwise use user provided path.
+    if [ -z "$dir" ]; then
+        dir=$default
+    else
+        dir=$dir
+    fi
+    #realpath for installDir. No relative paths allowed.
+    #There is a bug with paths like "~/path/to/dir". For some reason "realpath" do not
+    #resolve this type of path in the script, but it does in the shell!!??
+    #return=$(realpath "${dir}")
+    return=$(file::full_path "${dir}")
+    
+    #Return value
+    echo "$return"
+}
+
+
+
+
+# Some propaganda/user feedback.
+echo "
+
+$(fgcolor green '                 = BIOBASH INSTALLER =') $(fgcolor end)       
+$(fgcolor green '         Bioinformatics and Systems Biology Laboratory') $(fgcolor end)
+$(fgcolor green '   Institute for Genetics -  National University of Colombia') $(fgcolor end)
+"
+
+#----------------------------------------------------------------------------
+#
+#  BEFORE ATTEMPTING ANYTHING... check pre-requisites.
+#
+#----------------------------------------------------------------------------
+./check_dependencies.sh
+
+#If check dependencies was succesful it creates a "flag" file: depend_ok
+#otherwise (file doesn`t exist) there are dependencies to be met. Stop installation.
+if [[ ! -e depend_ok ]];then
+	
+	echo "Quitting installation of BioBash.
+	"
+	exit 1
+fi
+
+# If we reached this point it means dependencies check was succesful and therefore
+# it is safe to erase depend_ok file. It is not needed from now on.
+rm depend_ok
+
+
+
+
+#----------------------------------------------------------------------------
+#
+#          START ACTUAL INSTALLATION
+#
+#-----------------------------------------------------------------------------
+
+# We are assuming a standard installation on a Linux/OSX Machine (at least
+# for now). This is the default directory for installation.
+default="/usr/local"
+
+
+echo " Initiating BioBash installation."
+echo "$(hr)"
+
+echo  "
+The installation directory is the place where all BioBash related files will be stored,
+including libraries and binaries. By default BioBash will be installed in '$default' directory,
+nevertheless you need write permissions on that folder. Alternatively you can define  a
+path to another installation directory.
+Hit ENTER to use the default installation directory ($default) or provide a
+valid installation path:
+"
+
+installDir="$(define_install_dir)"
+
+
+# Wether install will be performed on user defined or default install dir, it is
+# important to make sure that it exists and that we can write on it.
+# Does it exist?
+if [ ! -d "${installDir}" ];then
+    
+ 
+	echo "$installDir does not exist. Please make sure it is a valid directory.
+	"
+	exit 1
+
+fi
+
+# If we reached this point it means directoy exists. Check if it is writable.
+if [ ! -w "$installDir" ];then
+	echo "I can not write to: $installDir. Please make sure you have the right permissions on that folder."
+	exit 1
+
+fi
+
+
+
+#If we reached this point, it means we can proceed with installation. 
+#----------------------------------------------------------------------
+#
+#                          MAIN INSTALLATION
+#
+#-----------------------------------------------------------------------
+# "version" is a file in main install dir
+BBVERSION=$(cat version)
+BIOBASH_HOME=$(echo "$installDir/biobash-$BBVERSION")
+
+#User feedback
+echo "
+$(hr)
+"
+echo "
+Everything looks ok and I am ready to install BioBash version $BBVERSION in $BIOBASH_HOME.
+"
+
+#Flow control. Answer should be "y" or "n"
+continue=0
+until [ $continue  == "y" ] || [ $continue == "n" ]
+do
+    read -p 'Proceed? [y/n]: ' continue
+done
+
+if [[ $continue == "n" ]]; then
+    
+    echo "
+    Thank you for your interest in BioBash.
+    Nothing done. Quitting installation.
+    
+    Bye!
+    
+    "
+    exit 0
+    
+elif [[ $continue == "y" ]];then
+    echo ""
+else
+    echo "ERROR: Installation can not proceed. Unknown reason."
+    exit 1
+fi
+
+
+#Create BIOBASH directory. The "-p" option is useful when re-trying the installation multiple times,
+#so if the directory was created before it won't complain because directory already exists.
+mkdir -p "$BIOBASH_HOME"
+
+
+#----------------------------------------------------------------------------
+#
+#                            SETUP ENVIRONMENT
+#
+# This routine puts all needed  environmental variables into bashrc
+# 
+#----------------------------------------------------------------------------
+#Note that we are sending the $BIOBASH_HOME variable to the script!!!
+./setup_environment.sh "$BIOBASH_HOME"
+
+#If environment setup was succesful it creates a "flag" file: environ_ok
+#otherwise (file doesn`t exist) there were errors. Stop installation.
+if [[ ! -e environ_ok ]];then
+	
+	echo "Quitting installation of BioBash.
+	"
+	exit 1
+fi
+
+# If we reached this point it means environment set up was succesful and therefore
+# it is safe to erase depend_ok file. It is not needed from now on.
+rm environ_ok
+
+
+
+#----------------------------------------------------------------------------
+#
+#                            Copy libraries
+#
+#            This routine copies libraries and stuff in BIOBASH_HOME
+# 
+#----------------------------------------------------------------------------
+
+# Future version needs a better selection of what to install.
+cp -r ./lib "$BIOBASH_HOME"
+cp -r ./bin "$BIOBASH_HOME"
+cp source/bb_* "$BIOBASH_HOME" #These are all the actual BB scripts.
+
+
+#----------------------------------------------------------------------------
+#
+#                            Install Interfaces
+#
+#            This routine copies libraries and stuff in BIOBASH_HOME
+# 
+#----------------------------------------------------------------------------
+
+
+echo "
+$(emoji thumbsup) [BIOBASH WAS INSTALLED SUCCESFULLY!]
+
+$(attribute bold) Before using BioBash$(attribute end) please update your environment with the following command:
+
+   > source ~/.bashrc
+   
+   Alternatively you can open a new terminal or logout and login from your account.
+   
+   $(attribute bold)Thank you for installing BIOBASH $(attribute end)
+   
+           Bioinformatics and Systems Biology Laboratory
+    Institute for Genetics - National University of Colombia
+                    Bogota - Colombia 2022
+"
+exit 0
+

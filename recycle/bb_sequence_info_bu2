@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+# @file bb_fasta_info
+# @brief Displays general information from a FASTA (Nucleotide) or FASTQ file.
+# @description 
+#	This function displays statistics from a fasta/fastq  files holding nucleotide  information.
+# @example 
+#	bb_seq_info -i [FILE] -p [INT]
+# @arg -i FASTA/FASTQ file.
+# @arg -p  Processors (optional): Number of processor (cpu cores) to use.
+
+# Only source libraries needed.
+source "$BIOBASH_NATIVE_LIB_PATH/io.sh"; 
+source "$BIOBASH_NATIVE_LIB_PATH/file.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/feedback.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/string.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/array.sh";
+
+hasArgs=$(io::script_has_args "$#")
+isPipe=$(io::input_is_pipe)
+
+# If there are no arguments and not data stream.
+if [[ $hasArgs = 1 && $isPipe = 1 ]]; then
+
+	helpUsage="bb_fasta_info -i [file] -p [Number]
+	Where [file] is  FASTA/FASTQ file. 
+       Processors (-p) Number of processor (cpu cores) to use."
+       
+
+	helpDesc="Displays general information from a FASTA (Nucleotide) or FASTQ file."
+
+	# DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+	exit 0
+fi
+
+
+#Define a default value for CPU cores to use.
+cores=1
+
+if [[ $hasArgs = 0 && $isPipe = 1 ]]; then
+	while getopts i:p: option; 
+	do
+		case "${option}" in
+
+			i) 
+                inputFile="$OPTARG";;
+            p) 
+                cores="$OPTARG";;
+
+			\?)
+				feedback::sayfrom "Unknown parameter option." "error"
+				exit;;
+		esac
+	done
+fi
+
+				
+
+#######################################################
+# DEALING WITH DATA STREAM STDIN == STDOUT (terminal)
+#
+# Since we have mandatory arguments this is necessary, hwe are here because data
+# comes from a pipe and it should have arguments.
+#######################################################
+
+if [[ $isPipe = 0 ]]; then
+
+
+	# It is key to capture the data stream using $(cat -) and not: $(cat -- "$@")
+    # The latter cuases a lot of problems during pipes with arguments such as:
+    # cat "hola" | bb_get_list -f
+    #check: https://stackoverflow.com/questions/2746553/read-values-into-a-shell-variable-from-a-pipe
+    # 
+    data=$(cat -)
+	inputFile=$(file::make_temp_file)
+	
+    # write to file	
+	echo "$data" > $inputFile
+	
+	#Used to clean up environment
+	eraseFile=0
+
+	#This is  hack used to clean the environment. The only reason we will erase user data
+	# is because we created, as this temporary file.  This flag will let us know that
+	# we can safely erase this file.
+	eraseFile=0
+
+
+    while getopts p: option; 
+    do
+        case "${option}" in
+                
+        p)
+            cores="$OPTARG";;
+                    
+        \?)
+            feedback::sayfrom "Unknown parameter option." "error"
+            echo "${help}"
+            exit;;
+        esac
+    done 
+fi
+
+
+
+
+
+#####################################################################
+# To this point we have a file.
+#####################################################################
+
+# ------ Check if file exists -------
+fileExists=$(file::file_exists $inputFile)
+if [[ $fileExists -eq 1 ]];then
+	feedback::sayfrom "Unable to find file: ${inputFile}." "error"
+	exit 1
+fi
+
+
+
+#####################################################################
+#                       SCRIPT'S CORE
+#####################################################################
+# No matter which type (FASTA/FASTQ) we perform the whole analysis.
+# There after then we decide which information should be shown accordingly.
+# Note that we get rid of the header, because we will adapt it according to our requirements.
+result=$(${BIOBASH_BIN_OS}/seqkit stats -a -b  $inputFile -j $cores | tail -n 2)
+
+
+#--- Check data type and define headers and other stuff accordingly ---
+isFasta=$(file::is_fasta $inputFile) 
+if [[ $isFasta == "0" ]]; then
+	
+	#Calculate % of N's (Are we overheading the run time just for this kind of info?)
+	#N=$(grep -v "^>" $inputFile | grep "N" -o -i | wc -l | tr -d ' ')
+	#perc=$(echo "(($N)*100)/$total" | bc)
+
+	threshold90=$(echo "(90*${total})/100" | bc)
+		for i in "${seqLengths[@]}"; do
+			let sum+=$i
+	
+			#Get N90
+			if [[ $sum -ge $threshold90 ]]; then
+
+				n90="${seqLengths[$index]}"
+				break
+			fi
+
+			#Increment index
+			let index++
+
+		done
+
+	echo "$result"
+	
+else
+
+	echo "$result"
+fi
+
+exit
+
+
+
+
+
+# When output comes from STDIN Seqkit shows the path to the temporary file created
+# so we need this conditional to get rid of it (the "sed" part.)
+#https://unix.stackexchange.com/questions/595839/how-to-remove-column-from-file-without-altering-format
+if [ $isPipe = 0 ];then
+
+	$BIOBASH_BIN_OS/seqkit stats -a -b $inputFile -j $cores| sed -r 's/^[^[:blank:]]+[[:blank:]]+//'
+
+else
+
+	$BIOBASH_BIN_OS/seqkit stats  -a -b  $inputFile -j $cores | awk -v v="$ns" '{print $0,  v}'
+
+fi
+
+
+##################
+# Clening up
+##################
+if [ "$eraseFile" == 0 ];then
+	rm $inputFile
+fi
+if [ "$eraseOutFile" == 0 ];then
+	rm $outFile
+fi
+
+exit 0

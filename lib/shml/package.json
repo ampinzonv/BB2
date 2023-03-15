@@ -1,0 +1,33 @@
+{
+  "name": "shml",
+  "version": "1.1.0",
+  "description": "SHML is a shell framework for faster and easier script development.",
+  "bin": {
+      "shml": "shml.sh",
+      "shml.sh": "shml.sh"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/odb/shml.git"
+  },
+  "keywords": [
+    "sh",
+    "color",
+    "bash",
+    "zsh",
+    "linux",
+    "darwin"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/odb/shml/issues"
+  },
+  "homepage": "http://shml.xyz/"
+}

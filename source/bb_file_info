@@ -1,0 +1,208 @@
+#!/usr/bin/env bash
+# @file bb_file_info
+# @brief Displays general information from a FASTA (Nucleotide) or FASTQ file.
+# @description 
+#	This function displays statistics from a fasta/fastq  files holding nucleotide  information.
+# @example 
+#	bb_file_info -i [FILE] -p [INT]
+# @arg -i -i (mandatory) path to FASTA or FASTQ file.
+# @arg -p (optional) Number of cpu cores to use. Defaults to 1.
+# @arg -h (optional) show header information.
+
+# NOTICE
+# This script operates over a complete FASTA/FASTQ file. Meaning that if it is a multiple file
+# it will report a average of all sequences in this file NOT individual stats for the fasta entries in file.
+# Therefore a sequence_info script is also available in BB to get statistics for all individual
+# sequences in a file.
+
+# Only source libraries needed.
+source "$BIOBASH_NATIVE_LIB_PATH/io.sh"; 
+source "$BIOBASH_NATIVE_LIB_PATH/file.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/feedback.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/string.sh";
+source "$BIOBASH_NATIVE_LIB_PATH/array.sh";
+
+hasArgs=$(io::script_has_args "$#")
+isPipe=$(io::input_is_pipe)
+
+# If there are no arguments and not data stream.
+if [[ $hasArgs = 1 && $isPipe = 1 ]]; then
+
+	helpDesc="Displays general information from a FASTA (Nucleotide) or FASTQ file."
+
+	helpUsage="bb_file_info -i [file] -p [Integer] -h
+	-i (mandatory) path to FASTA or FASTQ file. 
+	-p (optional) Number of cpu cores to use. Defaults to 1.
+	-h (optional) show header information."
+
+	
+
+
+	# DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+	exit 0
+fi
+
+
+#Define a default value for CPU cores to use.
+cores=1
+
+if [[ $hasArgs = 0 && $isPipe = 1 ]]; then
+	while getopts i:p:h option; 
+	do
+		case "${option}" in
+
+			i) 
+                inputFile="$OPTARG";;
+            p) 
+                cores="$OPTARG";;
+			h)
+				showHeader="TRUE";;
+
+			\?)
+				feedback::sayfrom "Unknown parameter option." "error"
+				exit;;
+		esac
+	done
+fi
+
+				
+
+#######################################################
+# DEALING WITH DATA STREAM STDIN == STDOUT (terminal)
+#
+# Since we have mandatory arguments this is necessary, hwe are here because data
+# comes from a pipe and it should have arguments.
+#######################################################
+
+if [[ $isPipe = 0 ]]; then
+
+
+	# It is key to capture the data stream using $(cat -) and not: $(cat -- "$@")
+    # The latter cuases a lot of problems during pipes with arguments such as:
+    # cat "hola" | bb_get_list -f
+    #check: https://stackoverflow.com/questions/2746553/read-values-into-a-shell-variable-from-a-pipe
+    # 
+    data=$(cat -)
+	inputFile=$(file::make_temp_file)
+	
+    # write to file	
+	echo "$data" > $inputFile
+	
+	#Used to clean up environment
+	eraseFile=0
+
+	#This is  hack used to clean the environment. The only reason we will erase user data
+	# is because we created, as this temporary file.  This flag will let us know that
+	# we can safely erase this file.
+	eraseFile=0
+
+
+    while getopts p:h option; 
+    do
+        case "${option}" in
+                
+        p)
+            cores="$OPTARG";;
+		h)
+				showHeader="TRUE";;
+                    
+        \?)
+            feedback::sayfrom "Unknown parameter option." "error"
+            echo "${help}"
+            exit;;
+        esac
+    done 
+fi
+
+
+
+
+
+#####################################################################
+# To this point we have a file.
+#####################################################################
+
+# ------ Check if file exists -------
+fileExists=$(file::file_exists $inputFile)
+if [[ $fileExists -eq 1 ]];then
+	feedback::sayfrom "Unable to find file: ${inputFile}." "error"
+	exit 1
+fi
+
+
+
+#####################################################################
+#                       SCRIPT'S CORE
+#####################################################################
+
+# Note that the sed part in this pipe is used to change any "";"" for "_". Because we are going
+# to use ";" as field delimiter to put all the string into an array (in a next step). So if sequence name has a ";" in its name
+# we are going to skrew it up. This was necessary because something went wrong with tabs and spaces and it was nearly impossible
+# to put the string into an array with those delimiters. Moreover "tr" was the only command capable of doing the correct substitution.
+
+
+#Este script puede ser mas eficiente si omitimos escribir al disco los datos que vienen de un pipe
+#Asi podemos hacer un cat directamente sobre $data. En el casod e chequear si es un fasta hacemos un head de
+# $data y lo enviamos a la función.
+
+
+result=$(${BIOBASH_BIN_OS}/seqkit stats -a -b -T $inputFile -j $cores | tail -n 1 | sed 's/;/_/' | tr "\t" ";")
+
+#Put everything into an array
+resultArray=( $(string::split $result ";") )
+
+
+#Uncomment for debugging only
+#for i in "${array[@]}"; do	echo $i done
+
+
+
+#--- Check data type and define headers and other stuff accordingly ---
+isFasta=$(file::is_fasta $inputFile) 
+if [[ $isFasta == "0" ]]; then
+
+	# If we use case insensitive "i" option in grep, search for "N", running time rises up to ~3X.
+	N=$(grep -e "^>" -v  $inputFile | grep -o -e  "N" | wc -l | tr -d ' ')
+	percN=$(echo "scale=3; (($N)*100)/${resultArray[4]}" | bc)
+		
+	# --- OUTPUT ---
+	fileName=$(file::name $inputFile)
+
+		if [ "$showHeader" == "TRUE" ];then
+
+			echo "File	NumSeqs	Bases	Ns	%Ns	minL	maxL	N50	%GC"
+		fi
+		echo "${resultArray[0]}	${resultArray[3]}	${resultArray[4]}	${N}	${percN}	${resultArray[5]}	${resultArray[7]}	${resultArray[12]}	${resultArray[15]}"
+		
+	
+else
+	if [ "$showHeader" == "TRUE" ];then
+		echo "file	num_seqs	Bases	min_len	avg_len	max_len	Q1	Q2	Q3	N50	Q20(%)	Q30(%)	GC(%)"
+	fi
+	#echo "${resultArray[0]}	${resultArray[3]}	${resultArray[4]}	${resultArray[5]}	${resultArray[6]}	${resultArray[7]}	${resultArray[8]}	${resultArray[9]} ${resultArray[10]}	${resultArray[12]}	${resultArray[15]}"
+		
+		#Info I consider is not necessary
+		unset resultArray[1] #Format
+		unset resultArray[2] #Type
+		unset resultArray[11] #Sum gap
+
+		for i in "${resultArray[@]}"; do
+			printf "$i\t"
+		done
+		
+		#Used to introduce a new line.
+		echo ""
+	fi
+
+##################
+# Clening up
+##################
+if [ "$eraseFile" == 0 ];then
+	rm $inputFile
+fi
+if [ "$eraseOutFile" == 0 ];then
+	rm $outFile
+fi
+
+exit 0

@@ -1,0 +1,164 @@
+2023-04-08 (FORK)
+* KEY CHANGES in the way BB operates. Implementing API.
+* Development bashrc_osx/linux changed to reflect new BB2 folder.
+* Created biobash library file structure.
+* dummy function structure created for Bio::IO module.
+
+2023-04-01
+* By default sequence_info don't show header information. "-h(eader)" optional flag implemented.
+* unit test for sequence_info_implemented
+
+2023-04-01
+* Unit testing added to most implemented functions.
+* eval_outcome in unit_test_functions now evals also float numbers.
+
+2023_02-14
+* bb_sequence_info finalizada.
+* Posibilidad de mejorar performance en bb_sequence_info se registra como enhancement en github issues.
+
+2023_02-13
+* bashrc_osx and bashrc_linux files updated to reflect 64 bits paths.
+
+2023_02-10
+* sequence_info improved performance. We sacrifice N90 for that.
+* sequence_info fasta analysis complete.
+
+
+2023_01-31
+* Fixed bug in sequence_info that showed path to temporary file when script was read from STDIN.
+
+2023_01-30
+* Installation was modified to check for cpucores and cpu architecture.
+* Appropriate installation directories created for different architectures. 
+* Seqkit replaces Seqtk.
+* "Seqkit stast" replaces "seqcounts" from EMBOSS in bb_count_seqs.
+* "Seqkit stast" replaces "infoseq" from EMBOSS in bb_sequence_info.
+
+2023-01-27
+* bb_sequence_info now also determines n50 on fasta files.
+
+2023-01-23
+* Added a protein test file :apoe_prot.fasta
+* Dummy function (file::guess_sequence_type) to guess if a file holds nucleotide or aminoacid data is added to lib/bb_native/file.sh.
+* Added non production stable bb_sequence_info script.
+
+2023-01-17
+* bb_get_list renamed to bb_get_nr_list, still mantains the same double behaviour of displaying a nr list with or without frequencies.
+* Added new script bb_extract_subset_from_list.
+* New tagged version (0.1.3) released.
+
+2023-01-12
+* Fixed bug in bb_get_list when data came from a pipe and the "-f" option was present.
+
+2023-01-12
+* get_nr_list and get_freq_from_list now merged into a sigle script: bb_get_list (-f option to get frequencies).
+
+2022-12-02
+* bb_get_nr_list added to the set of scripts.
+* A new mets.lst file added to the set of testdata.
+* Improved feedback::help function. Now accepts two string variables.
+
+
+2022-11-28
+* Shebang changed to /usr/bin/env bash in all scripts.
+* New feedback::help function added to feedback lib.
+* Created structure to work with  bb_get_nr_list
+
+2022-11-19
+* Emboss added to the list of dependencies check.
+* BB main scripts now moved to a directory called "source".
+* in "installbiobash" script, BB main scripts are now copied from "source" directory.
+
+2022-11-3
+* Solved bug in setup_environment that hardcoded the full $PATH in .bashrc file. This prevented any actualization of PATH variable to take effect, because it was already hardcoded by Biobash installer. Now the variable "$PATH" is writen in the .bashrc file not the hardcoded path (line 208).
+* Fixed bug in bb_get_fasta_headers line 116 with expected unary operator when running script with "-i".
+
+2022-11-3
+* Uninstaller now cleans up bashrc file ufter unistallation.
+* Other minor aesthetic updates  implemented in install/Uninstall.
+
+2022-11-2
+* Uninstallation now erases BB paths from PATH. echo $PATH is now uncluttered.
+* BB installer now hadds a BEGIN and END section to .bashrc. This will be useful for erasing the whole content in uninstallation script.
+
+2022-10-31
+* io.sh functions now return 0 (TRUE) and 1 (FALSE). This is done to keep consistency across most functions in library.
+* An stable version of input check has been reached and implemented in bb_get_fasta_headers.
+* A new version of BB  with this changes released today.
+
+2022-10-28
+* io.sh is updated. input_is_empty was moved to "script_has_args". 
+* input_is_file_or_pipe was moved to "input_is_pipe".  so Each function now evaluates a specific script state.
+
+2022-10-26
+* Input validation now is implemented in a new library called io.sh.
+* Created two functions: input_is_empty and input_is_file_or_pipe. 
+
+2022-09-15
+* Functional input validation of STDIN/STDOUT (issue #3 in GitHub). Although not yet fully implemented. It partially works on bb_get_fasta_headers but has to be implemented as function.
+
+2022-09-14
+* Minor changes to error msg in in bb_get_fasta_headers.
+* Issue #2 in Github marked as solved.
+
+2022-05-15
+* Fixed bug in setup_environment, that prevented "/usr/local/bin" to be searched in $PATH.
+
+2022-05-15
+* "realpath" changed for file::full_path.
+
+2022-05-13
+* bb_native is now the only library used in BB. bash-utility and bb_native  were merged.
+* new function file::is_fasta added to  bb_native/file.sh.
+* new function file::is_multiple_fasta added to  bb_native/file.sh.
+* new function file::is_fastq added to  bb_native/file.sh.
+* New test data for above functions was added.
+* No functional function file::is_vcf added.
+* No functional functions file::is_vcf, file::is_bed, file::is_fast5 were added.
+* Most functions were standarized to utput 0, 1 or 2.
+
+2022-05-10
+* Functional routine to read from STDIN added to bb_get_fasta_headers.
+* Theres still a bug, since calling script without arguments makes it wait forever because of "cat".
+
+2022-05-09
+* Environment vars starting with "BB_" where renamed to "BIOBASH_"
+* Added biobashrc_osx. This is a file to source only for development.
+* New bb_native functions to validate fasta (isFasta) and multiple fasta files (isMultipleFasta).
+
+2022-05-08
+* New BIOBASH_OS variable added in setup_environment. Replaces BIOBASH_OS_osx/linux vars.
+* bb_get_fasta_headers is used as started ponit to create a "model" script forfuther dev. 
+
+2023-03-07
+* sequence_info changed to file_info. It better reflects what it does: operate over a single/multiple file.
+* dummy sequence_info script added. It operates over individual sequences not whole files.
+
+2023-03-05
+* Added unistallation script
+* Fixed BIOBASH_BIN_OS issue that was not getting the path to OS specific binaries.
+
+2023-03-05
+* checkdependencies and installbiobash scripts are stable and perform the minimum necessary
+validations as to be considered "stable".
+* Created a tag with this version of BioBash.
+
+2023-03-05
+* installbiobash script was modified, so it performs basic install now. 
+
+2021-12-15
+* Stripped template bashrc. Left only strictly neccesary variables.
+
+2021-12-05
+* Added check dependencies script.
+* Added seqtk installer.
+
+2021-12-03
+* Defined a new feedback function "say" on bb_native library.
+
+2021-12-02
+* Environmental variables now go harcoded on .bashrc file
+
+2021-12-01
+* General structure and a simple installation script added.
+* Added way around to source environmental variable file in all scripts.
