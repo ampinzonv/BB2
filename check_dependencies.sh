@@ -22,7 +22,8 @@ is missing this installation will be stopped.
 This is a safe procedure that  WILL NOT compromise any of your files, installed programs or your system integrity. 
 
 "
-soft=('zcat' 'wget' 'unzip' 'gzip' 'gnuplot' 'xargs' 'embossversion')
+#soft=('zcat' 'wget' 'unzip' 'gzip' 'gnuplot' 'xargs' 'embossversion')
+soft=('zcat' 'wget' 'unzip' 'gzip' 'xargs' 'embossversion')
 
 #Flow control. Answer should be "y" or "n"
 continue=0

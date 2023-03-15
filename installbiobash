@@ -202,7 +202,7 @@ rm environ_ok
 # Future version needs a better selection of what to install.
 cp -r ./lib "$BIOBASH_HOME"
 cp -r ./bin "$BIOBASH_HOME"
-cp source/bb_* "$BIOBASH_HOME" #These are all the actual BB scripts.
+cp scripts/bb_* "$BIOBASH_HOME" #These are all the actual BB scripts.
 
 
 #----------------------------------------------------------------------------
@@ -227,7 +227,7 @@ $(attribute bold) Before using BioBash$(attribute end) please update your enviro
    
            Bioinformatics and Systems Biology Laboratory
     Institute for Genetics - National University of Colombia
-                    Bogota - Colombia 2022
+                    Bogota - Colombia
 "
 exit 0
 

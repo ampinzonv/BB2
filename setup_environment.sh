@@ -216,8 +216,10 @@ BIOBASH_OS="$OS"
 SHML_LIB="$BIOBASH_LIB/shml/shml.sh" 
 BASHUTILITY_LIB_PATH="$BIOBASH_LIB/bash-utility"
 BASHUTILITY_LIB="$BASHUTILITY_LIB_PATH/bash_utility.sh"
-BIOBASH_NATIVE_LIB_PATH="$BIOBASH_LIB/bb_native"
-BIOBASH_NATIVE_LIB="$BB_NATIVE_LIB_PATH/bb_native.sh"
+#BIOBASH_NATIVE_LIB_PATH="$BIOBASH_LIB/bb_native"
+BIOBASH_NATIVE_LIB_PATH="$BIOBASH_LIB/Bio"
+#This file is used to aggregate all the modules in one big file.
+BIOBASH_NATIVE_LIB="$BIOBASH_LIB/biobash.sh"
 BIOBASH_CORES=$numCores
 
 if [[ $OS == "linux" ]];then
