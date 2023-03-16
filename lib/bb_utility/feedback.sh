@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-source $BIOBASH_HOME/lib/shml/shml.sh
-source $BIOBASH_HOME/lib/bb_native/file.sh
+source $BIOBASH_LIB/shml/shml.sh
+source $BASHUTILITY_LIB_PATH/file.sh
 
 
 # @file Feedback

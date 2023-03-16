@@ -15,10 +15,10 @@ BIOBASH_OS=linux
 BIOBASH_BIN_OS=/home/apinzon/Dev/repo/BB2/bin/linux/64
 
 SHML_LIB=/home/apinzon/Dev/repo/BB2/lib/shml/shml.sh
-BASHUTILITY_LIB_PATH=/home/apinzon/Dev/repo/BB2/lib/bash-utility
-BASHUTILITY_LIB=/home/apinzon/Dev/repo/BB2/lib/bash-utility/bash_utility.sh
-BIOBASH_NATIVE_LIB_PATH=/home/apinzon/Dev/repo/BB2/lib/bb_native
-BIOBASH_NATIVE_LIB=/home/apinzon/Dev/repo/BB2/lib/bb_native/bb_native.sh
+BASHUTILITY_LIB_PATH=/home/apinzon/Dev/repo/BB2/lib/bb_utility
+BASHUTILITY_LIB=/home/apinzon/Dev/repo/BB2/lib/bbutility.sh
+BIOBASH_NATIVE_LIB_PATH=/home/apinzon/Dev/repo/BB2/lib/Bio
+BIOBASH_NATIVE_LIB=/home/apinzon/Dev/repo/BB2/lib/biobash.sh
 
 
 export BIOBASH_HOME

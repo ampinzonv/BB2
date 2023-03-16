@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# This individual file is necessary because get_data_stream expects
+# a data stream, so, since it is not possible to send it from within the script
+# it is necessary to have this script that calls the test function with a pipe.
+
+
+testData="$BIOBASH_HOME/testdata/simpleString.txt"
+cat  $testData | ./test_get_data_stream

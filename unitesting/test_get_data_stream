@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+#Tests  BBIO::get_data_stream
+# This script is called and receives a data stream, then outputs it.
+
+# shellcheck source=/dev/null # to ignore the errorbash-language-server
+source $BIOBASH_NATIVE_LIB_PATH/BBio.sh
+source ./unit_testing_common.sh
+
+#This file contains the string: "AGCT"
+testData="$BIOBASH_HOME/testdata/simpleString.txt"
+#Arrage
+# Is in the companion script run_test_get_data_stream
+expected=$(cat $testData)
+
+#Act
+result=$(BBIO::get_data_stream)
+
+# Uncomment for testing
+#echo " BEFORE: $expected -- $result"
+
+
+#Assert
+eval_outcome "$result" "$expected"   
+
+
+
+

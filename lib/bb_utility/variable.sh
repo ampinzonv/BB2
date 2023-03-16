@@ -37,7 +37,11 @@ variable::is_array() {
 # @exitcode 0  If input is number.
 # @exitcode 1 If input is not a number.
 variable::is_numeric() {
-    declare re='^[0-9]+$'
+    
+    # This function was updated from the original one from labbots (https://github.com/labbots/bash-utility)
+    # Added the following regexp (taken from: )
+    #[[ $value =~ ^(\.[0-9]+|[0-9]+(\.[0-9]*)?)$ ]]
+    declare re='^(\.[0-9]+|[0-9]+(\.[0-9]*)?)$'
     if [[ ${1} =~ $re ]]; then
         return 0
     fi

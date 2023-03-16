@@ -1,3 +1,11 @@
+2023-04-08
+* bb_native renamed to bb_utility and implied scripts re-accomodated to reflect that.
+* New unittesting dir created.
+* Unit test created for BBIO::get_data_stream
+* variable::is_numeric regexp update to handle float numbers too.
+* Fixed eval_outcome to (partially) handle evaluation of strings too (see issue BIOB-62)
+* unit_testing_common file created for holding common routines for unit testing.
+
 2023-04-08 (FORK)
 * KEY CHANGES in the way BB operates. Implementing API.
 * Development bashrc_osx/linux changed to reflect new BB2 folder.
