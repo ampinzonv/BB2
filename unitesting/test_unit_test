@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source ./unit_testing_common.sh
+
+
+result=0.5
+expected=0.5
+
+feedback::say "Testing: $0 ..." "notice"
+eval_outcome "$result" "$expected"  
+
+echo ""

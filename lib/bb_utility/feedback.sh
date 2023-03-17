@@ -32,8 +32,8 @@ elif [ $2 = "success" ]; then
    color="darkgray"
 fi
 
-echo $(fgcolor lightblue "Message from: $0") $(fgcolor end)
-echo $(fgcolor $color  "$preset $1") $(fgcolor end)
+echo -n $(fgcolor lightblue "Message from: $0") $(fgcolor end)
+echo -n $(fgcolor $color  "$preset $1") $(fgcolor end)
 
 }
 
@@ -63,7 +63,7 @@ elif [ $2 = "success" ]; then
    color="gray"
 fi
 
-echo $(fgcolor $color "$1") $(fgcolor end)
+echo -n $(fgcolor $color "$1") $(fgcolor end)
 
 }
 

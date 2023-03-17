@@ -17,6 +17,10 @@ eval_outcome() {
     #Capture the "return" from last called function
     returned=$?
 
+    #----------------------------------------------------------------
+    # Check if we are evaluating a string or a number.
+    #----------------------------------------------------------------
+    
     #1==FALSE meaning it is a string
     if [[ $returned -eq 1 ]];then
         if [ "$1" == "$2" ];then         
@@ -24,27 +28,24 @@ eval_outcome() {
         else     
             feedback::say "Failed" "error" #both strings are different
         fi
-        exit 0
-    fi
 
+    # So this is a number. But what kind?
+    # If TRUE this is a float
+    elif [[ $1 =~ [\.] || $2 =~ [\.] ]];then
 
-    #From now on we are sure this is a number
-    # Is this float?
-    if [[ $1 =~ [\.] || $2 =~ [\.] ]]
-        then
             # Transform the comparison to a binary comparison using BC.
             # Output: 1 if equal, 0 if not equal.
             # Check: https://stackoverflow.com/questions/25612017/integer-expression-expected-bash
             v=$(echo "$1 == $2" | bc -l)
 
             if [ "$v" -eq "0" ]; then
-            feedback::say "Failed" "error"
-        else
-            feedback::say "Success!" "success"
-        fi
+                feedback::say "Failed" "error"
+            else
+                feedback::say "Success!" "success"
+            fi
     
     else
-        # Since we have integer values we can make a direct comparison.
+        # ok, it seems we are dealing with integers.
         if [ "$1" -ne "$2" ]; then
             feedback::say "Failed" "error"
         else

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#Tests  BBIO::get_data_stream
+#Tests  BBIO::stream_to_tmp_file
 # This script is called and receives a data stream, then outputs it.
 
 # shellcheck source=/dev/null # to ignore the errorbash-language-server
@@ -16,20 +16,15 @@ testData="$BIOBASH_HOME/testdata/simpleString.txt"
 # Is in the companion script run_test_get_data_stream
 expected=$(cat $testData)
 
+
 #Act
-result=$(io::get_data_stream)
+tmpFile=$(io::stream_to_tmp_file)
+#so far we should have a tmp file. Let's check its content
 
-# Uncomment for testing
-#echo " BEFORE: $expected -- $result"
-
+result=$(cat $tmpFile)
 
 #Assert
 feedback::say "Testing: $0 ..." "notice"
 eval_outcome "$result" "$expected"   
 
 echo ""
-
-
-
-
-

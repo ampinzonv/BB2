@@ -1,4 +1,15 @@
-2023-04-08
+2023-03-17
+* feedback.sh modified so outputs do not show a "new line".
+* Unit test inform  the script that is actually  running.
+* Added test_unit_test to test unit_test itself.
+* BBio functions were sent to io.sh since these were general io operations not specific to bioinformatics.
+* BBfile.sh was created to handle specific operation on bioinformatics files.
+* Functions over bioinfo files were moved form file.sh to BBfile.sh
+* unit_test scripts were modified according to recent changes.
+* BBFormat.sh was taken out since its hypothetical routines should (hypothetically) be in BBfile.sh
+* get_exit_code function added to io.sh
+
+2023-03-16
 * bb_native renamed to bb_utility and implied scripts re-accomodated to reflect that.
 * New unittesting dir created.
 * Unit test created for BBIO::get_data_stream
@@ -6,17 +17,17 @@
 * Fixed eval_outcome to (partially) handle evaluation of strings too (see issue BIOB-62)
 * unit_testing_common file created for holding common routines for unit testing.
 
-2023-04-08 (FORK)
+2023-03-08 (FORK)
 * KEY CHANGES in the way BB operates. Implementing API.
 * Development bashrc_osx/linux changed to reflect new BB2 folder.
 * Created biobash library file structure.
 * dummy function structure created for Bio::IO module.
 
-2023-04-01
+2023-03-01
 * By default sequence_info don't show header information. "-h(eader)" optional flag implemented.
 * unit test for sequence_info_implemented
 
-2023-04-01
+2023-03-01
 * Unit testing added to most implemented functions.
 * eval_outcome in unit_test_functions now evals also float numbers.
 
