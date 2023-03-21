@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Assumes bashrc has been sourced!!
+#
+
+source $SHML_LIB
+
+echo ""
+
+echo $(bgcolor cyan " .:: BioBash Standard Test ::. ") $(bgcolor end)
+echo ""
+
+./run_test_get_data_stream
+./run_test_stream_to_tmp_file
+
+echo ""
