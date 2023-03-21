@@ -25,7 +25,7 @@ source $BASHUTILITY_LIB_PATH/file.sh
 # @exitcode 0  
 # @exitcode 1  
 # @exitcode 2 
-file::is_fasta()
+BBfile::is_fasta()
 {
     declare fastaFile=$1
     if [ "$(grep -c "^>" $fastaFile)" -ge 1 ]; then
@@ -53,7 +53,7 @@ file::is_fasta()
 # @exitcode 0  
 # @exitcode 1  
 # @exitcode 2 
-file::is_multiple_fasta()
+BBfile::is_multiple_fasta()
 {
     declare fastaFile=$1
 
@@ -80,7 +80,7 @@ file::is_multiple_fasta()
 # @exitcode 0  
 # @exitcode 1  
 # @exitcode 2 
-file::is_fastq()
+BBfile::is_fastq()
 {
     #tomar la primera linea
     declare fastqFile=$1
@@ -110,7 +110,7 @@ file::is_fastq()
 # @exitcode 0  
 # @exitcode 1  
 # @exitcode 2 
-file::guess_sequence_type()
+BBfile::guess_sequence_type()
 {
     # This is not a trivial problem. actually A,C,G and T are also part of protein
     # sequences and it is hard to tell which is which with high confidence.

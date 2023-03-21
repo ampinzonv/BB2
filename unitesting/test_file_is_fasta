@@ -1,29 +1,25 @@
 #!/usr/bin/env bash
 
-#Tests  BBIO::stream_to_tmp_file
+#Tests  BBfile::is_fasta
 # This script is called and receives a data stream, then outputs it.
 
 # shellcheck source=/dev/null # to ignore the errorbash-language-server
-source $BASHUTILITY_LIB_PATH/io.sh
+source $BIOBASH_NATIVE_LIB_PATH/BBfile.sh
 source $BASHUTILITY_LIB_PATH/feedback.sh;
 source ./unit_testing_common.sh
 
 #This file contains the string: "AGCT"
-testData="$BIOBASH_HOME/testdata/simpleString.txt"
-
+testData="$BIOBASH_HOME/testdata/apoe.fasta"
 
 #Arrange
-# Is in the companion script run_test_get_data_stream
-expected=$(cat $testData)
-
+expected=0 #is fasta
 
 #Act
-tmpFile=$(io::stream_to_tmp_file)
-#so far we should have a tmp file. Let's check its content
-
-result=$(cat $tmpFile)
+result=$(BBfile::is_fasta $testData)
 
 #Assert
 unit_test_header
+
 eval_outcome "$result" "$expected"   
+
 unit_test_footer

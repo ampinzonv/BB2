@@ -11,5 +11,8 @@ echo ""
 
 ./run_test_get_data_stream
 ./run_test_stream_to_tmp_file
+./test_file_is_fasta
+./test_file_is_fastq
+./test_file_is_multiple
 
 echo ""

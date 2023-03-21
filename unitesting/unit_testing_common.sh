@@ -53,3 +53,24 @@ eval_outcome() {
         fi
     fi
 }
+
+#
+# Simple function to format unit tests output footer.
+#
+#
+#
+unit_test_footer(){
+
+    echo ""
+    echo "-"
+}
+
+#
+# Simple function to format unit tests output header.
+#
+#
+#
+unit_test_header(){
+
+    feedback::say "Testing: $0 ..." "notice"
+}

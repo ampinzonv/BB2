@@ -1,3 +1,9 @@
+2023-03-21
+* BBFile_is_fasta implemented.
+* BBFile_is_fastq implemented.
+* BBFile_is_multiple implemented.
+* added unit_test_footer and unit_test_header functions to unit_testing_common.
+
 2023-03-17
 * feedback.sh modified so outputs do not show a "new line".
 * Unit test inform  the script that is actually  running.

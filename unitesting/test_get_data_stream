@@ -24,10 +24,11 @@ result=$(io::get_data_stream)
 
 
 #Assert
-feedback::say "Testing: $0 ..." "notice"
+unit_test_header
+
 eval_outcome "$result" "$expected"   
 
-echo ""
+unit_test_footer
 
 
 
