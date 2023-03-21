@@ -1,4 +1,4 @@
-![](web/bash_logo.png) 
+![](web/biobash_logo.png) 
 
 # Official repository of the BioBash (BB) project.
 
