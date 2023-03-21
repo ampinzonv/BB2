@@ -14,5 +14,6 @@ echo ""
 ./test_file_is_fasta
 ./test_file_is_fastq
 ./test_file_is_multiple
+./test_file_fastq_to_fasta
 
 echo ""

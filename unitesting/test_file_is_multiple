@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #Tests  BBfile::is_multiple_fasta
-# This script is called and receives a data stream, then outputs it.
+
 
 # shellcheck source=/dev/null # to ignore the errorbash-language-server
 source $BIOBASH_NATIVE_LIB_PATH/BBfile.sh
