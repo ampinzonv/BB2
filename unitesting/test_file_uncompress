@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+#Tests  BBfile::uncompress
+
+
+# shellcheck source=/dev/null # to ignore the errorbash-language-server
+source $BIOBASH_NATIVE_LIB_PATH/BBfile.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source $BASHUTILITY_LIB_PATH/file.sh;
+source ./unit_testing_common.sh
+
+
+testData="$BIOBASH_HOME/testdata/apoe.fasta.gz"
+
+
+# -------------------------------------------------------------------
+#
+# -------------------------------------------------------------------
+
+#Arrange
+expected="NNNNNNNNN"
+
+#Act
+result=$(BBfile::uncompress $testData | tail -n 1)
+
+#Assert
+unit_test_header
+
+eval_outcome "$result" "$expected"
+
+unit_test_footer

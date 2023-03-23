@@ -1,8 +1,14 @@
 2023-03-21
+
+* Implemented a function to create random strings: string::random 
+* Implemented BBfile::uncompress to uncompress gzipped files (usaully fats or fastq files).
+
+2023-03-21
 * BBFile_is_fasta implemented.
 * BBFile_is_fastq implemented.
 * BBFile_is_multiple implemented.
 * added unit_test_footer and unit_test_header functions to unit_testing_common.
+* BB_file_fastq_to_fasta implemented
 
 2023-03-17
 * feedback.sh modified so outputs do not show a "new line".

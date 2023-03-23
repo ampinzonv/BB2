@@ -196,3 +196,15 @@ string::regex() {
     fi
 
 }
+
+# @description Creates a random string
+#
+# @example
+#   string::random 
+#
+string::random(){
+    
+    r=$(xxd -l16 -ps /dev/urandom)
+    printf $r
+
+}

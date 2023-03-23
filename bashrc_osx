@@ -10,7 +10,7 @@
 
 BIOBASH_HOME=/Users/andres/Dev/repo/BB2
 BIOBASH_LIB=/Users/andres/Dev/repo/BB2/lib 
-BIOBASH_BIN=/Users/andres/Dev/repo/BB2/source
+BIOBASH_BIN=/Users/andres/Dev/repo/BB2/scripts
 BIOBASH_OS=osx
 BIOBASH_BIN_OS=/Users/andres/Dev/repo/BB2/bin/osx/64
 

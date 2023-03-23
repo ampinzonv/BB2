@@ -15,5 +15,7 @@ echo ""
 ./test_file_is_fastq
 ./test_file_is_multiple
 ./test_file_fastq_to_fasta
+./test_file_multiple_fasta_to_singles
+./test_file_uncompress
 
 echo ""

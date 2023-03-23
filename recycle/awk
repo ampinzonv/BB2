@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+awk '
+    # Allow us to put every sequence into a block. Thus now awk
+    # is reading not line by line (default) but reads the whole fasta block.
+    # Basically the fasta file is converted to a record:
+    #
+    # >ID
+    # AGCTAGCTAGCT
+    #
+    # Is converted to (notice that the ">" dissapeared because we used it as RS): 
+    #
+    # ID    AGCTAGCTAGCT
+    #
+    BEGIN{RS=">";FS="\n"}
+
+    # NR : Number of records red so far.
+    # $1 is the first field of the record (the string: "ID").
+    
+    #NR>1 {outName=sub(/[^\s]+/,"",$1)".fasta"; print ">" $0 > outName; close(outName);}
+    NR>1 {fnme=$1".fasta"; print ">" $0 > fnme; close(fnme);next}
+    ' $1
+

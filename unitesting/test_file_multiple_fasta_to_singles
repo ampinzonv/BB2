@@ -7,25 +7,33 @@
 source $BIOBASH_NATIVE_LIB_PATH/BBfile.sh
 source $BASHUTILITY_LIB_PATH/feedback.sh;
 source $BASHUTILITY_LIB_PATH/file.sh;
+source $BASHUTILITY_LIB_PATH/string.sh;
 source ./unit_testing_common.sh
 
 
 testData="$BIOBASH_HOME/testdata/apoe_mul.fasta.gz"
 
-#Arrange
-outDir=$(file::make_temp_dir BB false)
-echo $outDir
-expected="NNNNNNNNNNNNNNNNNNNN"
 
+# -------------------------------------------------------------------
+# let's try the first case where the script is invoked without a
+# pre-defined folder so it creates one.
+# -------------------------------------------------------------------
+
+#Arrange
+expected="NNNNNNNNNNNNNNNNNNNN"
+outDir=$(string::random)
 
 #Act
-result=$(BBfile::multiple_fasta_to_singles "$testData"  "$outDir")
-result2=$(gunzip -c "${outDir}"/apoe_mul.part_KY560197.1-4.fasta.gz  | tail -n 1)
+BBfile::multiple_fasta_to_singles $testData $outDir
+result=$(gunzip -c $outDir/apoe_mul.part_KY560197.1-4.fasta | tail -n 1)
+#result2=$(gunzip -c "${outDir}"/apoe_mul.part_KY560197.1-4.fasta.gz  | tail -n 1)
 
 
 #Assert
 unit_test_header
 
-eval_outcome "$result2" "$expected"
+eval_outcome "$result" "$expected"
 
 unit_test_footer
+
+rm -Rf $outDir
