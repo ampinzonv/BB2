@@ -1,5 +1,4 @@
 2023-03-21
-
 * Implemented a function to create random strings: string::random 
 * Implemented BBfile::uncompress to uncompress gzipped files (usaully fats or fastq files).
 

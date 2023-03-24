@@ -21,3 +21,4 @@ awk '
     NR>1 {fnme=$1".fasta"; print ">" $0 > fnme; close(fnme);next}
     ' $1
 
+†
