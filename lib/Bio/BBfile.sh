@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
-# BioBash Module for Bio::IO
+# BioBash Module for Bio::File
 # Created by: Andrés Pinzón (ampinzonv@unal.edu.co)
 #  
 # @description
-# This module contains functions to manage IO specifically related to bioinformatics data.
-# This module handles specific operations over bioinformatics files, such as:
-# convert from one format to other, validate if a file is  a valid fastq or fasta file.
-#
+# This module contains functions to operate over bioinformatic files not over
+# its content (for that matter BBFormat or BBSeq could be a better option).
 # For general operations over files of any kind refer to bb_utility/io.sh file.
 #
 

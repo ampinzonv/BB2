@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+#Tests  BBSeq::get_fasta_components
+
+
+# shellcheck source=/dev/null # to ignore the errorbash-language-server
+source $BIOBASH_NATIVE_LIB_PATH/BBseq.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source $BASHUTILITY_LIB_PATH/file.sh;
+source ./unit_testing_common.sh
+
+
+testData="$BIOBASH_HOME/testdata/$1"
+arg=$2
+
+BBSeq::get_fasta_components $testData $arg
