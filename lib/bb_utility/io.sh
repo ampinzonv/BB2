@@ -25,29 +25,42 @@ source $BASHUTILITY_LIB_PATH/file.sh
 #   data=$(io::get_data_stream)
 #   echo -n "$data" #Outputs: AGCT
 #
-# @arg none
+# @arg none (but expects data stream "$@")
 #
 # @exitcode 0 If succesful
 # @exitcode 1 If not succesful
 io::get_data_stream(){
 
-    # $@ all positional arguments as separate strings. 
-    # Since we expect only one (the streaned data), it makes sense.
-    cat -- "$@"
+    # Returns "0" if data comes from a pipe
+    r=$(io::is_pipe)
+    if [[ "${r}" -eq 0 ]];then
+
+        # $@ all positional arguments as separate strings. 
+        # Since we expect only one (the streamed data), it makes sense
+        cat -- "$@"
+    else
+        echo "io::is_pipe: Missing data from STDIN"
+        exit 1
+        
+    fi
 
 }
 
-# @brief Gets a data stream and save it to a temporary file
-# @description
-#
+# @brief Gets a data stream and saves it to a temporary file
+# @description Receives a stream of data tipically via a UNIX pipe,
+# then it gets data using io::get_data_stream (which in turn checks that
+# it is actually a stream of data using io::is_pipe) and creates a temporary
+# file with streamed data.
 #
 # @example
-#   
+#   tmpFile=$(echo "ACGT" | io::stream_to_tmp_file)
+#   echo $tmpFile
+#   /var/folders/d0/mk4zgpc11p142jl25jjwsjxm0000gr/T/tmp.vup6k2Dg
+#  
+# @arg none (but expects a stream of data)
 #
-# @arg 
-#
-# @exitcode 0 If ...
-# @exitcode 2 If ...
+# @exitcode 0 On success
+# @exitcode 1 On failure
 io::stream_to_tmp_file(){
     
     #Get data stream
@@ -123,5 +136,5 @@ io::is_pipe(){
     else
         pipe=1
     fi
-    echo "${pipe}"
+    printf "${pipe}"
 }

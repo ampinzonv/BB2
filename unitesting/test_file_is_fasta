@@ -15,7 +15,7 @@ testData="$BIOBASH_HOME/testdata/apoe.fasta"
 expected=0 #is fasta
 
 #Act
-result=$(BBfile::is_fasta $testData)
+result=$(BBfile::is_fasta -i $testData)
 
 #Assert
 unit_test_header

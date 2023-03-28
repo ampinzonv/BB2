@@ -9,23 +9,48 @@
 #
 
 source $BASHUTILITY_LIB_PATH/file.sh
+source $BIOBASH_LIB/process_optargs.sh;
 
 
 
 # @description Checks if a file is valid fasta file. 
 # @example
-#   file::file_is_fasta "./file.fa[,fasta]" 
+#   file::file_is_fasta -i "./file.fa[,fasta]" 
 #   #Output
 #   0, 1 or 2.
 #
-# @arg $1 path to a file.
+# @arg -i/--input (mandatory) path to a file.
 #
-# @exitcode 0  
-# @exitcode 1  
-# @exitcode 2 
+# @exitcode 0  On success 
+# @exitcode 1  On failure
 BBfile::is_fasta()
 {
-    declare fastaFile=$1
+
+    # Initialise the necessary variables that will be checked / populated by process_optargs
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=( )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input )
+    local COMMAND_NAME="BBfile::is_fasta"
+
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    process_optargs "$@" || exit 1
+
+    #----------------------------------------------------------------
+    # WE NEED A FILE TO CONTINUE
+    #----------------------------------------------------------------
+
+    # Check input file (REQUIRED!)
+    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+    else
+        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+        echo ""
+        exit  1
+    fi
+
+    # More on "declare": https://phoenixnap.com/kb/bash-declare
+    declare fastaFile=$file
     if [ "$(grep -c "^>" $fastaFile)" -ge 1 ]; then
         return=0
     else
@@ -53,7 +78,30 @@ BBfile::is_fasta()
 # @exitcode 2 
 BBfile::is_multiple_fasta()
 {
-    declare fastaFile=$1
+    # Initialise the necessary variables that will be checked / populated by process_optargs
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=( )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input )
+    local COMMAND_NAME="BBfile::is_multiple_fasta"
+
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    process_optargs "$@" || exit 1
+
+    #----------------------------------------------------------------
+    # WE NEED A FILE TO CONTINUE
+    #----------------------------------------------------------------
+
+    # Check input file (REQUIRED!)
+    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+    else
+        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+        echo ""
+        exit  1
+    fi
+
+    declare fastaFile=$file
 
     if [ "$(grep -c "^>" $fastaFile)" -ge 2 ]; then
         return=0
@@ -80,8 +128,31 @@ BBfile::is_multiple_fasta()
 # @exitcode 2 
 BBfile::is_fastq()
 {
+    # Initialise the necessary variables that will be checked / populated by process_optargs
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=( )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input )
+    local COMMAND_NAME="BBfile::is_fastq"
+
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    process_optargs "$@" || exit 1
+
+    #----------------------------------------------------------------
+    # WE NEED A FILE TO CONTINUE
+    #----------------------------------------------------------------
+
+    # Check input file (REQUIRED!)
+    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+    else
+        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+        echo ""
+        exit  1
+    fi
+
     #tomar la primera linea
-    declare fastqFile=$1
+    declare fastqFile=$file
     firstLine=$(head -n 1 $fastqFile)
 
     # ver si comienza con un "@"
@@ -116,25 +187,48 @@ BBfile::is_fastq()
 #   ./file.fa[.gz] 
 #
 #
-# @arg $1 path to fastq file.
-# @arg $2 name for compressed output. If ".gz" extension addedd then it is compressed.
+# @arg -i/--input (Mandatory) path to fastq file.
+# @arg -c/--compress (Optional) name for compressed output. If ".gz" extension addedd then it is compressed.
 # 
 # @exitcode 0  
 # @exitcode 1  
 BBfile::fastq_to_fasta(){
 
-    if [ -z "$2" ];then
-        outFile=" "
+    # Initialise the necessary variables that will be checked / populated by process_optargs
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=( )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output )
+    local COMMAND_NAME="BBfile::is_fastq"
+
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    process_optargs "$@" || exit 1
+
+    #----------------------------------------------------------------
+    # WE NEED A FILE TO CONTINUE
+    #----------------------------------------------------------------
+    # Check input file (REQUIRED!)
+    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
     else
-        outFile="-o $2"
+        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+        echo ""
+        exit  1
     fi
 
-    $BIOBASH_BIN_OS/seqkit fq2fa $1 $outFile
+    #Check if we have a second parameter. Note that seqkit output option is also "-o"
+    if   is_in '-o'      "${!OPTIONS[@]}"; then outFile="-o ${OPTIONS[-o]}"
+    elif is_in '--output' "${!OPTIONS[@]}"; then outFile="-o ${OPTIONS[--output]}"
+    else
+        outFile=""
+    fi
+
+    $BIOBASH_BIN_OS/seqkit fq2fa $file $outFile
 }
 
 # @brief Splits a multiple fasta file into single sequences.
 # @description Splits a multiple fasta file into single sequences, where
-# each sequence file is named using input file name and the description in the header fasta.
+# each sequence file is named using the input file name and the description in the header fasta.
 #  If an outdir is not defined, a directory is created and named after the input file name
 # plus the .singles extension. If input is a compressed file, each outputed individual file is also compressed.
 # PLEASE notice that this function ALWAYS OUTPUTS to the current directory, even if you define the output
@@ -161,26 +255,62 @@ BBfile::fastq_to_fasta(){
 #   
 #
 #
-# @arg $1 path to fastq file.
-# @arg $2 (optional) Output directory.
+# @arg -i/--input (Mandatory) path to fastq file.
+# @arg -o/--output (optional) Output directory.
 # 
 # @exitcode 0  
 # @exitcode 1
 BBfile::multiple_fasta_to_singles(){
 
+    # Initialise the necessary variables that will be checked / populated by process_optargs
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=( )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output )
+    local COMMAND_NAME="BBfile::multiple_fasta_to_singles"
+
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    process_optargs "$@" || exit 1
+
+    #----------------------------------------------------------------
+    # WE NEED A FILE TO CONTINUE
+    #----------------------------------------------------------------
+    # Check input file (REQUIRED!)
+    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+    else
+        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+        echo ""
+        exit  1
+    fi
+
+    #Check if we have a second parameter. Note that seqkit output option is also "-o"
+    if   is_in '-o'      "${!OPTIONS[@]}"; then outDir="${OPTIONS[-o]}"
+    elif is_in '--output' "${!OPTIONS[@]}"; then outDir="${OPTIONS[--output]}"
+    else
+        name=$(file::name $file)
+        outDir=$(echo "${name}.singles")
+    fi
+
+echo "OUTDIR: $outDir"
+    #====
+
+
+
+
     # If outdir was not defined, create an output name to avoid seqkit weird behaviour
     # Note that by default seqkit outputs to the same directory where input file is.
     # We want to output to the current directory. 
-    if [ -z "$2" ];then
-            name=$(file::name $1)
-            outDir=$(echo "${name}.singles")
-        else
-            outDir="$2"
-    fi
+    # if [ -z "${outDir}" ];then
+    #         name=$(file::name $file)
+    #         outDir=$(echo "${name}.singles")
+    #     else
+    #         outDir="${outDir}"
+    # fi
 
     # Uncomment for debuggin'
-    # echo "$BIOBASH_BIN_OS/seqkit split --quiet -i $1 -O $outDir"
-    $BIOBASH_BIN_OS/seqkit split --quiet -i $1 -O ./$outDir
+    #echo "$BIOBASH_BIN_OS/seqkit split --quiet -i $1 -O $outDir"
+    $BIOBASH_BIN_OS/seqkit split --quiet -i $file -O ./$outDir
 
     #See: https://stackoverflow.com/questions/21476033/splitting-a-multiple-fasta-file-into-separate-files-keeping-their-original-names
     #For a possible solution based on AWK.
@@ -199,8 +329,31 @@ BBfile::multiple_fasta_to_singles(){
 # @exitcode 1  on failure
 BBfile::uncompress(){
 
+
+    # Initialise the necessary variables that will be checked / populated by process_optargs
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=( )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output )
+    local COMMAND_NAME="BBfile::uncompress"
+
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    process_optargs "$@" || exit 1
+
+    #----------------------------------------------------------------
+    # WE NEED A FILE TO CONTINUE
+    #----------------------------------------------------------------
+    # Check input file (REQUIRED!)
+    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+    else
+        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+        echo ""
+        exit  1
+    fi
+
     # note that this does the same that zcat, but the latter fails in OSX.
-    gunzip -c $1
+    gunzip -c $file
 
 }
 

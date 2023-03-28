@@ -24,9 +24,9 @@ eval_outcome() {
     #1==FALSE meaning it is a string
     if [[ $returned -eq 1 ]];then
         if [ "$1" == "$2" ];then         
-            feedback::say "Success!" "success"  #both strings are equal
+            feedback::say "[ Success ]" "success"  #both strings are equal
         else     
-            feedback::say "Failed" "error" #both strings are different
+            feedback::say "[ Failed ]" "error" #both strings are different
         fi
 
     # So this is a number. But what kind?
@@ -39,17 +39,17 @@ eval_outcome() {
             v=$(echo "$1 == $2" | bc -l)
 
             if [ "$v" -eq "0" ]; then
-                feedback::say "Failed" "error"
+                feedback::say "[ Failed ]" "error"
             else
-                feedback::say "Success!" "success"
+                feedback::say "[ Success ]" "success"
             fi
     
     else
         # ok, it seems we are dealing with integers.
         if [ "$1" -ne "$2" ]; then
-            feedback::say "Failed" "error"
+            feedback::say "[ Failed ]" "error"
         else
-            feedback::say "Success!" "success"
+            feedback::say "[ Success ]" "success"
         fi
     fi
 }
@@ -62,7 +62,6 @@ eval_outcome() {
 unit_test_footer(){
 
     echo ""
-    echo "-"
 }
 
 #
@@ -71,6 +70,7 @@ unit_test_footer(){
 #
 #
 unit_test_header(){
-
-    feedback::say "Testing: $0 ..." "notice"
+    
+    file=$(echo ${0} | sed 's/test_//g')
+    feedback::say "      $file ..." "notice"
 }

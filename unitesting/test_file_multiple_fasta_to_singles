@@ -24,7 +24,7 @@ expected="NNNNNNNNNNNNNNNNNNNN"
 outDir=$(string::random)
 
 #Act
-BBfile::multiple_fasta_to_singles $testData $outDir
+BBfile::multiple_fasta_to_singles  --output $outDir --input $testData
 result=$(gunzip -c $outDir/apoe_mul.part_KY560197.1-4.fasta | tail -n 1)
 #result2=$(gunzip -c "${outDir}"/apoe_mul.part_KY560197.1-4.fasta.gz  | tail -n 1)
 

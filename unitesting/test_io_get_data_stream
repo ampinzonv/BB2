@@ -19,7 +19,7 @@ expected=$(cat $testData)
 #Act
 result=$(io::get_data_stream)
 
-# Uncomment for testing
+# Uncomment for debuggin
 #echo " BEFORE: $expected -- $result"
 
 

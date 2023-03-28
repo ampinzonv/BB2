@@ -7,6 +7,7 @@
 # things like extract fasta headers, translate, count number of entries should beplaced here.
 
 source $BASHUTILITY_LIB_PATH/file.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh
 source $BIOBASH_LIB/process_optargs.sh;
 
 
@@ -65,7 +66,8 @@ BBSeq::get_fasta_components()
     if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
     elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
     else
-        echo "INPUT FILE REQUIRED"
+        feedback::sayfrom "BBSeq::get_fasta_components: Input file required." "error"
+        echo
         exit  1
     fi
 

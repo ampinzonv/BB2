@@ -6,5 +6,9 @@
 
 
 testData="$BIOBASH_HOME/testdata/simpleString.txt"
-cat  $testData | ./test_get_data_stream
+cat  $testData | ./test_io_get_data_stream
+
+# This is a way to make it fail, call the function without input:
+#./test_io_get_data_stream
+
 

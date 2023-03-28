@@ -15,7 +15,7 @@ testData="$BIOBASH_HOME/testdata/apoe_mul.fasta"
 expected=0 #is multiple fasta
 
 #Act
-result=$(BBfile::is_multiple_fasta $testData)
+result=$(BBfile::is_multiple_fasta --input $testData)
 
 #Assert
 unit_test_header

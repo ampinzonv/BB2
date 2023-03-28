@@ -12,8 +12,17 @@ source ./unit_testing_common.sh
 
 testData="$BIOBASH_HOME/testdata/apoe_mul.fasta"
 
-#Capture arguments as a string. Necessary when created a script that calls this function
-#myArgs="printf ${@}"
+# Capture arguments as a string. Necessary when created a script that calls this function
+# myArgs="printf ${@}"
 
+#Arrange
+expected="KY560197.1-4"
 
-BBSeq::get_fasta_components --input ${testData} -s
+#Act
+result=$(BBSeq::get_fasta_components --input $testData -d | tail -n 1)
+
+#Assert
+unit_test_header
+eval_outcome "$result" "$expected"
+unit_test_footer
+

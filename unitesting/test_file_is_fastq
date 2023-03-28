@@ -15,7 +15,7 @@ testData="$BIOBASH_HOME/testdata/example.fastq"
 expected=0 #is fastq
 
 #Act
-result=$(BBfile::is_fastq $testData)
+result=$(BBfile::is_fastq --input $testData)
 
 #Assert
 unit_test_header

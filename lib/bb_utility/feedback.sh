@@ -33,7 +33,7 @@ elif [ $2 = "success" ]; then
 fi
 
 echo -n $(fgcolor lightblue "Message from: $0") $(fgcolor end)
-echo -n $(fgcolor $color  "$preset $1") $(fgcolor end)
+echo -n $(fgcolor $color  "${preset} $1") $(fgcolor end)
 
 }
 

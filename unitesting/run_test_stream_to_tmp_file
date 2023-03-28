@@ -6,4 +6,5 @@
 
 
 testData="$BIOBASH_HOME/testdata/simpleString.txt"
-cat  $testData | ./test_stream_to_tmp_file
+cat  $testData | ./test_io_stream_to_tmp_file
+

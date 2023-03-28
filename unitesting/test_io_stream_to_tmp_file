@@ -19,6 +19,7 @@ expected=$(cat $testData)
 
 #Act
 tmpFile=$(io::stream_to_tmp_file)
+
 #so far we should have a tmp file. Let's check its content
 
 result=$(cat $tmpFile)

@@ -21,7 +21,7 @@ testData="$BIOBASH_HOME/testdata/apoe.fasta.gz"
 expected="NNNNNNNNN"
 
 #Act
-result=$(BBfile::uncompress $testData | tail -n 1)
+result=$(BBfile::uncompress -i $testData | tail -n 1)
 
 #Assert
 unit_test_header
