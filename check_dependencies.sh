@@ -10,7 +10,7 @@
 #Note that libraries paths here are hardcoded, since we still do not have environmental
 #variables set yet.
 
-source lib/bb_native/check.sh
+source lib/bb_utility/check.sh
 source lib/shml/shml.sh
 
 
@@ -23,7 +23,7 @@ This is a safe procedure that  WILL NOT compromise any of your files, installed 
 
 "
 #soft=('zcat' 'wget' 'unzip' 'gzip' 'gnuplot' 'xargs' 'embossversion')
-soft=('zcat' 'wget' 'unzip' 'gzip' 'xargs' 'embossversion')
+soft=('zcat' 'wget' 'unzip' 'gzip' 'xargs')
 
 #Flow control. Answer should be "y" or "n"
 continue=0

@@ -5,8 +5,8 @@
 
 #Common libraries
 source lib/shml/shml.sh
-source lib/bb_native/check.sh
-source lib/bb_native/file.sh
+source lib/bb_utility/check.sh
+source lib/bb_utility/file.sh
 
 
 #----------------------------------------------------------------------------
@@ -202,22 +202,22 @@ rm environ_ok
 # Future version needs a better selection of what to install.
 cp -r ./lib "$BIOBASH_HOME"
 cp -r ./bin "$BIOBASH_HOME"
+cp -r ./unitesting "$BIOBASH_HOME"
+cp -r ./testdata "$BIOBASH_HOME"
 cp scripts/bb_* "$BIOBASH_HOME" #These are all the actual BB scripts.
 
 
 #----------------------------------------------------------------------------
 #
-#                            Install Interfaces
-#
-#            This routine copies libraries and stuff in BIOBASH_HOME
+#               Source enviroment
 # 
 #----------------------------------------------------------------------------
-
+source ~/.bashrc
 
 echo "
 $(emoji thumbsup) [BIOBASH WAS INSTALLED SUCCESFULLY!]
 
-$(attribute bold) Before using BioBash$(attribute end) please update your environment with the following command:
+$(attribute bold) You can start using BioBash$(attribute end) if something seems not be working please update your environment with the following command:
 
    > source ~/.bashrc
    

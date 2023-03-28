@@ -8,6 +8,7 @@
 * BBFile::fastq_to_fasta now requires the optional output key value to be set to -o/--output.
 * BBFile::multiple_fasta_to_singles now requires the mandatory "-i/--input" for input file.
 * BBFile::multiple_fasta_to_singles now requires the optional output folder key/value to be set to -o/--output.
+* Install script updated to reflect new paths. Tested on OSX.
 
 
 2023-03-27

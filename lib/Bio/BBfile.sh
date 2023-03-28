@@ -292,22 +292,6 @@ BBfile::multiple_fasta_to_singles(){
         outDir=$(echo "${name}.singles")
     fi
 
-echo "OUTDIR: $outDir"
-    #====
-
-
-
-
-    # If outdir was not defined, create an output name to avoid seqkit weird behaviour
-    # Note that by default seqkit outputs to the same directory where input file is.
-    # We want to output to the current directory. 
-    # if [ -z "${outDir}" ];then
-    #         name=$(file::name $file)
-    #         outDir=$(echo "${name}.singles")
-    #     else
-    #         outDir="${outDir}"
-    # fi
-
     # Uncomment for debuggin'
     #echo "$BIOBASH_BIN_OS/seqkit split --quiet -i $1 -O $outDir"
     $BIOBASH_BIN_OS/seqkit split --quiet -i $file -O ./$outDir

@@ -23,7 +23,9 @@ outFileGZ="$outFile.gz"
 
 #Act
 result=$(BBfile::fastq_to_fasta -i $testData  --output $outFileGZ)
-echo $result
+
+# Uncomment for debugging
+# echo $result
 
 # OSX has an issue with zcat, it always complains because can't find the file...
 # But "gunzip -c" appears to have the same effect and works both in Linux and OSX.
