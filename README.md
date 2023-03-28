@@ -6,7 +6,7 @@
 This project is aimed to develope a Bioinformatics library for common tasks in the field of Computational Biology (mainly Bioinformatics) using the BASH language.
 It is leaded by [Andrés M. Pinzón](https://www.researchgate.net/profile/Andres-Pinzon-13/research) , full time professor at [Bioinformatics and Systems Biology Laboratory](https://gibbslab.github.io/) , [Institute for Genetics](https://genetica.unal.edu.co/)  - [National University of Colombia](http://unal.edu.co/)  in south America. 
 
-Please refer to [BioBASH official documentation](https://github.com/ampinzonv/BB2/wiki) for details.
+This page provides a general informative overview of BioBASH project. Please refer to [BioBASH official documentation](https://github.com/ampinzonv/BB2/wiki) for details.
 
 ## Why BioBash?
 Basically [this library has been around for several years in our laboratory](https://github.com/gibbslab/biobash), as a bunch of routines programmed for common bioinformatics tasks such as dealing with FASTA headers and FQ files, as well as with manipulation of lists of genes etc.
