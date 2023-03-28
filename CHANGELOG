@@ -9,6 +9,9 @@
 * BBFile::multiple_fasta_to_singles now requires the mandatory "-i/--input" for input file.
 * BBFile::multiple_fasta_to_singles now requires the optional output folder key/value to be set to -o/--output.
 * Install script updated to reflect new paths. Tested on OSX.
+* Install script now copies unitesting and testdata folders.
+* Installation/unistallation and unit testing in OSX and Linux/Ubuntu successful.
+* Released the 0.2.0 version of BioBASH.
 
 
 2023-03-27
