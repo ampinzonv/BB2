@@ -34,11 +34,11 @@ A library call [SHML](https://odb.github.io/shml/) (Shell Markup Language) is us
 
 Another library used behind the scenes by BB is [Bash-Utility](https://github.com/labbots/bash-utility), which provides a series of functions and helpers for Bash programming that saves you much time and effort.
 
-[Process_optargs](https://sr.ht/~tpapastylianou/process_optargs/) is also used through all BioBASH for managing fucntion flags and key/values.
+[Process_optargs](https://sr.ht/~tpapastylianou/process_optargs/) is also used through all BioBASH for managing function flags and key/values.
 
-Although BB is perhaps the most complete Bash library for Bioinformatics, this is not really a new idea in the community, several other projects under the same name has been started (and abandoned) with the same name, and some of the ideas and even part of the code of these projects was used in the [first version of this library](https://github.com/gibbslab/biobash). 
+Although BioBASH is perhaps the most complete Bash library for Bioinformatics, this is not really a new idea in the community, several other projects under the same name has been started (and abandoned) with the same name, and some of the ideas and even part of the code of these projects was used in the [first version of this library](https://github.com/gibbslab/biobash). 
 
-Nevertheless, since the whole idea of BB as a pure Bash scripts for Bioinformatics was switched to Bash interfaces to other tools, it is hard to find pieces of code from other projects here and if so, clarifications are made in documentation for each BB function and/or script that uses them. Finally, to my knowledge  the only worth mentioning BioBash project is [Simon Frost's](https://github.com/sdwfrost/biobash) Biobash, really nice scripts although poorly documented. 
+Nevertheless, since the whole idea of BioBASH as a pure Bash scripts for Bioinformatics was switched to a BASH interface for several bioinformatics tools published as functions or as a set of scripts for solving several bioinformatics tools, it is hard to find pieces of code from other projects hereby and if so, clarifications are made in documentation for each BB function and/or script that uses them. Finally, to my knowledge  the only worth mentioning BioBash project is [Simon Frost's](https://github.com/sdwfrost/biobash) Biobash, really nice scripts although poorly documented. 
 
 
 ### Coding standards
