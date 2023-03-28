@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+source ./process_optargs
+
+function myfunction () {    # The function whose options/args we want to process
+
+ # Initialise the necessary variables that will be checked / populated by process_optargs
+   local -A OPTIONS=()
+   local -a ARGS=()
+   local -a VALID_FLAG_OPTIONS=( -h/--help -v --version )    # note -v and --version represent separate flags here! (e.g. '-v' could be for 'verbose')
+   local -a VALID_KEYVAL_OPTIONS=( -r/--repetitions )
+   local COMMAND_NAME="myfunction"
+
+ # Perform the processing to populate the OPTIONS and ARGS arrays.
+   process_optargs "$@" || exit 1
+
+ # Validate parsed options and arguments
+   if is_in '-h' "${!OPTIONS[@]}" || is_in '--help' "${!OPTIONS[@]}"
+   then display_help
+   fi
+
+   if   is_in '-r'            "${!OPTIONS[@]}"; then REPS="${OPTIONS[-r]}"
+   elif is_in '--repetitions' "${!OPTIONS[@]}"; then REPS="${OPTIONS[--repetitions]}"
+   fi
+
+   if   test "${#ARGS[@]}" -lt 2
+   then error "myfunction requires at least 2 non-option arguments"
+        exit 1
+   fi
+
+   # ...etc
+}
+
+myfunction -h

@@ -7,6 +7,7 @@
 # things like extract fasta headers, translate, count number of entries should beplaced here.
 
 source $BASHUTILITY_LIB_PATH/file.sh
+source $BIOBASH_LIB/process_optargs.sh;
 
 
 # @brief Retrieves the components from a fasta entry/entries 
@@ -26,35 +27,159 @@ source $BASHUTILITY_LIB_PATH/file.sh
 # It is assumed that KY560197.1 is the sequence ID.
 #
 # @example
-# Invoked without modifieres shows all info:
-#   BBSeq::get_fasta_components "./file.fa[,fasta]" 
+# Invoked without modifiers shows all info:
+#   BBSeq::get_fasta_components -i "./file.fa[,fasta]" 
 #   #Output (tab separated one row per sequence)
 #   SeqID   Description   Sequence  
 #  When invoked with a modifier (-h, -d and/or -s) Displays appropriate info:
 #  -h: header, -d sequence ID, -s Sequences
 # 
 #
-# @arg $1 path to a file.
-# @arg $2 (optional) Any modifier or a set of them 
+# @arg -i/--input (required) path to a file.
+# @arg -h (optional) 
+# @arg -d/--id (optional)
+# @arg -s/--sequence (optional)
 #
 # @exitcode 0  on success
 # @exitcode 1  on failure
 BBSeq::get_fasta_components()
 {
 
+    BIN="$BIOBASH_BIN_OS/seqkit fx2tab "
+
+    # Initialise the necessary variables that will be checked / populated by process_optargs
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=( -h/--header -s/--sequence -d/--id )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input )
+    local COMMAND_NAME="BBSeq::get_fasta_components"
+
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    process_optargs "$@" || exit 1
+
+    #----------------------------------------------------------------
+    # WE NEED A FILE TO CONTINUE
+    #----------------------------------------------------------------
+
+    # Check input file (REQUIRED!)
+    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+    else
+        echo "INPUT FILE REQUIRED"
+        exit  1
+    fi
+
+
+    #----------------------------------------------------------------
+    # Check flags and key/values status
+    #----------------------------------------------------------------
+
+    #Header line
+    if is_in '-h' "${!OPTIONS[@]}" || is_in '--header' "${!OPTIONS[@]}"
+        then header="on"
+    else
+        header="off"
+    fi
+
+    #Sequence
+    if is_in '-s' "${!OPTIONS[@]}" || is_in '--sequence' "${!OPTIONS[@]}"
+        then sequence="on"
+    else
+        sequence="off"
+    fi
+
+    #sequence ID
+    if is_in '-d' "${!OPTIONS[@]}" || is_in '--id' "${!OPTIONS[@]}"
+        then seqID="on"
+    else
+        seqID="off"
+    fi
+
+    #Uncomment for debugging
+    echo "VARS: header=$header sequence=$sequence seqID=$seqID"
+    
+    #----------------------------------------------------------------
+    #                       TEST OPTIONS
+    #----------------------------------------------------------------
     # Test different options we have:
     # a) Just Fasta file provided
     # b) Fasta file + one argument (h, d or s)
     # c) Fasta file + two arguments (hd, hs, ds)
     # d) Fasta file +  three arguments (which defualts to case "a")
 
+    #case a. The function is called without any flag
+    if [[ "${header}" == "off" && "${sequence}" == "off" && "${seqID}" == "off" ]]; then
+        COMMAND=$(echo "${BIN}" "${file}")
+        $COMMAND
+        exit 0
+    fi
+    
+    #case d is pretty much the same than case "a", just the opossite.
+    if [[ "${header}" == "on" && "${sequence}" == "on" && "${seqID}" == "on" ]]; then
+        COMMAND=$(echo "${BIN}" "${file}")
+        $COMMAND
+        exit 0
+    fi
 
-    # Fasta file only provided
-    if [ $# -eq 1  ];then
-        cat $1 | awk 'BEGIN {RS = ">"; FS = "\n"} NR>1{printf "%s\t", ">"$1} {for(i=2;i<=NF;i+=1) printf "%s", $i}{printf "%s","\n"}'
+    # ---------------------------------------------------------------
+    # Cases b. Here we have three options, one for each argument. In each case the process is quite
+    # different, because seqkit do not provide all the flexibility we want in BB.
+    # ---------------------------------------------------------------
+    if [[ "${header}" == "on" && "${sequence}" == "off" && "${seqID}" == "off" ]]; then
+
+        COMMAND=$(echo "${BIN}" " -n " "${file}")
+        $COMMAND
+        exit 0
+
+    elif [[ "${header}" == "off" && "${sequence}" == "on" && "${seqID}" == "off" ]]; then
+
+        # Use the "-i" option because it outputs the sequence ID plus TAB plus sequence. It is easier to parse.
+        COMMAND=$(echo "${BIN}" " -i " "${file}")
+        $COMMAND | awk '{print $2}'
+        exit 0
+
+    elif [[ "${header}" == "off" && "${sequence}" == "off" && "${seqID}" == "on" ]]; then
+        
+        # Use the "-i" option because it outputs the sequence ID plus TAB plus sequence. It is easier to parse.
+        COMMAND=$(echo "${BIN}" " -i " "${file}")
+        $COMMAND | awk '{print $1}'
+        exit 0
+
     else
-        # agiven argument was provided
+        # We have to test another possible case. Series C
+        true
 
-        echo "Con argumentos"
+    fi
+
+    # ---------------------------------------------------------------
+    # Cases C. Here we have three options, one for each argument. 
+    # Fasta file (default) + a combination of two arguments (hd, hs, ds)
+    # ---------------------------------------------------------------
+    if [[ "${header}" == "on" && "${sequence}" == "off" && "${seqID}" == "on" ]]; then
+
+        COMMAND=$(echo "${BIN}" " -n " "${file}")
+        $COMMAND
+        exit 0
+
+    elif [[ "${header}" == "on" && "${sequence}" == "on" && "${seqID}" == "off" ]]; then
+        # ¡¡¡¡¡¡¡¡ WARNING!!!!!!!!
+        # Here we should display only the fasta header without the ID + sequence
+        # BUT FOR NOW we are defaulting to show everything, because I have not found a easy way
+        # to get rid of the first word of the (sequene ID) of the header fasta.
+        # Meaning that -hs is equal to -hsd.
+        COMMAND=$(echo "${BIN}" "${file}")
+        $COMMAND
+        exit 0
+
+    elif [[ "${header}" == "off" && "${sequence}" == "on" && "${seqID}" == "on" ]]; then
+        
+        COMMAND=$(echo "${BIN}" " -i " "${file}")
+        $COMMAND
+        exit 0
+
+    else
+    
+        true
+
     fi
 }

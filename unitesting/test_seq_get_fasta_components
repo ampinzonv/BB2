@@ -10,7 +10,10 @@ source $BASHUTILITY_LIB_PATH/file.sh;
 source ./unit_testing_common.sh
 
 
-testData="$BIOBASH_HOME/testdata/$1"
-arg=$2
+testData="$BIOBASH_HOME/testdata/apoe_mul.fasta"
 
-BBSeq::get_fasta_components $testData $arg
+#Capture arguments as a string. Necessary when created a script that calls this function
+#myArgs="printf ${@}"
+
+
+BBSeq::get_fasta_components --input ${testData} -s

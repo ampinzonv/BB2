@@ -1,0 +1,17 @@
+   function is_in () {
+    # --------------------------------------------------------------------------
+    # Checks if first input reoccurs in the remaining list of input arguments.
+    #
+    # The intended way to call this function is with an 'exploded' array
+    # variable as the second argument, effectively checking if the first input
+    # is a member of the array, e.g.:
+    #
+    #   Elements=( 1 3 5 7 9 )
+    #   is_in 5 "${Elements[@]}"   # succeeds
+    #   is_in 6 "${Elements[@]}"   # fails
+    # --------------------------------------------------------------------------
+
+      Element="$1" && shift
+      for Arg; do test "$Element" = "$Arg" && return 0; done
+      return 1
+   }

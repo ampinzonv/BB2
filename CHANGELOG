@@ -1,4 +1,8 @@
 2023-03-21
+* BBFile::get_fasta_components completely imnplemented.
+* Implemented third party "process_optargs" lib to parse CLI arguments. 
+
+2023-03-21
 *Initiated BBFile::get_fasta_components
 
 2023-03-21
