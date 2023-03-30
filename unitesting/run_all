@@ -4,18 +4,28 @@
 
 source $SHML_LIB
 
+#Header
 echo ""
 
 echo "$(hr '- ' 20)"
 echo $(attribute bold)$(fgcolor black "  BIOBASH STANDARD TEST ") $(fgcolor end)$(attribute end)
 date
 echo "$(hr '- ' 20)"
-echo ""
 
+
+
+#--------------------------------------------------------------------
+#    BB::IO TESTS
+#--------------------------------------------------------------------
+echo ""
 echo $(fgcolor blue " Running BB::IO tests.") $(fgcolor end)
 ./run_test_get_data_stream
 ./run_test_stream_to_tmp_file
 
+
+#--------------------------------------------------------------------
+#   BB::FILE TESTS
+#--------------------------------------------------------------------
 echo ""
 echo $(fgcolor blue " Running BB::File tests.") $(fgcolor end)
 ./test_file_is_fasta
@@ -25,8 +35,21 @@ echo $(fgcolor blue " Running BB::File tests.") $(fgcolor end)
 ./test_file_multiple_fasta_to_singles
 ./test_file_uncompress
 
+#--------------------------------------------------------------------
+#   BB::SEQ TESTS
+#--------------------------------------------------------------------
 echo ""
 echo $(fgcolor blue " Running BB::Seq tests.") $(fgcolor end)
 ./test_seq_get_fasta_components
 
+
+#--------------------------------------------------------------------
+#       UTILITY TESTS
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " Running Utility tests.") $(fgcolor end)
+./test_utility_os_default_number_of_cores
+
+
+#Some output formatting
 echo ""

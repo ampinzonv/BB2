@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+#Tests  utility-os::default_number_of_cores
+
+
+# shellcheck source=/dev/null # to ignore the errorbash-language-server
+source $BASHUTILITY_LIB_PATH/os.sh;
+source ./unit_testing_common.sh
+
+#Arrange
+expected=$(echo "${BIOBASH_CORES}/3" | bc)
+
+#Act
+result=$(os::default_number_of_cores)
+
+
+#Assert
+unit_test_header
+eval_outcome "$result" "$expected"   
+unit_test_footer

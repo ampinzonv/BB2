@@ -9,6 +9,7 @@
 #
 
 source $BASHUTILITY_LIB_PATH/file.sh
+source $BASHUTILITY_LIB_PATH/os.sh
 source $BIOBASH_LIB/process_optargs.sh;
 
 
@@ -188,7 +189,7 @@ BBfile::is_fastq()
 #
 #
 # @arg -i/--input (Mandatory) path to fastq file.
-# @arg -c/--compress (Optional) name for compressed output. If ".gz" extension addedd then it is compressed.
+# @arg -o/--output (Optional. Default STDOUT) name for output file. If ".gz" extension addedd then it is compressed.
 # 
 # @exitcode 0  
 # @exitcode 1  
@@ -198,7 +199,7 @@ BBfile::fastq_to_fasta(){
     local -A OPTIONS=()
     local -a ARGS=()
     local -a VALID_FLAG_OPTIONS=( )
-    local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output -j/--jobs)
     local COMMAND_NAME="BBfile::is_fastq"
 
     # Perform the processing to populate the OPTIONS and ARGS arrays.
@@ -223,7 +224,16 @@ BBfile::fastq_to_fasta(){
         outFile=""
     fi
 
-    $BIOBASH_BIN_OS/seqkit fq2fa $file $outFile
+    #Check if we have a third parameter for parallel processing.
+    jobs=""
+    if   is_in '-j'      "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[-j]}"
+    elif is_in '--jobs' "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[--jobs]}"
+    else
+        #use defaults
+        jobs=" -j $(os::default_number_of_cores)"
+    fi
+
+    $BIOBASH_BIN_OS/seqkit fq2fa $file $outFile $jobs
 }
 
 # @brief Splits a multiple fasta file into single sequences.
@@ -255,8 +265,9 @@ BBfile::fastq_to_fasta(){
 #   
 #
 #
-# @arg -i/--input (Mandatory) path to fastq file.
+# @arg -i/--input (mandatory) path to fastq file.
 # @arg -o/--output (optional) Output directory.
+# @arg -j/--jobs (optional) Number of cores to use. See documentation for default number (usually 1).
 # 
 # @exitcode 0  
 # @exitcode 1
@@ -266,7 +277,7 @@ BBfile::multiple_fasta_to_singles(){
     local -A OPTIONS=()
     local -a ARGS=()
     local -a VALID_FLAG_OPTIONS=( )
-    local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output -j/--jobs)
     local COMMAND_NAME="BBfile::multiple_fasta_to_singles"
 
     # Perform the processing to populate the OPTIONS and ARGS arrays.
@@ -292,9 +303,27 @@ BBfile::multiple_fasta_to_singles(){
         outDir=$(echo "${name}.singles")
     fi
 
+     #Check if we have a second parameter. Note that seqkit output option is also "-o"
+    if   is_in '-o'      "${!OPTIONS[@]}"; then outDir="${OPTIONS[-o]}"
+    elif is_in '--output' "${!OPTIONS[@]}"; then outDir="${OPTIONS[--output]}"
+    else
+        name=$(file::name $file)
+        outDir=$(echo "${name}.singles")
+    fi
+
+
+    #Check if we have a third parameter for parallel processing.
+    jobs=""
+    if   is_in '-j'      "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[-j]}"
+    elif is_in '--jobs' "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[--jobs]}"
+    else
+        #use defaults
+        jobs=" -j $(os::default_number_of_cores)"
+    fi
+
     # Uncomment for debuggin'
-    #echo "$BIOBASH_BIN_OS/seqkit split --quiet -i $1 -O $outDir"
-    $BIOBASH_BIN_OS/seqkit split --quiet -i $file -O ./$outDir
+    #echo "$BIOBASH_BIN_OS/seqkit split --quiet -i ${file} -O ${outDir} ${jobs}"
+    $BIOBASH_BIN_OS/seqkit split --quiet -i ${file} -O ./${outDir} ${jobs}
 
     #See: https://stackoverflow.com/questions/21476033/splitting-a-multiple-fasta-file-into-separate-files-keeping-their-original-names
     #For a possible solution based on AWK.

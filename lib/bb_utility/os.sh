@@ -133,3 +133,45 @@ os::detect_mac_version() {
         return 1
     fi
 }
+
+# @brief Returns the number of default cores to use.
+# @description During BIOBASH installation the global variable $BIOBASH_CORES is set.
+# This variable holds the actual number of cores in the system. Nevertheless usually we do not
+# want to run a process using all cores available, this should be set by user. So this function
+# provides a "default" number of processors to use, something that could be 1/3 of all cores available.
+#
+# @noargs
+#
+# @example
+#   os::default_number_of_cores
+#   #Output
+#   an Integer
+#
+# @exitcode 0  On success
+# @exitcode 1  On failure
+#
+os::default_number_of_cores() {
+
+    # In some weird cases during installation if BB installer is not able
+    # to asses the number of cores, this variables is set to 1. So it makes not sense to go 
+    # further and try to divide this number.
+    if [ $BIOBASH_CORES -eq 1 ];then
+        printf $BIOBASH_CORES
+        exit 0
+    fi
+
+    #                        PLEASE READ THE FOLLOWING!!! 
+    # My first idea was to set $cores to a 1/3 of total cores
+    # but in huge infraestructures for simple processes this could get things worst than better,
+    # we could be trying to convert a fastq file to fasta using 35 or more cpu cores!
+    # So the following code can be used if somehow we realize that using a default value of 1/3 (or
+    # whatever) is better than 1. So uncomment the following if that is the case (and comment line 173):
+    #
+    # factor=3
+    # cores=$(echo "${BIOBASH_CORES}/${factor}" | bc)
+
+
+    #...Otherwise let the following untouched.
+    cores=1
+    printf "${cores}"
+}

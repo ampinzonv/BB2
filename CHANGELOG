@@ -1,3 +1,11 @@
+2023-03-30
+* Updated process_optargs to the latest version. Fixes the issue of script hanging when value not passed to key.
+* BBfile::fastq_to_fasta now receives a -j/--jobs argument for parallel computing.
+* BBfile::multiple_fasta_to_singles now receives a -j/--jobs argument for parallel computing.
+* BBseq::get_fasta_components now receives a -j/--jobs argument for parallel computing.
+* A os::default_number_of_processors function was implemented. Defaults to 1 cpu core (see function comments).
+* "bc" added  to software requirements during installation.
+
 2023-03-28
 * Beautified Biobash Standard Test.
 * BBIO::get_data_stream now checks for empty input (missing data from STDIN).
@@ -11,7 +19,7 @@
 * Install script updated to reflect new paths. Tested on OSX.
 * Install script now copies unitesting and testdata folders.
 * Installation/unistallation and unit testing in OSX and Linux/Ubuntu successful.
-* Released the 0.2.0 version of BioBASH.
+* Released the 0.2.0 version of BioBASH.  
 
 
 2023-03-27

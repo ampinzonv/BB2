@@ -1,4 +1,4 @@
-   function process_optargs () {
+function process_optargs () {
     ################################################################################################
     #
     # Used inside a (caller) function (or script) to parse its input arguments
@@ -131,6 +131,8 @@
     #        # ...etc
     #     }
     #
+    #
+    # AUTHOR: Tasos Papastylianou (https://tpapastylianou.com)
     #
     ################################################################################################
 
@@ -340,26 +342,23 @@
           # Process key-value option in long form if valid
             elif $STILL_PROCESSING_OPTIONS &&
                  test "${1:0:2}" = "--"   &&
-                 is_in "${1%=*}" "${VALID_LONG_KEYVAL_OPTIONS[@]}"
+                 is_in "${1%%=*}" "${VALID_LONG_KEYVAL_OPTIONS[@]}"
             then if   test "$( echo "$1" | tr -s [:alpha:] Y )" = "--Y"                # check if first token is of form '--optionname'
                  then OPTION_KEY="$1"; OPTION_VALUE="$2"; OPTION_SHIFT=2
-                      if   test -z "$OPTION_VALUE"
+                      if   builtin test ! -v 2   # i.e. if $2 is not set -- builtin test required for this check, as coreutils test does not have it
                       then error "Error: Option ${OPTION_KEY} requires an argument but none was provided." && return 1
                       fi
                  elif test "$( echo "$1" | tr -s [:alpha:] Y | cut -b -4 )" = "--Y="   # check if first token is of form '--optionname='
                  then OPTION_KEY="$(   echo "$1" | cut -d= -f1 )"
-                      OPTION_VALUE="$( echo "$1" | cut -d= -f2 )"
+                      OPTION_VALUE="$( echo "$1" | cut -d= -f2 )"   # Note: this allows an implicit empty string as a valid input (e.g. '--optioname=""' or even 'optionname=' )
                       OPTION_SHIFT=1
-                      if   test -z "$OPTION_VALUE"
-                      then error "Error: Option ${OPTION_KEY} requires an argument but none was provided." && return 1
-                      fi
                  else error "Error: '$1' seems not to be a valid first token for a long form key value option?" && return 1
                  fi
 
           # If a long-form option is detected but is not valid, raise an error
             elif $STILL_PROCESSING_OPTIONS &&
                  test "${1:0:2}" = "--"
-            then error "Error: Unknown option '${1%=*}' passed to $COMMAND_NAME" && return 1
+            then error "Error: Unknown option '${1%%=*}' passed to $COMMAND_NAME" && return 1
 
           # Process key-value option in short form if valid
             elif $STILL_PROCESSING_OPTIONS &&
@@ -367,10 +366,13 @@
                  is_in "${1:0:2}" "${VALID_SHORT_KEYVAL_OPTIONS[@]}"
             then if   test ${#1} -eq 2   # Check if option key is contiguous with value or not and assign accordingly
                  then OPTION_KEY="$1"      ; OPTION_VALUE="$2"    ; OPTION_SHIFT=2
+                      if   builtin test ! -v 2   # i.e. if $2 is not set -- builtin test required for this check, as coreutils test does not have it
+                      then error "Error: Option ${OPTION_KEY} requires an argument but none was provided." && return 1
+                      fi
                  else OPTION_KEY="${1:0:2}"; OPTION_VALUE="${1:2}"; OPTION_SHIFT=1
                  fi
 
-          # Process flag option in short form if valid
+          # Process flag option in short form if valid (and appearing by itself)
             elif $STILL_PROCESSING_OPTIONS &&
                  test "${1:0:1}" = "-"    &&
                  test ${#1} -eq 2         &&
@@ -381,7 +383,7 @@
             elif $STILL_PROCESSING_OPTIONS &&
                  test "${1:0:1}" = "-"    &&
                  is_in "-${1:1:1}" "${VALID_SHORT_FLAG_OPTIONS[@]}"
-            then set -- "${1:0:2}" "-${1:2}" "${@:2}"   # split joined flags
+            then set -- "${1:0:2}" "-${1:2}" "${@:2}"   # split joined flag or keyval option
                  continue
 
           # If a short-form option is detected but is not valid, raise an error
@@ -429,7 +431,7 @@
       done
 
 
-    # By this points the OPTIONS and ARGS arrays have been populated
+    # By this point, the OPTIONS and ARGS arrays have been populated
     # and will be accessed by the parent function after this one returns.
 
    }
@@ -447,7 +449,7 @@
 
 
 
-   function is_in () {
+function is_in () {
     # --------------------------------------------------------------------------
     # Checks if first input reoccurs in the remaining list of input arguments.
     #
@@ -467,10 +469,14 @@
 
    
 
-   function warning () {
-    # ------------------------------------
+  function warning () {
+    # -----------------------------------------------------------
     # Same as `error`, but printed in blue
-    # ------------------------------------
+    #
+    # Depends on 'error' function (needs to be sourced alongside)
+    # -----------------------------------------------------------
 
+      local ANSI_BLUE="\x1b[94m"
+      local ANSI_RESET="\x1b[39m"
       error "${ANSI_BLUE}$*${ANSI_RESET}"
    }

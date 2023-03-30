@@ -8,6 +8,7 @@
 
 source $BASHUTILITY_LIB_PATH/file.sh
 source $BASHUTILITY_LIB_PATH/feedback.sh
+source $BASHUTILITY_LIB_PATH/os.sh
 source $BIOBASH_LIB/process_optargs.sh;
 
 
@@ -36,17 +37,16 @@ source $BIOBASH_LIB/process_optargs.sh;
 #  -h: header, -d sequence ID, -s Sequences
 # 
 #
-# @arg -i/--input (required) path to a file.
-# @arg -h (optional) 
-# @arg -d/--id (optional)
-# @arg -s/--sequence (optional)
+# @arg -i/--input    (required) path to a file.
+# @arg -h/--header   (optional) Show fasta header.
+# @arg -d/--id       (optional) Show sequence ID.
+# @arg -s/--sequence (optional) Show sequence.
+# @arg -j/--jobs     (optional) Number of CPU cores to use.
 #
 # @exitcode 0  on success
 # @exitcode 1  on failure
 BBSeq::get_fasta_components()
-{
-
-    BIN="$BIOBASH_BIN_OS/seqkit fx2tab "
+{ 
 
     # Initialise the necessary variables that will be checked / populated by process_optargs
     local -A OPTIONS=()
@@ -70,6 +70,25 @@ BBSeq::get_fasta_components()
         echo
         exit  1
     fi
+
+
+    # Since this script has many users cases and command varies accordingly, it is better to standarized
+    # the number of cores from the very begininng
+    
+
+    #Check if we have a third parameter for parallel processing.
+    jobs=""
+    if   is_in '-j'      "${!OPTIONS[@]}"; then jobs=" -j ${OPTIONS[-j]} "
+    elif is_in '--jobs' "${!OPTIONS[@]}"; then jobs=" -j ${OPTIONS[--jobs]} "
+    else
+        #use defaults
+        jobs=" -j $(os::default_number_of_cores) "
+    fi
+
+    #----------------------------------------------------------------
+    # DEFAULT COMMAND
+    #----------------------------------------------------------------
+    BIN="$BIOBASH_BIN_OS/seqkit fx2tab ${jobs} "
 
 
     #----------------------------------------------------------------
