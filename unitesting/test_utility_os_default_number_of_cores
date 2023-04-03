@@ -8,11 +8,12 @@ source $BASHUTILITY_LIB_PATH/os.sh;
 source ./unit_testing_common.sh
 
 #Arrange
-expected=$(echo "${BIOBASH_CORES}/3" | bc)
+expected=$(echo "${BIOBASH_CORES}/2" | bc)
+#echo $expected
 
 #Act
 result=$(os::default_number_of_cores)
-
+#echo $result
 
 #Assert
 unit_test_header

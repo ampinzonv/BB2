@@ -165,13 +165,15 @@ os::default_number_of_cores() {
     # but in huge infraestructures for simple processes this could get things worst than better,
     # we could be trying to convert a fastq file to fasta using 35 or more cpu cores!
     # So the following code can be used if somehow we realize that using a default value of 1/3 (or
-    # whatever) is better than 1. So uncomment the following if that is the case (and comment line 173):
+    # whatever) is better than 1. So uncomment the following if that is the case (and comment line below also):
     #
     # factor=3
     # cores=$(echo "${BIOBASH_CORES}/${factor}" | bc)
 
 
     #...Otherwise let the following untouched.
-    cores=1
+    cores=1 # Comment if changed above.
+
+    
     printf "${cores}"
 }

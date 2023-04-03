@@ -1,3 +1,7 @@
+2023-04-03
+* Fixed a bug in os::default_number_of_cores testing that failed during testing. Even division by 3 was generating "0". Tests expected "1".
+* bb_uninstall_biobash moved to root dir, soit can be used for install and uninstallation. 
+
 2023-03-30
 * Updated process_optargs to the latest version. Fixes the issue of script hanging when value not passed to key.
 * BBfile::fastq_to_fasta now receives a -j/--jobs argument for parallel computing.

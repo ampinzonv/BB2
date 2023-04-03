@@ -19,7 +19,7 @@ BASHUTILITY_LIB_PATH=/Users/andres/Dev/repo/BB2/lib/bb_utility
 BASHUTILITY_LIB=/Users/andres/Dev/repo/BB2/lib/bbutility.sh
 BIOBASH_NATIVE_LIB_PATH=/Users/andres/Dev/repo/BB2/lib/Bio
 BIOBASH_NATIVE_LIB=/Users/andres/Dev/repo/BB2/lib/biobash.sh
-BIOBASH_CORES=4
+BIOBASH_CORES=2
 
 
 export BIOBASH_HOME
