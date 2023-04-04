@@ -8,17 +8,17 @@ source $BIOBASH_NATIVE_LIB_PATH/BBfile.sh
 source $BASHUTILITY_LIB_PATH/feedback.sh;
 source ./unit_testing_common.sh
 
-#This file contains the string: "AGCT"
 testData="$BIOBASH_HOME/testdata/apoe.fasta"
 
 #Arrange
 expected=0 #is fasta
 
 #Act
-result=$(BBfile::is_fasta --input $testData)
+#result=$(BBfile::is_fasta --input $testData)
+result=$(cat "${testData}" | BBfile::is_fasta)
 
 
 #Assert
-# unit_test_header
-# eval_outcome "$result" "$expected"   
-# unit_test_footer
+unit_test_header
+eval_outcome "$result" "$expected"   
+unit_test_footer

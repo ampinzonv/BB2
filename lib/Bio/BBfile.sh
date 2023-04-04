@@ -10,17 +10,18 @@
 
 source $BASHUTILITY_LIB_PATH/file.sh
 source $BASHUTILITY_LIB_PATH/os.sh
+source $BASHUTILITY_LIB_PATH/io.sh
 source $BIOBASH_LIB/process_optargs.sh;
 
 
 
 # @description Checks if a file is valid fasta file. 
 # @example
-#   file::file_is_fasta -i "./file.fa[,fasta]" 
+#   file::file_is_fasta -i/--input "./file.fa[,fasta]" 
 #   #Output
-#   0, 1 or 2.
+#   Returns 0 if file is fasta, 1 if it is not.
 #
-# @arg -i/--input (mandatory) path to a file.
+# @arg -i/--input (mandatory) path to a file (unless input comes from pipe).
 #
 # @exitcode 0  On success 
 # @exitcode 1  On failure
@@ -31,88 +32,134 @@ BBfile::is_fasta()
     local -A OPTIONS=()
     local -a ARGS=()
     local -a VALID_FLAG_OPTIONS=( )
-    local -a VALID_KEYVAL_OPTIONS=( -i/--input )
+    #
     local COMMAND_NAME="BBfile::is_fasta"
 
-    # Perform the processing to populate the OPTIONS and ARGS arrays.
-    process_optargs "$@" || exit 1
-
+    
     #----------------------------------------------------------------
-    # WE NEED A FILE TO CONTINUE
+    #          Data stream?   
     #----------------------------------------------------------------
+    pipe=$(io::is_pipe)
+    
+    # "1" means __IT IS NOT__ a pipe.
+    if [ "${pipe}" -eq 1 ]; then
 
-    # Check input file (REQUIRED!)
-    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
-    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+        local -a VALID_KEYVAL_OPTIONS=( -i/--input )
+        # Perform the processing to populate the OPTIONS and ARGS arrays.
+        process_optargs "$@" || exit 1
+
+        # Since is not pipe (data stream) we suposse it is a file
+        # therefore we assign the value assigned to -i/--input key to "$file"".
+        if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+        elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+
+            # RUN #
+            run=$(grep -c -m 1 "^>" "${file}")
+            
+
+        else
+            #If -i/--input is not present then there is an error
+            feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+            echo ""
+            exit  1
+        fi
     else
-        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
-        echo ""
-        exit  1
+        # If we are here it means we are dealing with data stream.
+        local -a VALID_KEYVAL_OPTIONS=()
+        process_optargs "$@" || exit 1
+
+        
+        # Data stream has to be captured. Note that the $file variabe in this case holds a data stream and
+        # not a file. We keep the same name for further consistency in the script.
+        file=$(io::get_data_stream)
+        
+        # RUN #
+        run=$(echo -n "${file}" | grep -c "^>" -m 1)
+        
     fi
 
-    # More on "declare": https://phoenixnap.com/kb/bash-declare
-    declare fastaFile=$file
-    if [ "$(grep -c "^>" $fastaFile)" -ge 1 ]; then
+    #----------------------------------------------------------------
+    #                       RETURN
+    #----------------------------------------------------------------
+    # If the number of ">" is equal or greater than 1, is fasta.
+    if [ "${run}" -ge 1 ]; then
         return=0
     else
         return=1
     fi
 
     #return
-    echo "$return"    
-    exit 0
+    printf "${return}"   
 
+    exit 0 
 }
 
 
 
 # @description Checks if a file is a valid multiple fasta.
 # @example
-#   file::file_is_multiple_fasta "./file.fa[,fasta]" 
+#   file::file_is_multiple_fasta -i/--input file.fa[,fasta] 
 #   #Output
 #   0
 #
-# @arg 
+# @arg -i/--input (mandatory) path to a file (unless input comes from pipe). 
 #
 # @exitcode 0  
 # @exitcode 1  
-# @exitcode 2 
 BBfile::is_multiple_fasta()
 {
     # Initialise the necessary variables that will be checked / populated by process_optargs
     local -A OPTIONS=()
     local -a ARGS=()
     local -a VALID_FLAG_OPTIONS=( )
-    local -a VALID_KEYVAL_OPTIONS=( -i/--input )
+    #
     local COMMAND_NAME="BBfile::is_multiple_fasta"
 
-    # Perform the processing to populate the OPTIONS and ARGS arrays.
-    process_optargs "$@" || exit 1
-
     #----------------------------------------------------------------
-    # WE NEED A FILE TO CONTINUE
+    #          Data stream?   
     #----------------------------------------------------------------
+    pipe=$(io::is_pipe)
+    
+    # "1" means __IT IS NOT__ a pipe.
+    if [ "${pipe}" -eq 1 ]; then
+        local -a VALID_KEYVAL_OPTIONS=( -i/--input )
+        process_optargs "$@" || exit 1
 
-    # Check input file (REQUIRED!)
-    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
-    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+        if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+        elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+        
+            # RUN #
+            run=$(grep -c -m 2 "^>" "${file}")
+        else
+            feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+            echo ""
+            exit  1
+        fi
+
     else
-        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
-        echo ""
-        exit  1
+        #DATA COMES FROM STREAM
+        local -a VALID_KEYVAL_OPTIONS=()
+        process_optargs "$@" || exit 1
+
+        file=$(io::get_data_stream)
+        
+        # RUN #
+        run=$(echo -n "${file}" | grep -c "^>" -m 2)
+        
     fi
 
-    declare fastaFile=$file
-
-    if [ "$(grep -c "^>" $fastaFile)" -ge 2 ]; then
+    #----------------------------------------------------------------
+    #                       RETURN
+    #----------------------------------------------------------------
+    if [ "${run}" -ge 2 ]; then
         return=0
     else
         return=1
     fi
 
     #return
-    echo "$return"
-    exit
+    printf "${return}"   
+    exit 0 
 }
 
 

@@ -16,6 +16,9 @@ eval_outcome() {
     variable::is_numeric "$1"
     #Capture the "return" from last called function
     returned=$?
+    
+    A=$(variable::is_numeric "${1}")
+    B=$(variable::is_numeric "${2}")
 
     #----------------------------------------------------------------
     # Check if we are evaluating a string or a number.
