@@ -15,25 +15,30 @@ testData="$BIOBASH_HOME/testdata/example.fastq"
 #Arrange
 expected=">ee15a423-b008-44be-a4b2-5441d11b0b94"
 
-# Note that we created this empty temporary file only to get the name...
-outFile=$(file::make_temp_file)
-
-#Because we are going to use it to create another one with th .gz extension
-outFileGZ="$outFile.gz"
-
 #Act
-result=$(BBfile::fastq_to_fasta -i $testData  --output $outFileGZ)
+# --  Result for input file. output STDOUT  -- 
+#result=$(BBfile::fastq_to_fasta -i $testData -j 2 | head -n 1 | awk '{print $1}')
 
+# --  Result for data stream. output STDOUT  -- 
+#result=$(cat $testData | BBfile::fastq_to_fasta | head -n 1 | awk '{print $1}')
+
+
+# --  Results for Input file. Output to a compressed file  -- 
+outFile=$(file::make_temp_file) # Created  only to get the name...
+outFileGZ="$outFile.gz"  #Because we are going to use it to create another one with th .gz extension
+
+#$(BBfile::fastq_to_fasta --input "${testData}" -j 2 --output "${outFileGZ}")
+
+# --  Results for Data Stream. Output to a compressed file  -- 
+$(cat "${testData}" | BBfile::fastq_to_fasta  -j 2 --output "${outFileGZ}")
 
 # OSX has an issue with zcat, it always complains because can't find the file...
 # But "gunzip -c" appears to have the same effect and works both in Linux and OSX.
 # Check this: https://serverfault.com/questions/570024/zcat-gzcat-works-in-linux-not-on-osx-general-linux-osx-compatibility
-result2=$(gunzip -c  $outFile | head -n 1 | awk '{print $1}')
+result=$(gunzip -c  $outFileGZ | head -n 1 | awk '{print $1}')
 
 
 #Assert
 unit_test_header
-
-eval_outcome "$result2" "$expected"
-
+eval_outcome "$result" "$expected"
 unit_test_footer

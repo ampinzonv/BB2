@@ -15,11 +15,10 @@ testData="$BIOBASH_HOME/testdata/example.fastq"
 expected=0 #is fastq
 
 #Act
-result=$(BBfile::is_fastq --input $testData)
+#result=$(BBfile::is_fastq --input $testData)
+result=$(cat $testData | BBfile::is_fastq)
 
 #Assert
 unit_test_header
-
 eval_outcome "$result" "$expected"   
-
 unit_test_footer

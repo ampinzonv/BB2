@@ -1,4 +1,8 @@
-2023-04-03
+2023-04-07
+* Implemented support for input from STDIN in BBfile::is_fastq
+* Implemented support for input from STDIN in BBfile::fastq_to_fasta
+
+2023-04-05
 * Fixed a bug in os::default_number_of_cores testing that failed during testing. Even division by 3 was generating "0". Tests expected "1".
 * bb_uninstall_biobash moved to root dir, soit can be used for install and uninstallation. 
 * Implemented support for input from STDIN in BBfile::is_fasta and BBfile::is_multiple.

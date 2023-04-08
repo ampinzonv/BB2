@@ -180,41 +180,61 @@ BBfile::is_fastq()
     local -A OPTIONS=()
     local -a ARGS=()
     local -a VALID_FLAG_OPTIONS=( )
-    local -a VALID_KEYVAL_OPTIONS=( -i/--input )
+    #
     local COMMAND_NAME="BBfile::is_fastq"
 
-    # Perform the processing to populate the OPTIONS and ARGS arrays.
-    process_optargs "$@" || exit 1
-
+    
+     #----------------------------------------------------------------
+    #          Data stream?   
     #----------------------------------------------------------------
-    # WE NEED A FILE TO CONTINUE
-    #----------------------------------------------------------------
+    pipe=$(io::is_pipe)
+    
+    # "1" means __IT IS NOT__ a pipe.
+    if [ "${pipe}" -eq 1 ]; then
 
-    # Check input file (REQUIRED!)
-    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
-    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+        local -a VALID_KEYVAL_OPTIONS=( -i/--input )
+        # Perform the processing to populate the OPTIONS and ARGS arrays.
+        process_optargs "$@" || exit 1
+
+        # Check input file (REQUIRED!)
+        if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+        elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+        
+            firstLine=$(head -n 1 $file)
+            
+        else
+            feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+            echo ""
+            exit  1
+        fi
     else
-        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
-        echo ""
-        exit  1
+        # If we are here it means we are dealing with data stream.
+        local -a VALID_KEYVAL_OPTIONS=()
+        process_optargs "$@" || exit 1
+
+        
+        # Data stream has to be captured. Note that the $file variabe in this case holds a data stream and
+        # not a file. We keep the same name for further consistency in the script.
+        file=$(io::get_data_stream)
+        firstLine=$(echo $file | head -n 1)
     fi
 
-    #tomar la primera linea
-    declare fastqFile=$file
-    firstLine=$(head -n 1 $fastqFile)
+    # RUN #
+    run=$(echo "${firstLine}" | grep -c "^@")
 
-    # ver si comienza con un "@"
-    if [ "$(echo "$firstLine" | grep -c "^@")" -ge 1 ]; then
+    if [ "${run}" -ge 1 ]; then
         return=0
-    elif [ "$(echo "$firstLine" | grep -c "^@")" -lt 1 ]; then
+    elif [ "${run}" -lt 1 ]; then
         return=1
     else
         return=2
     fi
 
-    echo "$return"
+    echo "${return}"
     exit
 }
+
+
 
 # @brief converts a fastq file to a fasta format (compressed or uncompressed in GZ format).
 # @description Transforms a fastq file into a fasta file.
@@ -247,40 +267,90 @@ BBfile::fastq_to_fasta(){
     local -a ARGS=()
     local -a VALID_FLAG_OPTIONS=( )
     local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output -j/--jobs)
-    local COMMAND_NAME="BBfile::is_fastq"
+    local COMMAND_NAME="BBfile::fastq_to_fasta"
 
-    # Perform the processing to populate the OPTIONS and ARGS arrays.
-    process_optargs "$@" || exit 1
 
-    #----------------------------------------------------------------
-    # WE NEED A FILE TO CONTINUE
-    #----------------------------------------------------------------
-    # Check input file (REQUIRED!)
-    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
-    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+
+    pipe=$(io::is_pipe)
+    # "1" means __IT IS NOT__ a pipe.
+    if [ "${pipe}" -eq 1 ]; then
+    
+    
+        process_optargs "$@" || exit 1
+
+        #-----------------------------------------------------------
+        # Check if we have a second parameter. Note that seqkit output option is also "-o"
+        #-----------------------------------------------------------
+        if   is_in '-o'      "${!OPTIONS[@]}"; then outFile="-o ${OPTIONS[-o]}"
+        elif is_in '--output' "${!OPTIONS[@]}"; then outFile="-o ${OPTIONS[--output]}"
+        else
+            outFile=""
+        fi
+
+
+        #-----------------------------------------------------------
+        #Check if we have a third parameter for parallel processing.
+        #-----------------------------------------------------------
+        jobs=""
+        if   is_in '-j'      "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[-j]}"
+        elif is_in '--jobs' "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[--jobs]}"
+        else
+            #use defaults
+            jobs=" -j $(os::default_number_of_cores)"
+        fi
+
+        #-----------------------------------------------------------
+        # Check if we have an input file
+        #-----------------------------------------------------------
+        if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"  
+            # RUN #
+            $BIOBASH_BIN_OS/seqkit fq2fa $file $outFile $jobs
+            exit 0
+
+        elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+
+            # RUN #
+            $BIOBASH_BIN_OS/seqkit fq2fa $file $outFile $jobs
+            exit 0
+            
+        else
+            #If -i/--input is not present then there is an error
+            feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+            echo ""
+            exit  1
+        fi
+
     else
-        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
-        echo ""
-        exit  1
+        # If we are here it means we are dealing with data stream.
+
+
+        local -a VALID_KEYVAL_OPTIONS=(-o/--output -j/--jobs)
+        process_optargs "$@" || exit 1
+
+
+        file=$(io::get_data_stream)
+        #Check if we have a second parameter. Note that seqkit output option is also "-o"
+        if   is_in '-o'      "${!OPTIONS[@]}"; then outFile="-o ${OPTIONS[-o]}"
+        elif is_in '--output' "${!OPTIONS[@]}"; then outFile="-o ${OPTIONS[--output]}"
+        else
+            outFile=""
+        fi
+
+        #Check if we have a third parameter for parallel processing.
+        jobs=""
+        if   is_in '-j'      "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[-j]}"
+        elif is_in '--jobs' "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[--jobs]}"
+        else
+            #use defaults
+            jobs=" -j $(os::default_number_of_cores)"
+        fi
+        
+        # RUN #
+        echo $file | $BIOBASH_BIN_OS/seqkit fq2fa $outFile $jobs
+        exit 0
+        
     fi
 
-    #Check if we have a second parameter. Note that seqkit output option is also "-o"
-    if   is_in '-o'      "${!OPTIONS[@]}"; then outFile="-o ${OPTIONS[-o]}"
-    elif is_in '--output' "${!OPTIONS[@]}"; then outFile="-o ${OPTIONS[--output]}"
-    else
-        outFile=""
-    fi
-
-    #Check if we have a third parameter for parallel processing.
-    jobs=""
-    if   is_in '-j'      "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[-j]}"
-    elif is_in '--jobs' "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[--jobs]}"
-    else
-        #use defaults
-        jobs=" -j $(os::default_number_of_cores)"
-    fi
-
-    $BIOBASH_BIN_OS/seqkit fq2fa $file $outFile $jobs
 }
 
 # @brief Splits a multiple fasta file into single sequences.
