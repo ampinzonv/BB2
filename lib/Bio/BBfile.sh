@@ -354,17 +354,19 @@ BBfile::fastq_to_fasta(){
 }
 
 # @brief Splits a multiple fasta file into single sequences.
-# @description Splits a multiple fasta file into single sequences, where
-# each sequence file is named using the input file name and the description in the header fasta.
-#  If an outdir is not defined, a directory is created and named after the input file name
-# plus the .singles extension. If input is a compressed file, each outputed individual file is also compressed.
-# PLEASE notice that this function ALWAYS OUTPUTS to the current directory, even if you define the output
-# as a complete path. For example a command like:
+# @description Splits a multiple fasta file into single sequences, where:
+# 
+# 1) If -o/--output is defined, a directory is created accordingly. 
+# 2) If -o/--output is not defined, a directory is created IN THE SAME PATH where the input file resides
+# In both cases splitted files are named  after file name.
 #
-# BBfile::multiple_fasta_to_singles input.fa /home/andres/outputs
+# A similar behavior can be expected if data comes from STDIN and not from a file:
 #
-# Will put the single files in ./home/andres/outputs so it will create the whole directory tree
-# from ./home to outputs and put the files there.
+# 4) If -o/--output is defined, a directory is created accordingly. 
+# 5) If -o/--output is not defined a directory named "stdin.split" is created. 
+# In both cases splitted files are prefixed with "stdin.part_"
+#
+# If input is a compressed file, each outputed individual file is also compressed.
 #
 # @example
 #   cat file.fasta
@@ -381,8 +383,7 @@ BBfile::fastq_to_fasta(){
 #       file.part_B.fasta[.gz]
 #   
 #
-#
-# @arg -i/--input (mandatory) path to fastq file.
+# @arg -i/--input (mandatory) path to fastq file (overriden if data comes from STDIN).
 # @arg -o/--output (optional) Output directory.
 # @arg -j/--jobs (optional) Number of cores to use. See documentation for default number (usually 1).
 # 
@@ -397,53 +398,71 @@ BBfile::multiple_fasta_to_singles(){
     local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output -j/--jobs)
     local COMMAND_NAME="BBfile::multiple_fasta_to_singles"
 
-    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    # defining a command like this in a variable, requires the use of "eval" below
+    # Check this for more info:
+    # https://stackoverflow.com/questions/4668640/how-can-i-execute-a-command-stored-in-a-variable
+    # https://stackoverflow.com/questions/11065077/the-eval-command-in-bash-and-its-typical-uses
+    #
+    # The "-i" here means: split fasta files based on sequence ID.
+    local RUN=$(echo -n "$BIOBASH_BIN_OS/seqkit split --quiet -i")
+    
+    # Args can be processed here...
     process_optargs "$@" || exit 1
 
-    #----------------------------------------------------------------
-    # WE NEED A FILE TO CONTINUE
-    #----------------------------------------------------------------
-    # Check input file (REQUIRED!)
-    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
-    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+    #-----------------------------------------------------------
+    # Check if we have an output... 
+    #-----------------------------------------------------------
+    if   is_in '-o'      "${!OPTIONS[@]}"; then outDir=" -O ${OPTIONS[-o]}"
+    elif is_in '--output' "${!OPTIONS[@]}"; then outDir=" -O ${OPTIONS[--output]}"
     else
-        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
-        echo ""
-        exit  1
+        local outDir=""
     fi
-
-    #Check if we have a second parameter. Note that seqkit output option is also "-o"
-    if   is_in '-o'      "${!OPTIONS[@]}"; then outDir="${OPTIONS[-o]}"
-    elif is_in '--output' "${!OPTIONS[@]}"; then outDir="${OPTIONS[--output]}"
-    else
-        name=$(file::name $file)
-        outDir=$(echo "${name}.singles")
-    fi
-
-     #Check if we have a second parameter. Note that seqkit output option is also "-o"
-    if   is_in '-o'      "${!OPTIONS[@]}"; then outDir="${OPTIONS[-o]}"
-    elif is_in '--output' "${!OPTIONS[@]}"; then outDir="${OPTIONS[--output]}"
-    else
-        name=$(file::name $file)
-        outDir=$(echo "${name}.singles")
-    fi
-
-
-    #Check if we have a third parameter for parallel processing.
+    #-----------------------------------------------------------
+    # Check if we have a parameter for parallel processing.
+    #-----------------------------------------------------------
     jobs=""
     if   is_in '-j'      "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[-j]}"
     elif is_in '--jobs' "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[--jobs]}"
     else
         #use defaults
-        jobs=" -j $(os::default_number_of_cores)"
+        local jobs=" -j $(os::default_number_of_cores)"
     fi
+    
+    
 
-    # Uncomment for debuggin'
-    #echo "$BIOBASH_BIN_OS/seqkit split --quiet -i ${file} -O ${outDir} ${jobs}"
-    $BIOBASH_BIN_OS/seqkit split --quiet -i ${file} -O ./${outDir} ${jobs}
+    #-----------------------------------------------------------
+    # Test if we have a Data stream or a file.
+    #-----------------------------------------------------------
+    pipe=$(io::is_pipe)
+    # "1" means __IT IS NOT__ a pipe.
+    if [ "${pipe}" -eq 1 ]; then
+    
+        if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"  
+            # RUN #
+            eval "${RUN}" "${file}" "${outDir}" "${jobs}"
+
+        elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+
+            # RUN #
+            eval "${RUN}" "${file}" "${outDir}" "${jobs}"
+                
+        else
+            feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+            echo ""     
+        fi
+
+    else
+
+        file=$(io::get_data_stream)
+
+        # RUN #
+        echo "${file}" | eval "${RUN}" "${outDir}" "${jobs}"
+    
+    fi
 
     #See: https://stackoverflow.com/questions/21476033/splitting-a-multiple-fasta-file-into-separate-files-keeping-their-original-names
     #For a possible solution based on AWK.
+    
 }
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#Tests  BBfile::fastq_to_fasta
+#Tests  BBfile::multiple_fasta_to_singles
 
 
 # shellcheck source=/dev/null # to ignore the errorbash-language-server
@@ -11,29 +11,38 @@ source $BASHUTILITY_LIB_PATH/string.sh;
 source ./unit_testing_common.sh
 
 
-testData="$BIOBASH_HOME/testdata/apoe_mul.fasta.gz"
-
-
-# -------------------------------------------------------------------
-# let's try the first case where the script is invoked without a
-# pre-defined folder so it creates one.
-# -------------------------------------------------------------------
 
 #Arrange
+testData="$BIOBASH_HOME/testdata/apoe_mul.fasta.gz"
 expected="NNNNNNNNNNNNNNNNNNNN"
-outDir=$(string::random)
+out=$(string::random)
 
 #Act
-BBfile::multiple_fasta_to_singles  --output $outDir --input $testData
-result=$(gunzip -c $outDir/apoe_mul.part_KY560197.1-4.fasta | tail -n 1)
-#result2=$(gunzip -c "${outDir}"/apoe_mul.part_KY560197.1-4.fasta.gz  | tail -n 1)
+# SCENARIO 1: Works.
+# BBfile::multiple_fasta_to_singles  --output "${out}"  -i "${testData}" -j 4
+# result=$(gunzip -c "$out"/apoe_mul.part_KY560197.1-4.fasta.gz | tail -n 1)
+
+# SCENARIO 2:  Works
+# Works but creates the output dir in the same directory of the input file.
+# BBfile::multiple_fasta_to_singles  --input $testData -j 4
+# result=$(gunzip -c /Users/andres/Dev/repo/BB2/testdata/apoe_mul.fasta.gz.split/apoe_mul.part_KY560197.1-4.fasta.gz | tail -n 1)
+
+
+# SCENARIO 3: Works
+# Note that we are using "cat" in the result because $testData is decompressed before.
+# gunzip -c  $testData | BBfile::multiple_fasta_to_singles --output $out
+# result=$(cat "$out"/stdin.part_KY560197.1-4.fasta | tail -n 1)
+
+# SCENARIO 4: Works
+# Note that it creates a "stdin.split" directory
+gunzip -c  $testData | BBfile::multiple_fasta_to_singles
+result=$(cat stdin.split/stdin.part_KY560197.1-4.fasta | tail -n 1)
+
 
 
 #Assert
 unit_test_header
-
 eval_outcome "$result" "$expected"
-
 unit_test_footer
-
-rm -Rf $outDir
+#rm -Rf $out
+rm -Rf stdin.split

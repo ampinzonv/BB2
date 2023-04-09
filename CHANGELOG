@@ -1,3 +1,6 @@
+2023-04-09
+* Implemented support for input from STDIN in BBfile::multiple_fasta_to_singles
+
 2023-04-07
 * Implemented support for input from STDIN in BBfile::is_fastq
 * Implemented support for input from STDIN in BBfile::fastq_to_fasta
