@@ -9,6 +9,7 @@
 source $BASHUTILITY_LIB_PATH/file.sh
 source $BASHUTILITY_LIB_PATH/feedback.sh
 source $BASHUTILITY_LIB_PATH/os.sh
+source $BASHUTILITY_LIB_PATH/io.sh
 source $BIOBASH_LIB/process_optargs.sh;
 
 
@@ -59,17 +60,27 @@ BBSeq::get_fasta_components()
     process_optargs "$@" || exit 1
 
     #----------------------------------------------------------------
-    # WE NEED A FILE TO CONTINUE
+    # WE NEED A FILE/STREAM TO CONTINUE
     #----------------------------------------------------------------
+    pipe=$(io::is_pipe)
 
-    # Check input file (REQUIRED!)
-    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
-    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+    # "1" means __IT IS NOT__ a pipe.
+    if [ "${pipe}" -eq 1 ]; then
+
+        if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+        elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+        else
+            feedback::sayfrom "BBSeq::get_fasta_components: Input file required." "error"
+            echo
+            exit  1
+        fi
     else
-        feedback::sayfrom "BBSeq::get_fasta_components: Input file required." "error"
-        echo
-        exit  1
+        #$pipe == 0
+        file=$(io::get_data_stream)
+        
     fi
+    # Up to this point if data comes from a file it is assigned to "$file".
+    # If not means that data comes from a stream (pipe). So we can use that to change commands below.
 
 
     # Since this script has many users cases and command varies accordingly, it is better to standarized
@@ -86,9 +97,10 @@ BBSeq::get_fasta_components()
     fi
 
     #----------------------------------------------------------------
-    # DEFAULT COMMAND
+    #                       DEFAULT COMMAND
     #----------------------------------------------------------------
     BIN="$BIOBASH_BIN_OS/seqkit fx2tab ${jobs} "
+
 
 
     #----------------------------------------------------------------
@@ -117,7 +129,7 @@ BBSeq::get_fasta_components()
     fi
 
     #Uncomment for debugging
-    echo "VARS: header=$header sequence=$sequence seqID=$seqID"
+    #echo "VARS: header=$header sequence=$sequence seqID=$seqID"
     
     #----------------------------------------------------------------
     #                       TEST OPTIONS
@@ -130,16 +142,25 @@ BBSeq::get_fasta_components()
 
     #case a. The function is called without any flag
     if [[ "${header}" == "off" && "${sequence}" == "off" && "${seqID}" == "off" ]]; then
-        COMMAND=$(echo "${BIN}" "${file}")
-        $COMMAND
-        exit 0
+        
+        if [ "${pipe}" -eq 0 ]; then
+            echo "${file}" | ${BIN}
+        else
+            ${BIN} "${file}"
+        fi
+        exit 0  
     fi
     
     #case d is pretty much the same than case "a", just the opossite.
     if [[ "${header}" == "on" && "${sequence}" == "on" && "${seqID}" == "on" ]]; then
-        COMMAND=$(echo "${BIN}" "${file}")
-        $COMMAND
+    
+        if [ "${pipe}" -eq 0 ]; then
+            echo "${file}" | ${BIN}
+        else
+            ${BIN} "${file}"
+        fi
         exit 0
+        
     fi
 
     # ---------------------------------------------------------------
@@ -148,24 +169,36 @@ BBSeq::get_fasta_components()
     # ---------------------------------------------------------------
     if [[ "${header}" == "on" && "${sequence}" == "off" && "${seqID}" == "off" ]]; then
 
-        COMMAND=$(echo "${BIN}" " -n " "${file}")
-        $COMMAND
+        if [ "${pipe}" -eq 0 ]; then
+            echo "${file}" | ${BIN} -n
+        else
+            ${BIN} -n  "${file}"
+        fi
         exit 0
+        
 
     elif [[ "${header}" == "off" && "${sequence}" == "on" && "${seqID}" == "off" ]]; then
 
         # Use the "-i" option because it outputs the sequence ID plus TAB plus sequence. It is easier to parse.
-        COMMAND=$(echo "${BIN}" " -i " "${file}")
-        $COMMAND | awk '{print $2}'
+        if [ "${pipe}" -eq 0 ]; then
+            echo "${file}" | ${BIN} -i | awk '{print $2}'
+        else
+            ${BIN} -i  "${file}" | awk '{print $2}'
+        fi
         exit 0
 
     elif [[ "${header}" == "off" && "${sequence}" == "off" && "${seqID}" == "on" ]]; then
         
         # Use the "-i" option because it outputs the sequence ID plus TAB plus sequence. It is easier to parse.
-        COMMAND=$(echo "${BIN}" " -i " "${file}")
-        $COMMAND | awk '{print $1}'
+        if [ "${pipe}" -eq 0 ]; then
+            echo "${file}" | ${BIN} -i | awk '{print $1}'
+        else
+            
+            ${BIN} -i "${file}" | awk '{print $1}'
+            
+        fi
         exit 0
-
+        
     else
         # We have to test another possible case. Series C
         true
@@ -178,8 +211,11 @@ BBSeq::get_fasta_components()
     # ---------------------------------------------------------------
     if [[ "${header}" == "on" && "${sequence}" == "off" && "${seqID}" == "on" ]]; then
 
-        COMMAND=$(echo "${BIN}" " -n " "${file}")
-        $COMMAND
+        if [ "${pipe}" -eq 0 ]; then
+            echo "${file}" | ${BIN} -n
+        else
+            ${BIN} -n "${file}"
+        fi
         exit 0
 
     elif [[ "${header}" == "on" && "${sequence}" == "on" && "${seqID}" == "off" ]]; then
@@ -188,14 +224,20 @@ BBSeq::get_fasta_components()
         # BUT FOR NOW we are defaulting to show everything, because I have not found a easy way
         # to get rid of the first word of the (sequene ID) of the header fasta.
         # Meaning that -hs is equal to -hsd.
-        COMMAND=$(echo "${BIN}" "${file}")
-        $COMMAND
+        if [ "${pipe}" -eq 0 ]; then
+            echo "${file}" | ${BIN}
+        else
+            ${BIN} "${file}"
+        fi
         exit 0
 
     elif [[ "${header}" == "off" && "${sequence}" == "on" && "${seqID}" == "on" ]]; then
         
-        COMMAND=$(echo "${BIN}" " -i " "${file}")
-        $COMMAND
+        if [ "${pipe}" -eq 0 ]; then
+            echo "${file}" | ${BIN} -i 
+        else
+            ${BIN} -i "${file}"
+        fi
         exit 0
 
     else

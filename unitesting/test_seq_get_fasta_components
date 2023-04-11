@@ -11,6 +11,7 @@ source ./unit_testing_common.sh
 
 
 testData="$BIOBASH_HOME/testdata/apoe_mul.fasta"
+# testData="$BIOBASH_HOME/testdata/example.fastq"
 
 # Capture arguments as a string. Necessary when created a script that calls this function
 # myArgs="printf ${@}"
@@ -19,10 +20,17 @@ testData="$BIOBASH_HOME/testdata/apoe_mul.fasta"
 expected="KY560197.1-4"
 
 #Act
+#result=$(BBSeq::get_fasta_components --input $testData -d | tail -n 1)
+#cat "${testData}" | BBSeq::get_fasta_components -d | tail -n 1
+#  cat "${testData}" | BBSeq::get_fasta_components -d
+#result=$(cat "${testData}" | BBSeq::get_fasta_components -d | tail -n 1)
+#result=$(cat "${testData}" | BBSeq::get_fasta_components -sd | tail -n 1)
 result=$(BBSeq::get_fasta_components --input $testData -d | tail -n 1)
+echo "${result}"
+
 
 #Assert
 unit_test_header
-eval_outcome "$result" "$expected"
+eval_outcome "${result}" "${expected}"
 unit_test_footer
 
