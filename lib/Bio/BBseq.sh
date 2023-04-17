@@ -63,6 +63,7 @@ BBSeq::get_fasta_components()
     # WE NEED A FILE/STREAM TO CONTINUE
     #----------------------------------------------------------------
     pipe=$(io::is_pipe)
+    
 
     # "1" means __IT IS NOT__ a pipe.
     if [ "${pipe}" -eq 1 ]; then
@@ -246,3 +247,140 @@ BBSeq::get_fasta_components()
 
     fi
 }
+
+
+# @brief Displays the average  sequence quality  from FASTQ file.
+# @description This function takes a fastq file as input and returns the average
+# quality for each sequence in input file. Alternatively it will return a quality resume: the average of all
+# summed sequences, max and min quality scores, and number of sequences.
+#
+# @example
+#  # Display each sequence quality average
+#  BBSeq::get_fastq_quality -i file.fastq
+    # 8.51
+    # 10.43
+    # 7.27
+    # 8.66
+    # 7.75
+    # 8.85
+    # 8.19
+
+
+    # # Display quality report
+    # BBSeq::get_fastq_quality -i file.fastq --report
+    # File name       numseqs   sumlen   minlen   avg_len   max_len   Q20(%)   Q30(%)
+    # example.fastq   4437      883678   115      199.2     438       26.63    6.09
+
+# @arg -i/--input    (required) path to a file.
+# @arg -r/--report   (optional) Show average, max and min quality score and number of sequences.
+# @arg -q/--quality (optional) fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'. (default "sanger")
+# @exitcode 0  on success
+# @exitcode 1  on failure
+BBSeq::get_fastq_quality(){
+
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=( -r/--report )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input -q/--quality -j/--jobs )
+    local COMMAND_NAME="${FUNCNAME[0]}"
+
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    process_optargs "$@" || exit 1
+
+
+    #----------------------------------------------------------------
+    #                       VALIDATION
+    #----------------------------------------------------------------
+    pipe=$(io::is_pipe)
+
+    if [ "${pipe}" -eq 1 ]; then
+
+        if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+        elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+        else
+            feedback::sayfrom "${COMMAND_NAME}: Input file required." "error"
+            echo
+            exit  1
+        fi
+    else
+        file=$(io::get_data_stream)      
+    fi
+
+    # -- JOBS
+    if   is_in '-j'      "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[-j]} "
+    elif is_in '--jobs' "${!OPTIONS[@]}"; then jobs="-j ${OPTIONS[--jobs]} "
+    else
+        #use defaults
+        jobs="-j $(os::default_number_of_cores) "
+    fi
+
+    # -- QUALITY ENCODING
+    if   is_in '-q'      "${!OPTIONS[@]}"; then qual="-E ${OPTIONS[-q]} "
+    elif is_in '--quality' "${!OPTIONS[@]}"; then qual="-E ${OPTIONS[--quality]} "
+    else
+        #use defaults. When EMPTY seqkit uses sanger.
+        #we can default another one, for example: 
+        #qual=" -E 'illumina-1.3+' "
+        qual="-E sanger"
+    fi
+
+    # -- OUTPUT
+    #  . . . DEPRECATED DEPRECATED DEPRECATED . . . 
+    # BB outputs to STDOUT always, user should use  ">" for edirecttion and saving stuff...
+    #
+    # if   is_in '-o'      "${!OPTIONS[@]}"; then output="${OPTIONS[-o]} "
+    # elif is_in '--output' "${!OPTIONS[@]}"; then output="${OPTIONS[--output]} "
+    # else
+    #     #use defaults
+    #     output=""
+    # fi
+    
+
+    # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    #
+    #                       DEFAULTING COMMANDS
+    # Note that this script has two "modes"
+    # 1) Report mode, which shows a resumed report for all  input entries.
+    # 2) List mode, which gets all quality scores for each input entry.
+    #
+    # Note that all outputs here were implemented using cat and ">" because there was a
+    # difference between the output between 
+    #
+    #
+    #
+    # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    # ------------------------------------------------------------
+    # REPORT MODE
+    # ------------------------------------------------------------
+    if is_in '-r' "${!OPTIONS[@]}" || is_in '--report' "${!OPTIONS[@]}"; then 
+
+        if [ "${pipe}" -eq 1 ]; then
+            
+            $BIOBASH_BIN_OS/seqkit stats  -a -b -T ${jobs} ${qual}  ${file} | tail  -n 1 | awk '{print $1"    "$4 "   "$5"    "$6"    "$7"    "$8"    "$14"   "$15 }'
+            
+        else
+        
+            echo "${file}" | $BIOBASH_BIN_OS/seqkit stats  -a -b -T ${jobs}  ${qual} | tail  -n 1 | awk '{print $1"    "$4 "   "$5"    "$6"    "$7"    "$8"    "$14"   "$15 }'
+
+        fi
+
+    # ------------------------------------------------------------
+    # LIST (DEFAULT) MODE
+    # ------------------------------------------------------------
+    else
+        if [ "${pipe}" -eq 1 ]; then
+
+            $BIOBASH_BIN_OS/seqkit fx2tab -q ${jobs}  ${file} | awk '{print $NF}'
+
+        else
+            
+            echo "${file}" | $BIOBASH_BIN_OS/seqkit fx2tab -q ${jobs} | awk '{print $NF}'
+
+        fi
+    fi
+
+    exit 0
+}
+
+    

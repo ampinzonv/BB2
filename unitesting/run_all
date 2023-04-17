@@ -41,6 +41,7 @@ echo $(fgcolor blue " Running BB::File tests.") $(fgcolor end)
 echo ""
 echo $(fgcolor blue " Running BB::Seq tests.") $(fgcolor end)
 ./test_seq_get_fasta_components
+./test_seq_get_fastq_quality
 
 
 #--------------------------------------------------------------------

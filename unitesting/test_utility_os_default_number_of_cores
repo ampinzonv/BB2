@@ -17,5 +17,5 @@ result=$(os::default_number_of_cores)
 
 #Assert
 unit_test_header
-eval_outcome "$result" "$expected"   
+unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
 unit_test_footer

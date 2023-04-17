@@ -20,5 +20,5 @@ result=$(cat "${testData}" | BBfile::is_fasta)
 
 #Assert
 unit_test_header
-eval_outcome "$result" "$expected"   
+unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
 unit_test_footer

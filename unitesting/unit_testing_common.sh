@@ -4,6 +4,7 @@
 # Beautifying outputs
 source "$BASHUTILITY_LIB_PATH/feedback.sh";
 source "$BASHUTILITY_LIB_PATH/variable.sh";
+source "$SHML_LIB";
 
 # Common functions for all unit tests
 
@@ -27,9 +28,9 @@ eval_outcome() {
     #1==FALSE meaning it is a string
     if [[ $returned -eq 1 ]];then
         if [ "$1" == "$2" ];then         
-            feedback::say "[ Success ]" "success"  #both strings are equal
+            echo -n  "[Success]"   #both strings are equal
         else     
-            feedback::say "[ Failed ]" "error" #both strings are different
+            echo -n "[Failed]"  #both strings are different
         fi
 
     # So this is a number. But what kind?
@@ -42,17 +43,17 @@ eval_outcome() {
             v=$(echo "$1 == $2" | bc -l)
 
             if [ "$v" -eq "0" ]; then
-                feedback::say "[ Failed ]" "error"
+                echo -n "[Failed]" 
             else
-                feedback::say "[ Success ]" "success"
+                echo -n "[Success]" 
             fi
     
     else
         # ok, it seems we are dealing with integers.
         if [ "$1" -ne "$2" ]; then
-            feedback::say "[ Failed ]" "error"
+            echo -n "[Failed]" 
         else
-            feedback::say "[ Success ]" "success"
+            echo -n "[Success]" 
         fi
     fi
 }
@@ -75,5 +76,44 @@ unit_test_footer(){
 unit_test_header(){
     
     file=$(echo ${0} | sed 's/test_//g')
-    feedback::say "      $file ..." "notice"
+    feedback::say "${file}" "notice"  
+}
+
+#
+# Calculates the number of spaces for better output
+#
+# $1 string 1 (i.e. ./my_script)
+# $2 string 2 (i.e. [ Success ])
+#
+unit_test_spacer(){
+    
+    eval string1="$1"
+    eval string2="$2"
+    
+    #echo -n $string1
+
+
+    local Z=60 #Available space
+    local X=$(echo -n "${string1}" | awk '{print length}' | tr -d '\t')
+    local Y=$(echo  -n "${string2}" | awk '{print length}' | tr -d '\t')
+
+    # $S holds the space between script name and eval_outcome response.
+    local S=$(echo "${Z}-${X}-${Y}" | bc)
+
+    #Uncomment for debuggin'
+    #echo "${Z}-${X}-${Y} = ${S}"
+
+
+    echo -n "$(hr '.' ${S})"
+
+    # Work on coloring
+    if [ "${string2}" = "[Success]" ];then
+        echo -n $(fgcolor green " ${string2}") $(fgcolor end)
+    else
+        echo -n $(fgcolor red " ${string2}") $(fgcolor end)
+    fi
+
+    
+    
+
 }

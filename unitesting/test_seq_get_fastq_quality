@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+#Tests  BBfile::fastq_to_fasta
+
+
+# shellcheck source=/dev/null # to ignore the errorbash-language-server
+source $BIOBASH_NATIVE_LIB_PATH/BBseq.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source $BASHUTILITY_LIB_PATH/file.sh;
+source ./unit_testing_common.sh
+
+
+testData="$BIOBASH_HOME/testdata/example.fastq"
+expected=6.09
+
+# Testing data comes from input file
+#result=$(BBSeq::get_fastq_quality -i $testData)
+
+# Testing data comes from input file and is a report (--report)
+#result=$(BBSeq::get_fastq_quality -i $testData )
+
+# Testing data comes from STDIN, default output
+#result=$(cat $testData | BBSeq::get_fastq_quality)
+
+# Testing data comes from STDIN, is a report --report
+result=$(cat $testData | BBSeq::get_fastq_quality --report | awk '{print $NF}')
+
+
+#Assert
+unit_test_header
+unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
+unit_test_footer

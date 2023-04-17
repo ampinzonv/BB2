@@ -25,7 +25,5 @@ result=$(BBfile::uncompress -i $testData | tail -n 1)
 
 #Assert
 unit_test_header
-
-eval_outcome "$result" "$expected"
-
+unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
 unit_test_footer
