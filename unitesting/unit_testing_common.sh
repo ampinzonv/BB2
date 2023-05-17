@@ -92,10 +92,12 @@ unit_test_spacer(){
     
     #echo -n $string1
 
+    # Max in-screen horizontal characters.
+    # This value sets the maximun horizontal row space allowed for output.
+    local Z=60 
 
-    local Z=60 #Available space
     local X=$(echo -n "${string1}" | awk '{print length}' | tr -d '\t')
-    local Y=$(echo  -n "${string2}" | awk '{print length}' | tr -d '\t')
+    local Y=$(echo -n "${string2}" | awk '{print length}' | tr -d '\t')
 
     # $S holds the space between script name and eval_outcome response.
     local S=$(echo "${Z}-${X}-${Y}" | bc)

@@ -1,3 +1,10 @@
+2023-05-17
+* Java added as a dependency for BIOBASH. Needed for using ASCIIGENOME and maybe BBMAP.
+
+2023-04-17
+* Implemented BBseq::get_fastq_quality
+* Improved output for Unitesting. Implemented unit_test_spacer
+
 2023-04-09
 * Implemented support for input from STDIN in BBfile::multiple_fasta_to_singles
 * Implemented support for input from STDIN in BBseq::get_fasta_components

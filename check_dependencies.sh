@@ -23,7 +23,7 @@ This is a safe procedure that  WILL NOT compromise any of your files, installed 
 
 "
 #soft=('zcat' 'wget' 'unzip' 'gzip' 'gnuplot' 'xargs' 'embossversion')
-soft=('zcat' 'wget' 'unzip' 'gzip' 'xargs' 'bc')
+soft=('zcat' 'wget' 'unzip' 'gzip' 'xargs' 'bc' 'java')
 
 #Flow control. Answer should be "y" or "n"
 continue=0

@@ -273,7 +273,8 @@ BBSeq::get_fasta_components()
 
 # @arg -i/--input    (required) path to a file.
 # @arg -r/--report   (optional) Show average, max and min quality score and number of sequences.
-# @arg -q/--quality (optional) fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'. (default "sanger")
+# @arg -q/--quality  (optional) fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'. (default "sanger")
+# @arg -j/--jobs     (optional) Number of CPU cores to use.
 # @exitcode 0  on success
 # @exitcode 1  on failure
 BBSeq::get_fastq_quality(){
