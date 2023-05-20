@@ -1,5 +1,6 @@
 2023-05-17
 * Java added as a dependency for BIOBASH. Needed for using ASCIIGENOME and maybe BBMAP.
+* First API documentation created using shdoc and pandoc.
 
 2023-04-17
 * Implemented BBseq::get_fastq_quality

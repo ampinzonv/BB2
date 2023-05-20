@@ -1,0 +1,66 @@
+<h1 id="biobash-sequence">BioBash Sequence</h1>
+<p>This module contains functions to operate over sequences itself
+(DNA/RNA/Protein)</p>
+<h2 id="overview">Overview</h2>
+<p>BIOBASH module</p>
+<h2 id="index">Index</h2>
+<ul>
+<li><a
+href="#bbseqget_fasta_components">BBSeq::get_fasta_components</a></li>
+<li><a href="#bbseqget_fastq_quality">BBSeq::get_fastq_quality</a></li>
+</ul>
+<h3 id="bbseqget_fasta_components">BBSeq::get_fasta_components</h3>
+<p>This function retrieves different parts of fasta file. A fasta file
+has three main components:<br />
+1) The header (which begins with the “&gt;” sign) 2) The sequence ID
+(which is part of the header)* 3) The sequences itself The porpouse of
+this function is to retrieve that information individually, wether from
+a multiple or single sequence file. Please note that it is assumed that
+Sequence ID is ANY STRING in the fasta header between the “&gt;” sign
+and the first space. So in a header like: &gt;KY560197.1 Acipenser
+ruthenus ApoE (apoE) mRNA, partial cds It is assumed that KY560197.1 is
+the sequence ID.</p>
+<h4 id="example">Example</h4>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Invoked</span> without modifiers shows all info:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">BBSeq::get_fasta_components</span> <span class="at">-i</span> <span class="st">&quot;./file.fa[,fasta]&quot;</span> </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Output</span> <span class="er">(</span><span class="ex">tab</span> separated one row per sequence<span class="kw">)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">SeqID</span>   Description   Sequence  </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">When</span> invoked with a modifier <span class="er">(</span><span class="ex">-h,</span> <span class="at">-d</span> and/or <span class="at">-s</span><span class="kw">)</span> <span class="ex">Displays</span> appropriate info:</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-h:</span> header, <span class="at">-d</span> sequence ID, <span class="at">-s</span> Sequences</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">@arg</span>  <span class="at">-i</span>/--input    <span class="er">(</span><span class="ex">required</span><span class="kw">)</span> <span class="ex">path</span> to a file.</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">@arg</span>  <span class="at">-h</span>/--header   <span class="er">(</span><span class="ex">optional</span><span class="kw">)</span> <span class="ex">Show</span> fasta header.</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">@arg</span>  <span class="at">-d</span>/--id       <span class="er">(</span><span class="ex">optional</span><span class="kw">)</span> <span class="ex">Show</span> sequence ID.</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">@arg</span>  <span class="at">-s</span>/--sequence <span class="er">(</span><span class="ex">optional</span><span class="kw">)</span> <span class="ex">Show</span> sequence.</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">@arg</span>  <span class="at">-j</span>/--jobs     <span class="er">(</span><span class="ex">optional</span><span class="kw">)</span> <span class="ex">Number</span> of CPU cores to use.</span></code></pre></div>
+<h4 id="exit-codes">Exit codes</h4>
+<ul>
+<li><strong>0</strong>: on success</li>
+<li><strong>1</strong>: on failure</li>
+</ul>
+<h3 id="bbseqget_fastq_quality">BBSeq::get_fastq_quality</h3>
+<p>This function takes a fastq file as input and returns the average
+quality for each sequence in input file. Alternatively it will return a
+quality resume: the average of all summed sequences, max and min quality
+scores, and number of sequences.</p>
+<h4 id="example-1">Example</h4>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Display</span> each sequence quality average</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">BBSeq::get_fastq_quality</span> <span class="at">-i</span> file.fastq</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">8.51</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">10.43</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">7.27</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">8.66</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">7.75</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">8.85</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">8.19</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">Display</span> quality report</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">BBSeq::get_fastq_quality</span> <span class="at">-i</span> file.fastq <span class="at">--report</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">File</span> name       numseqs   sumlen   minlen   avg_len   max_len   Q20<span class="er">(</span><span class="ex">%</span><span class="kw">)</span>   <span class="ex">Q30</span><span class="er">(</span><span class="ex">%</span><span class="kw">)</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">example.fastq</span>   4437      883678   115      199.2     438       26.63    6.09</span></code></pre></div>
+<h4 id="exit-codes-1">Exit codes</h4>
+<ul>
+<li><strong>0</strong>: on success</li>
+<li><strong>1</strong>: on failure</li>
+</ul>
