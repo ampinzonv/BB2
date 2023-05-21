@@ -1,3 +1,6 @@
+2023-05-21
+* Integrated system to create documentation (uses shdoc and mkdoc).
+
 2023-05-17
 * Java added as a dependency for BIOBASH. Needed for using ASCIIGENOME and maybe BBMAP.
 * First API documentation created using shdoc and pandoc.
