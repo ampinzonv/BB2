@@ -1,3 +1,13 @@
+2023-05-25
+* New "all" folder created for holding software agnostic from OS (ej. bbmap).
+* setup_environment modified to reflect this changes. 
+* New BIOBASH_EXEC var added to hold BB final user scripts.
+* BIOBASH_BIN var now points to $BIOBASH_HOME/bin
+* BBmap binaries added to BIOBASH_BIN/all folder
+* BIOBASH_HOME/bashrc_osx modified to reflect changes in variables.
+* BIOBASH_HOME/bashrc_linux modified to reflect changes in variables.
+* "Scripts" folder renamed to "exec" to reflect changes in variables.
+
 2023-05-17
 * Java added as a dependency for BIOBASH. Needed for using ASCIIGENOME and maybe BBMAP.
 * First API documentation created using shdoc and pandoc.

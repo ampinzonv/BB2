@@ -208,8 +208,8 @@ fi
 # biobash version, converted into a directory.
 BIOBASH_HOME=$1
 
-BIOBASH_LIB="$BIOBASH_HOME/lib"
-BIOBASH_BIN="$BIOBASH_HOME/bin"
+BIOBASH_LIB="$BIOBASH_HOME/lib" # Holds all BB libraries including "Bio"
+BIOBASH_BIN="$BIOBASH_HOME/bin" # Holds all the external software dependencies for Biobash
 BIOBASH_OS="$OS"
 
 
@@ -219,6 +219,8 @@ BASHUTILITY_LIB="$BIOBASH_LIB/bash_utility.sh"   # Aggregates all the modules in
 BIOBASH_NATIVE_LIB_PATH="$BIOBASH_LIB/Bio"
 BIOBASH_NATIVE_LIB="$BIOBASH_LIB/biobash.sh"     # Aggregates all the modules in one big file.
 BIOBASH_CORES=$numCores
+BIOBASH_EXEC=$BIOBASH_HOME/exec  				 # Holds all the BB user executables (scripts).
+
 
 if [[ $OS == "linux" ]];then
     BIOBASH_BIN_OS="$BIOBASH_BIN/$BIOBASH_OS/$arch"
@@ -226,6 +228,9 @@ fi
 if [[ $OS == "osx" ]];then
     BIOBASH_BIN_OS="$BIOBASH_BIN/$BIOBASH_OS/$arch"
 fi
+
+# The following is a special case for software that is OS agnostic (ej. java-based).
+BIOBASH_BIN_ALL="$BIOBASH_BIN/all"
 
 
 # Since we are installing particular versions of BLAST, seqtk, clustalw (and maybe more)...
@@ -253,6 +258,7 @@ BIOBASH_LIB="$BIOBASH_LIB"
 BIOBASH_BIN="$BIOBASH_BIN"
 BIOBASH_OS="$BIOBASH_OS"
 BIOBASH_BIN_OS="$BIOBASH_BIN_OS"
+BIOBASH_BIN_ALL="$BIOBASH_BIN_ALL"
 
 SHML_LIB="$SHML_LIB"
 BASHUTILITY_LIB_PATH="$BASHUTILITY_LIB_PATH"
@@ -260,6 +266,7 @@ BASHUTILITY_LIB="$BASHUTILITY_LIB"
 BIOBASH_NATIVE_LIB_PATH="$BIOBASH_NATIVE_LIB_PATH"
 BIOBASH_NATIVE_LIB="$BIOBASH_NATIVE_LIB"
 BIOBASH_CORES="$BIOBASH_CORES"
+BIOBASH_EXEC="$BIOBASH_EXEC"
 
 
 export BIOBASH_HOME
@@ -267,15 +274,17 @@ export BIOBASH_LIB
 export BIOBASH_BIN
 export BIOBASH_OS
 export BIOBASH_BIN_OS
+export BIOBASH_BIN_ALL
 export SHML_LIB
 export BASHUTILITY_LIB_PATH
 export BASHUTILITY_LIB
 export BIOBASH_NATIVE_LIB_PATH
 export BIOBASH_NATIVE_LIB
 export BIOBASH_CORES
+export BIOBASH_EXEC
 
 
-export PATH="$BIOBASH_HOME:$BIOBASH_BIN:\$PATH"
+export PATH="$BIOBASH_HOME:$BIOBASH_EXEC:\$PATH"
 
 #BIOBASH-END
 " >> "$HOME"/.bashrc
