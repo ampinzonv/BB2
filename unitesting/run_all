@@ -43,6 +43,12 @@ echo $(fgcolor blue " Running BB::Seq tests.") $(fgcolor end)
 ./test_seq_get_fasta_components
 ./test_seq_get_fastq_quality
 
+#--------------------------------------------------------------------
+#   BB::INDEX TESTS
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " Running BB::Index tests.") $(fgcolor end)
+./test_index_genome_indexing
 
 #--------------------------------------------------------------------
 #       UTILITY TESTS

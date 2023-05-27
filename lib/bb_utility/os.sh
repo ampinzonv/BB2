@@ -177,3 +177,43 @@ os::default_number_of_cores() {
     
     printf "${cores}"
 }
+
+
+# @brief Returns the total memory in the system
+#  
+# @arg $1 It can be: mega, giga or tera. Defaults to bytes.  
+#
+# @exitcode 0  On success
+# @exitcode 1  On failure
+os::show_system_memory(){
+
+    #Check which OS are we working on
+    if [ "${BIOBASH_OS}" == "osx" ];then
+        m=$(sysctl hw.memsize | awk '{print $2}')
+    fi
+
+    if [ "${BIOBASH_OS}" == "linux" ];then
+        m=$(cat /proc/meminfo | head -n 1 | awk '{print $2}')
+    fi
+
+    # If empty $1, show memory in bytes.
+    if [ -z "${1}" ];then
+        printf "${m}"
+    else
+        if [ "${1}" == "giga" ];then
+            c=1073741824
+        fi
+        if [ "${1}" == "tera" ];then
+            c=1099511627776
+        fi
+        if [ "${1}" == "mega" ];then
+            c=1024
+        fi
+
+        #Show memory (m) in required format ($1).
+        mg=$(echo "${m}/${c}" | bc )
+
+        printf "${mg}"
+    fi
+
+}
