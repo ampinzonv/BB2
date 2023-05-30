@@ -15,13 +15,13 @@ source $BIOBASH_LIB/process_optargs.sh;
 # @description
 #   BIOBASH module
 
-# @description This function indexes genomic sequences
+# @description This function indexes genomic sequences using BBMap.
 #
 # @example
-#   result=$(BBindex::genome_indexing -i genome.fa -m 64 )
+#   result=$(BBindex::genome_indexing -i genome.fa -m 64 --jobs 10)
 #
-#   This will create a folder maned "ref" in the local directory,
-#   with the following structure:
+# This will run using 64GB of memory, 10 CPU cores and will create a folder maned "ref" (default)
+# in the local directory, with the following structure:
 #
 # ref
 # ├── genome
@@ -35,10 +35,19 @@ source $BIOBASH_LIB/process_optargs.sh;
 #         ├── chr1_index_k13_c8_b1.block
 #         └── chr1_index_k13_c8_b1.block2.gz
 #
+#  If used with the -o/--output [out_name] option, the "ref" directory will be created inside
+# the argument passed in [out_name] as follows:
+
+# out_name
+#       ├──ref
+#           ├── genome
+#               └── 1
+#        ...
 #
-# @arg  -i/--input    (required) path to a file (Unless data comes from a pipe).
-# @arg  -j/--jobs     (optional) Number of CPU cores to use.
-# @arg  -o/--output   (optional) Output file to save
+# @arg  -i/--input    (required) path to a file.
+# @arg  -j/--jobs     (optional) Number of CPU cores to use (default: use all available cores).
+# @arg  -o/--output   (optional) Output file to save (default: "./ref")
+# @arg  -m/--memory   (optional) Amount of memory to be used in GB (default: all available memory)
 #
 # @exitcode 0  on success
 # @exitcode 1  on failure

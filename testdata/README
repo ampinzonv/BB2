@@ -1,0 +1,24 @@
+* hepatitis_delta_virus.fa
+Whole genome sequence of Hepatitis Delta virus as downloaded from RefSeq.
+
+* hepatitis_virus_raw_reads.fq.gz
+Simulated interleaved Raw fastq data for hepatitis_delta_virus.fa genome.
+This was achieved as follows:
+
+$BIOBASH_BIN/all/bbmap/randomreads.sh \
+reads=500000 \
+length=120 \
+paired interleaved  \
+q=35 \
+out=hepatitis_virus_raw_reads.fq.gz
+
+Use this data along with the hepatitis genome for testing assembly. Note that this is
+still PAIRED END sequencing but in interleaved format.
+
+(NOTE: the shred.sh script can also be used to achieve a similar behaviour:
+Check: https://www.seqanswers.com/forum/bioinformatics/bioinformatics-aa/46985-yes-bbmap-can-do-that?t=58221)
+
+* wholegenome.fasta
+SARS-CoV2 whole genome sequence. Deprecated, for testing better use hepatitis_delta_virus.fa
+since it is smaller. Keep it here for backward compatibility with some BB testing.
+

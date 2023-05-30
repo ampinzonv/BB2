@@ -1,3 +1,8 @@
+2023-05-29
+* Compiled samtools for osx and linux (beta-testing).
+* On linux samtools was compiled without ncurses support.
+* Drafted BBalign::map_reads_to_reference.
+
 
 2023-05-27
 * BBindex::genome_indexing function created.

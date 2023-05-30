@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+#Tests  BBfile::is_fasta
+# This script is called and receives a data stream, then outputs it.
+
+# shellcheck source=/dev/null # to ignore the errorbash-language-server
+source $BIOBASH_NATIVE_LIB_PATH/BBalign.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source ./unit_testing_common.sh
+
+testData="$BIOBASH_HOME/testdata/fake1.fq,$BIOBASH_HOME/testdata/fake2.fq"
+#testData="$BIOBASH_HOME/testdata/fake1.fq"
+
+
+#Arrange
+expected=1679
+
+#Act
+# Create a temporary directory to hold results
+
+BBalign::map_reads_to_genome --input "${testData}"
+
+exit
+
+#Assert
+unit_test_header
+unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
+unit_test_footer
