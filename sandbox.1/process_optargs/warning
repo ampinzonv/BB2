@@ -1,7 +1,0 @@
-   function warning () {
-    # ------------------------------------
-    # Same as `error`, but printed in blue
-    # ------------------------------------
-
-      error "${ANSI_BLUE}$*${ANSI_RESET}"
-   }

@@ -1,8 +1,0 @@
-   function error () {
-    # --------------------------------------------------------------------------
-    # A useful, 'libstderred.so' compatible function for safely echoing error
-    # messages to stderr (see: https://unix.stackexchange.com/a/164223)
-    # --------------------------------------------------------------------------
-
-      awk "BEGIN { print \"$*\" > \"/dev/stderr\" }"
-   }
