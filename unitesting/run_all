@@ -50,6 +50,15 @@ echo ""
 echo $(fgcolor blue " Running BB::Index tests.") $(fgcolor end)
 ./test_index_genome_indexing
 
+
+#--------------------------------------------------------------------
+#       BB::ALIGN TESTS
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " Running BB::align tests.") $(fgcolor end)
+./test_align_map_reads_to_genome
+
+
 #--------------------------------------------------------------------
 #       UTILITY TESTS
 #--------------------------------------------------------------------

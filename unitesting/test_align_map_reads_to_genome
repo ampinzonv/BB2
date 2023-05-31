@@ -8,19 +8,24 @@ source $BIOBASH_NATIVE_LIB_PATH/BBalign.sh
 source $BASHUTILITY_LIB_PATH/feedback.sh;
 source ./unit_testing_common.sh
 
-testData="$BIOBASH_HOME/testdata/fake1.fq,$BIOBASH_HOME/testdata/fake2.fq"
-#testData="$BIOBASH_HOME/testdata/fake1.fq"
+testData="$BIOBASH_HOME/testdata/hepatitis_virus_raw_reads1.fq.gz,$BIOBASH_HOME/testdata/hepatitis_virus_raw_reads2.fq.gz"
+#testData="$BIOBASH_HOME/testdata/hepatitis_virus_raw_reads.fq.gz"
 
 
-#Arrange
-expected=1679
+#Arrange.
+expected="SO:unsorted"
 
-#Act
+# Act
 # Create a temporary directory to hold results
+dir=$(file::make_temp_dir "BB_" "false")
+samFile="${dir}/bbsam.sam"
 
-BBalign::map_reads_to_genome --input "${testData}"
-
+BBalign::map_reads_to_genome --input "${testData}" -x /Users/andres/Dev/repo/BB2/testdata/ --jobs 2 -o ${samFile}
 exit
+
+result=$(head -n 1 "${samFile}" | awk '{print $3}')
+
+
 
 #Assert
 unit_test_header
