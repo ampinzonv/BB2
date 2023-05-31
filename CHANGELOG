@@ -1,3 +1,6 @@
+2023-05-30
+* Solved issue with Git push. Named here for repo tracking.
+
 2023-05-29
 * Compiled samtools for osx and linux (beta-testing).
 * On linux samtools was compiled without ncurses support.
