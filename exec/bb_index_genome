@@ -1,31 +1,45 @@
 #!/usr/bin/env bash
 #
-# This script creates a genome Index. 
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# This script generates a genome Index using the BioBASH library.
 #
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
 #
 
 source "$BIOBASH_NATIVE_LIB_PATH/BBindex.sh";
-source "$BASHUTILITY_LIB_PATH/file.sh";
 source "$BASHUTILITY_LIB_PATH/feedback.sh";
 
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc="Creates a genome Index"
+helpUsage="bb_index_genome -i <Genome file in fasta format> [options]
 
+Options:
 
-helpDesc="Create a genome Index"
-helpUsage=" This example command will run using 64GB of memory and 10 CPU cores:
+-i | --input  <file>  (required) path to a file.
+-j | --jobs   [int]   (optional) Number of CPU cores to use (default: use all available cores).
+-o | --output [name]  (optional) Output file to save (default: "./ref")
+-m | --memory [int]   (optional) Amount of memory to be used in GB (default: all available memory)
 
-    bb_index_genome -i genome.fa -m 64 --jobs 10)
+Examples:
+Create index for file: genome.fa using 64GB of memory and 10 CPU cores:
 
-    Please note that this script will always create a "ref" directory holding the genome index (see below).
+    bb_index_genome -i genome.fa -m 64 --jobs 10
 
-    Arguments:
-
-    -i/--input    (required) path to a file.
-    -j/--jobs     (optional) Number of CPU cores to use (default: use all available cores).
-    -o/--output   (optional) Output file to save (default: "./ref")
-    -m/--memory   (optional) Amount of memory to be used in GB (default: all available memory)
-
-    
-    Directory structure of the indexed genome:
+    Please note that this script will always create a "ref" directory holding the genome 
+    with the following structure:
 
     ref
     ├── genome
@@ -39,8 +53,8 @@ helpUsage=" This example command will run using 64GB of memory and 10 CPU cores:
             ├── chr1_index_k13_c8_b1.block
             └── chr1_index_k13_c8_b1.block2.gz
 
-    If used with the -o/--output [out_name] option, the "ref" directory will be created inside
-    the argument passed in [out_name] as follows:
+    If used with the -o | --output [name] option, the "ref" directory will be created inside
+    the argument passed in [name] as follows:
 
     out_name
         ├──ref
@@ -49,9 +63,23 @@ helpUsage=" This example command will run using 64GB of memory and 10 CPU cores:
         ... (same structure as example above)
 "
 
+# ........................................................................
+#
+#               CHECK IF EMPTY DISPLAY HELP
+#
+# ........................................................................
 # If not arguments are passed show help
 # DO NOT FORGET to quote the variables.
 if [ $# -eq 0 ]; then
-    feedback::help  "$helpDesc" "$helpUsage"
+    # DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
     exit 0
 fi
+
+# ........................................................................
+#
+#               JUST RUN
+#
+# ........................................................................
+$(BBindex::genome_indexing "$@") 
+

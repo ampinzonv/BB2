@@ -77,14 +77,16 @@ echo -n $(fgcolor $color "$1") $(fgcolor end)
 feedback::help()
 {
 
-  script=$(file::basename $0)
+  local script=$(file::basename $0)
+  local version=$(cat "${BIOBASH_HOME}"/version)
+
   echo ""
-  echo "$(indent) $(color red)>$(color end) $(attribute bold "$script.")$(attribute end) "
-  echo "$(indent) $(a dim "$1") $(a end)"
-  echo "$(indent) $(a dim "---") $(a end)"
+  echo "$(color red)$(attribute bold "$script (BioBash ${version})")$(attribute end) $(color end) "
+  echo "$(a dim "$1") $(a end)"
+  echo "$(a dim "---") $(a end)"
   echo ""
-  echo "$(indent) Usage:"
-  echo "$(indent) $2"
+  echo "Usage:"
+  echo "$2"
   echo ""
   
 }

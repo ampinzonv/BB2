@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# This script generates a genome Index using the BioBASH library.
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+#
+
+source "$BIOBASH_NATIVE_LIB_PATH/BBformat.sh";
+source "$BASHUTILITY_LIB_PATH/feedback.sh";
+
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc="Converts from SAM to BAM format"
+helpUsage=" bb_convert_sam_to_bam  -i <SAM file>  [options]
+
+ Options:
+ -i | --input  <file>         (required) A valid SAM file.
+ -o | --output [string]       (optional) Name for output file in BAM format.
+ -j | --jobs   [int]          (optional) Number of processors to use.
+ -m | --memory [int]          (optional) Amount of memory to use in GB.
+ -k | --keep   [true | false] (optional) Keep (not erase) the SAM file after conversion. Default: true
+ -s | --sort   [true | false] (optional) Sort the obtained BAM file. Default: true
+
+ Examples:
+ 1) Convert file.sam into a sorted file.bam, keeping the SAM file intact. Use defaults for memory and processors.
+    
+    bb_convert_sam_to_bam -i file.sam    
+
+ 2) Convert file.sam  into the unsorted 'renamed_file.bam', use 3 processors, 16GB of memory and delete SAM file.
+    
+    bb_convert_sam_to_bam -i file.sam -j 3 -m 16 --keep false -s false --output renamed_file.bam
+"
+
+# ........................................................................
+#
+#               CHECK IF EMPTY DISPLAY HELP
+#
+# ........................................................................
+# If not arguments are passed show help
+# DO NOT FORGET to quote the variables.
+if [ $# -eq 0 ]; then
+    # DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+    exit 0
+fi
+
+# ........................................................................
+#
+#               JUST RUN
+#
+# ........................................................................
+$(BBformat::sam_to_bam "$@") 

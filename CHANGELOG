@@ -5,6 +5,8 @@
 * "sandbox" dir is now maintained OUTSIDE the repository particualrly for holding large SAM files.
 * In house generated  Forward and Reverse FQ files (seqkit) and interleaved version (bbmap) from hepatitis virus added to testdata (see testdata/README).
 * New brand BIOBASH logo! Hey!
+* bb_index_genome created (Starting our way to pre-Sabbatical build).
+* bb_convert_sam_to_bam created.
 
 
 2023-05-31
