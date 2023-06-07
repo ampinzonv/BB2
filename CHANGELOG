@@ -4,6 +4,7 @@
 * BBfile::fastq_to_fasta was replicated to: BBformat::fastq_to_fasta. Bothe kept for backwards compatibility (seems safe to delete the former).
 * "sandbox" dir is now maintained OUTSIDE the repository particualrly for holding large SAM files.
 * In house generated  Forward and Reverse FQ files (seqkit) and interleaved version (bbmap) from hepatitis virus added to testdata (see testdata/README).
+* New brand BIOBASH logo! Hey!
 
 
 2023-05-31
