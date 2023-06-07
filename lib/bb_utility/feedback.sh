@@ -28,8 +28,8 @@ elif [ $2 = "msg" ]; then
   color="blue"
 elif [ $2 = "success" ]; then 
   color="green"
- else
-   color="darkgray"
+else
+  color="darkgray"
 fi
 
 echo -n $(fgcolor lightblue "Message from $0:") $(fgcolor end)

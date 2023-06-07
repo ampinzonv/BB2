@@ -60,6 +60,15 @@ echo $(fgcolor blue " Running BB::align tests.") $(fgcolor end)
 
 
 #--------------------------------------------------------------------
+#       BB::FORMAT TESTS
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " Running BB::format tests.") $(fgcolor end)
+./test_format_sam_to_bam
+./test_format_fastq_to_fasta
+
+
+#--------------------------------------------------------------------
 #       UTILITY TESTS
 #--------------------------------------------------------------------
 echo ""

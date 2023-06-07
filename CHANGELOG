@@ -1,5 +1,13 @@
+2023-06-07
+* BBformat::sam_to_bam implemented.
+* New toy.sam file added to testdata (obtained from: https://github.com/samtools/samtools/blob/develop/examples/toy.sam)
+* BBfile::fastq_to_fasta was replicated to: BBformat::fastq_to_fasta. Bothe kept for backwards compatibility (seems safe to delete the former).
+* "sandbox" dir is now maintained OUTSIDE the repository particualrly for holding large SAM files.
+* In house generated  Forward and Reverse FQ files (seqkit) and interleaved version (bbmap) from hepatitis virus added to testdata (see testdata/README).
+
+
 2023-05-31
-* BBalign::map_reads_to_genome completed.
+* BBalign::map_reads_to_genome complete.
 
 2023-05-30
 * Solved issue with Git push. Named here for repo tracking.

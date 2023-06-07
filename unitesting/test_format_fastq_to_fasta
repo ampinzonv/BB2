@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+#Tests  BBfile::fastq_to_fasta
+
+
+# shellcheck source=/dev/null # to ignore the errorbash-language-server
+source $BIOBASH_NATIVE_LIB_PATH/BBfile.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source $BASHUTILITY_LIB_PATH/file.sh;
+source ./unit_testing_common.sh
+
+
+testData="$BIOBASH_HOME/testdata/example.fastq"
+
+#Arrange
+expected=">ee15a423-b008-44be-a4b2-5441d11b0b94"
+
+#Act
+# --  Result for input file. output STDOUT  -- 
+#result=$(BBfile::fastq_to_fasta -i $testData -j 2 | head -n 1 | awk '{print $1}')
+
+# --  Result for data stream. output STDOUT  -- 
+#result=$(cat $testData | BBfile::fastq_to_fasta | head -n 1 | awk '{print $1}')
+
+
+# --  Results for Input file. Output to a compressed file  -- 
+outFile=$(file::make_temp_file) # Created  only to get the name...
+outFileGZ="$outFile.gz"  #Because we are going to use it to create another one with th .gz extension
+
+#$(BBfile::fastq_to_fasta --input "${testData}" -j 2 --output "${outFileGZ}")
+
+# --  Results for Data Stream. Output to a compressed file  -- 
+$(cat "${testData}" | BBfile::fastq_to_fasta  -j 2 --output "${outFileGZ}")
+
+# OSX has an issue with zcat, it always complains because can't find the file...
+# But "gunzip -c" appears to have the same effect and works both in Linux and OSX.
+# Check this: https://serverfault.com/questions/570024/zcat-gzcat-works-in-linux-not-on-osx-general-linux-osx-compatibility
+result=$(gunzip -c  $outFileGZ | head -n 1 | awk '{print $1}')
+
+
+#Assert
+unit_test_header
+unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
+unit_test_footer
