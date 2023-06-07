@@ -15,22 +15,21 @@ source $BASHUTILITY_LIB_PATH/file.sh
 #
 # @arg $1 What you want to say
 # @arg $2 Type of message (warn, error, msg or success).
-feedback::sayfrom()
-{
+feedback::sayfrom(){
 
-if [ $2 = "error" ]; then
-  color="red"
-  preset="[Error] "
-elif [ $2 = "warn" ]; then 
-  color="lightyellow" 
-  preset="[Warn] "
-elif [ $2 = "msg" ]; then 
-  color="blue"
-elif [ $2 = "success" ]; then 
-  color="green"
-else
-  color="darkgray"
-fi
+  if [ $2 = "error" ]; then
+    color="red"
+    preset="[Error] "
+  elif [ $2 = "warn" ]; then 
+    color="lightyellow" 
+    preset="[Warn] "
+  elif [ $2 = "msg" ]; then 
+    color="blue"
+  elif [ $2 = "success" ]; then 
+    color="green"
+  else
+    color="darkgray"
+  fi
 
 echo -n $(fgcolor lightblue "Message from $0:") $(fgcolor end)
 echo  $(fgcolor $color  "${preset} $1") $(fgcolor end)

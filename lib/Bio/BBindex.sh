@@ -60,6 +60,11 @@ BBindex::genome_indexing(){
     local -a VALID_KEYVAL_OPTIONS=( -i/--input -j/--jobs -m/--memory -o/--output )
     local COMMAND_NAME="${FUNCNAME[0]}"
 
+    local ref 
+    local memory 
+    local jobs 
+    local output
+
     
 
     # ...............................................................

@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+#
+# This script creates a genome Index. 
+#
+#
+
+source "$BIOBASH_NATIVE_LIB_PATH/BBindex.sh";
+source "$BASHUTILITY_LIB_PATH/file.sh";
+source "$BASHUTILITY_LIB_PATH/feedback.sh";
+
+
+
+helpDesc="Create a genome Index"
+helpUsage=" This example command will run using 64GB of memory and 10 CPU cores:
+
+    bb_index_genome -i genome.fa -m 64 --jobs 10)
+
+    Please note that this script will always create a "ref" directory holding the genome index (see below).
+
+    Arguments:
+
+    -i/--input    (required) path to a file.
+    -j/--jobs     (optional) Number of CPU cores to use (default: use all available cores).
+    -o/--output   (optional) Output file to save (default: "./ref")
+    -m/--memory   (optional) Amount of memory to be used in GB (default: all available memory)
+
+    
+    Directory structure of the indexed genome:
+
+    ref
+    ├── genome
+    │   └── 1
+    │       ├── chr1.chrom.gz
+    │       ├── info.txt
+    │       ├── scaffolds.txt.gz
+    │       └── summary.txt
+    └── index
+        └── 1
+            ├── chr1_index_k13_c8_b1.block
+            └── chr1_index_k13_c8_b1.block2.gz
+
+    If used with the -o/--output [out_name] option, the "ref" directory will be created inside
+    the argument passed in [out_name] as follows:
+
+    out_name
+        ├──ref
+            ├── genome
+                └── 1
+        ... (same structure as example above)
+"
+
+# If not arguments are passed show help
+# DO NOT FORGET to quote the variables.
+if [ $# -eq 0 ]; then
+    feedback::help  "$helpDesc" "$helpUsage"
+    exit 0
+fi
