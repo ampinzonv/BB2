@@ -1,5 +1,6 @@
 2023-06-13
 * bb_map_reads_to_genome implemented.
+* Reseting repo again for big files.
 
 2023-06-07
 * BBformat::sam_to_bam implemented.
