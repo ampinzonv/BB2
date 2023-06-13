@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# This script maps FASTQ reads to an indexed genome.
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+#
+
+source "$BIOBASH_NATIVE_LIB_PATH/BBalign.sh";
+source "$BASHUTILITY_LIB_PATH/feedback.sh";
+
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc="Maps FASTQ reads against an indexed reference genome."
+helpUsage=" bb_map_reads_to_genome  -i <FASTQ file(s)>  -x <indexed genome> [options]
+
+ Options:
+ -i | --input  <string>       (required) path to fastq file(s). Comma separated if PE in different files.
+ -x | --index  [string]       (optional) Path to index directory.
+ -o | --output [string]       (optional) Output SAM file name (default: same as input plus ".sam.gz" extension).
+ -j | --jobs   [int]          (optional) Number of processors to use.
+ -m | --memory [int]          (optional) Amount of memory to use in GB (default: all available memory).
+ 
+Examples:
+1) Map PE reads (comma separated) and output a compressed SAM file (align.sam.gz) use 64 GB of RAM, 10 CPU cores:
+
+    bb_map_reads_to_genome -i read1.fq,read2.fq -x "path/to/indexDir" -m 64 --jobs 10 --output "results/align.sam.gz")
+
+2) Map SE (or interleaved) fastq file and output a raw (not compressed) SAM file. Search for index in local dir.
+
+    bb_map_reads_to_genome -i reads.fq --output "results/align.sam")
+
+3) Map PE reads and output a SAM file named after FASTQ file (i.e. reads1.sam)
+    
+    bb_map_reads_to_genome -i reads1.fq,reads2.fq 
+
+Description:
+INPUT: 
+This function takes a SE or PE fastq file and maps it to a reference genome.
+The PE file can be interleaved or separated into forward and reverse files.
+If PE files are provided as two separate fastq files the complete path to both files must be
+provided comma separated as follows even if both fastq files reside in the same directory:
+
+The following is CORRECT:
+ --input /complete/path/to/fastq1,/complete/path/to/fastq2
+ --input /other/path/to/fastq1,/different/path/to/fastq2
+ --input fastq1,fastq2
+(Note that for the latter it is assumed that fastq1 and fastq2 are in the local directory.)
+
+ The following is WRONG:
+--input /complete/path/to/fastq1,fastq2
+(UNLESS fastq2 is located in the current directory)
+
+The genome index provided is used (-x/--index option) for mapping, please note that this index MUST BE
+created with bb_index_genome (or BBMap), indexes created with Bowtie2 or other software will not work.
+The index MUST be located in a directory called "ref" and the path SHOULD NOT INCLUDE IT, for example if the "ref"
+directory is in the path: /home/data/indexes/ref
+
+The path should be:
+
+--index /home/data/indexes or -x /home/data/indexes
+
+If a path to a valid index is not provided, it will search for a index dir in local dir. If not found it will
+exit with errors.
+
+OUTPUT:
+A SAM file is written to the path provided with the -o/--output option. If the ".gz" extension is also used, the output file
+will be then compressed accordingly using GZIP. If -o/--output is not provided the name of the first input file will be used as base name
+and the ".sam" extension will be appended.
+If the file name exists in current directory the program will stop before proceeding.
+
+"
+
+# ........................................................................
+#
+#               CHECK IF EMPTY DISPLAY HELP
+#
+# ........................................................................
+# If not arguments are passed show help
+# DO NOT FORGET to quote the variables.
+if [ $# -eq 0 ]; then
+    # DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+    exit 0
+fi
+
+# ........................................................................
+#
+#               JUST RUN
+#
+# ........................................................................
+BBalign::map_reads_to_genome "$@"

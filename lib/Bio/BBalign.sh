@@ -62,7 +62,7 @@ source $BIOBASH_LIB/process_optargs.sh;
 # @arg  -j/--jobs     (optional) Number of CPU cores to use (default: use all available cores).
 # @arg  -o/--output   (optional) Output SAM file name (default:same as input plus ".sam.gz" extension).
 # @arg  -m/--memory   (optional) Amount of memory to be used IN GB FORMAT (default: all available memory).
-# @arg  -x/--index    (optional) Use index. If not provided create one in local directory.
+# @arg  -x/--index    (required) Path to index directory.
 BBalign::map_reads_to_genome(){
     
     # ...............................................................
@@ -76,6 +76,12 @@ BBalign::map_reads_to_genome(){
     local -a VALID_FLAG_OPTIONS=(  )
     local -a VALID_KEYVAL_OPTIONS=( -i/--input -j/--jobs -m/--memory -o/--output -x/--index )
     local COMMAND_NAME="${FUNCNAME[0]}"
+
+    local fastq
+    local output
+    local idx
+    local jobs
+    local mem
 
     # ...............................................................
     #

@@ -1,3 +1,6 @@
+2023-06-13
+* bb_map_reads_to_genome implemented.
+
 2023-06-07
 * BBformat::sam_to_bam implemented.
 * New toy.sam file added to testdata (obtained from: https://github.com/samtools/samtools/blob/develop/examples/toy.sam)
