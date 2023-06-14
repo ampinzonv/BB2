@@ -1,6 +1,7 @@
 2023-06-14
 * bb_get_fasta_info added.
 * Reported issues #8 and #9 in: https://github.com/ampinzonv/BB2/issues
+* Fixed path to executables in installbiobash.
 
 2023-06-13
 * bb_map_reads_to_genome implemented.

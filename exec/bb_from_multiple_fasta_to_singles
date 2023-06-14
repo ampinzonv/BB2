@@ -53,7 +53,7 @@ Examples:
   bb_from_multiple_fasta_to_singles "./file.fasta[.gz]"
 
   #Output
-  file.fasta[.gz].singles/clear
+  file.fasta[.gz].singles
       file.part_A.fasta[.gz]
       file.part_B.fasta[.gz]
 
