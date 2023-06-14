@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# This script generates a genome Index using the BioBASH library.
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+#
+
+source "$BIOBASH_NATIVE_LIB_PATH/BBfile.sh";
+source "$BASHUTILITY_LIB_PATH/feedback.sh";
+source $BASHUTILITY_LIB_PATH/io.sh
+
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc="Splits a multiple fasta file into single fasta files."
+helpUsage="bb_from_multiple_fasta_to_singles -i <multiple FASTA file> [options]
+
+Options:
+
+-i | --input  <file>  (required) path to a file. OPTIONAL only if data comes from a pipe.
+-j | --jobs   [int]   (optional) Number of CPU cores to use (default: use all available cores).
+-o | --output [name]  (optional) Output file to save (default: "./ref")
+
+    1) If -o/--output is defined, a directory is created accordingly. 
+    2) If -o/--output is not defined, a directory is created IN THE SAME PATH where the input file resides
+
+Since this script accepts data from a pipe (not only from a input file) the output naming will be slightly differente:
+    1) If -o/--output is defined, a directory is created accordingly. 
+    2) If -o/--output is not defined a directory named "stdin.split" is created.
+
+In both cases splitted files are prefixed with "stdin.part_" If input is a compressed file, each outputed individual file is also compressed.
+
+Examples:
+
+  cat file.fasta
+  >A
+  AGCT
+  >B
+  TTTT
+
+  bb_from_multiple_fasta_to_singles "./file.fasta[.gz]"
+
+  #Output
+  file.fasta[.gz].singles/clear
+      file.part_A.fasta[.gz]
+      file.part_B.fasta[.gz]
+
+"
+
+# ........................................................................
+#
+#               CHECK IF EMPTY DISPLAY HELP
+#
+# ........................................................................
+# If not arguments are passed show help
+# DO NOT FORGET to quote the variables.
+if [ $# -eq 0 ]; then
+    # DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+    exit 0
+fi
+
+# ........................................................................
+#
+#               JUST RUN
+#
+# ........................................................................
+pipe=$(io::is_pipe)
+
+# "1" means __IT IS NOT__ a pipe.
+if [ "${pipe}" -eq 1 ]; then
+    BBfile::multiple_fasta_to_singles "$@"
+else
+
+    data=$(io::get_data_stream)
+    echo "${data}" | BBfile::multiple_fasta_to_singles "$@"
+
+fi

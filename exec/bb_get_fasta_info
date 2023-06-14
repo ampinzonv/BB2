@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# This script generates a genome Index using the BioBASH library.
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+#
+
+source "$BIOBASH_NATIVE_LIB_PATH/BBseq.sh";
+source "$BASHUTILITY_LIB_PATH/feedback.sh";
+source $BASHUTILITY_LIB_PATH/io.sh
+
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc="Retrieve info from sigle or multiple FASTA file."
+helpUsage="bb_get_fasta_info -i <multiple FASTA file> [options]
+
+A fasta file has three main components:
+
+  1) The FASTA header.
+  2) The sequence ID (which is part of the header).
+  3) The sequences itself
+
+  The porpouse of this function is to retrieve that information individually, wether
+  from a multiple or single sequence file.
+  Please note that it is assumed that Sequence ID is ANY STRING in the fasta
+  header between the \">\" sign and the first space. So in a header like:
+      >KY560197.1 Acipenser ruthenus ApoE (apoE) mRNA, partial cds
+  It is assumed that KY560197.1 is the sequence ID.
+
+
+Options:
+
+-i | --input  <file>  (required) path to a file. OPTIONAL only if data comes from a pipe.
+-j | --jobs   [int]   (optional) Number of CPU cores to use (default: use all available cores).
+-h | --header         (optional) Show fasta header.
+-d | --id             (optional) Show sequence ID.
+-s | --sequence       (optional) Show sequence.
+
+PLASE NOTE that in this version of BioBASH this script does not support the -o/--output option to save the 
+output, so by default it will display results in the STDOUT (your screen).
+
+
+
+Examples:
+1) When invoked with none optional arguments, shows everything: ID, Header and sequence in tabular format.
+bb_get_fasta_info -i "./file.fa" 
+Outputs the following:
+KY560197.1 Acipenser ruthenus ApoE (apoE) mRNA, partial cds	CGAGAAGTTGGAACCCTACACCGGAA...
+
+2) When invoked with a modifier (-h, -d and/or -s) Displays appropriate info:
+
+bb_get_fasta_info -i "./file.fa" -h
+KY560197.1 Acipenser ruthenus ApoE (apoE) mRNA, partial cds
+
+bb_get_fasta_info -i "./file.fa" -d
+KY560197.1
+
+bb_get_fasta_info -i "./file.fa" -ds
+KY560197.1	CGAGAAGTTGGAACCCTACACCGGAAATATCAGAGAGTCCACCCAGCAGAAGCTGG ....
+"
+
+
+# ........................................................................
+#
+#               CHECK IF EMPTY DISPLAY HELP
+#
+# ........................................................................
+# If not arguments are passed show help
+# DO NOT FORGET to quote the variables.
+if [ $# -eq 0 ]; then
+    # DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+    exit 0
+fi
+
+# ........................................................................
+#
+#               JUST RUN
+#
+# ........................................................................
+pipe=$(io::is_pipe)
+
+# "1" means __IT IS NOT__ a pipe.
+if [ "${pipe}" -eq 1 ]; then
+    BBSeq::get_fasta_components "$@"
+else
+
+    data=$(io::get_data_stream)
+    echo "${data}" | BBSeq::get_fasta_components "$@"
+
+fi

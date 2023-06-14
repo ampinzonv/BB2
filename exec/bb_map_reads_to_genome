@@ -28,7 +28,7 @@ helpUsage=" bb_map_reads_to_genome  -i <FASTQ file(s)>  -x <indexed genome> [opt
 
  Options:
  -i | --input  <string>       (required) path to fastq file(s). Comma separated if PE in different files.
- -x | --index  [string]       (optional) Path to index directory.
+ -x | --index  [string]       (optional) Path to index directory. If not set, assumes index is in local dir.
  -o | --output [string]       (optional) Output SAM file name (default: same as input plus ".sam.gz" extension).
  -j | --jobs   [int]          (optional) Number of processors to use.
  -m | --memory [int]          (optional) Amount of memory to use in GB (default: all available memory).
