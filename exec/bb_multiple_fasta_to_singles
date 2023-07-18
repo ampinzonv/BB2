@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# This script splits a multiple fasta file into individual files.
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+#
+
+source "$BIOBASH_NATIVE_LIB_PATH/BBfile.sh";
+source "$BASHUTILITY_LIB_PATH/feedback.sh";
+source $BASHUTILITY_LIB_PATH/io.sh
+
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc="Splits a multiple fasta file into individual files"
+helpUsage="bb_from_multiple_fasta_to_singles -i <FASTA file> [options]:
+Options:
+
+-i | --input (mandatory) path to fastq file (overriden if data comes from STDIN).
+-o | --output (optional) Output directory.
+-j | --jobs (optional) Number of cores to use. See documentation for default number (usually 1).
+
+1) If -o/--output is defined, a directory is created accordingly. 
+2) If -o/--output is not defined, a directory is created IN THE SAME PATH where the input file resides
+an named after input file name. 
+In both cases splitted files are named  after file name.
+
+A similar behavior can be expected if data comes from STDIN and not from a file:
+4) If -o/--output is defined, a directory is created accordingly. 
+5) If -o/--output is not defined a directory named "stdin.split" is created. 
+In both cases splitted files are prefixed with "stdin.part_"
+If input is a compressed file, each outputed individual file is also compressed.
+
+Examples:
+
+cat file.fasta
+>A
+AGCT
+>B
+TTTT
+bb_multiple_fasta_to_singles -i ./file.fasta[.gz]
+
+#Output
+file.fasta[.gz].singles
+file.part_A.fasta[.gz]
+file.part_B.fasta[.gz]
+"
+
+# ........................................................................
+#
+#               CHECK IF EMPTY DISPLAY HELP
+#
+# ........................................................................
+# If not arguments are passed show help
+
+#               CHECK DATA STREAM
+# Since BBfile:::multiple_fasta_to_singles supports data stream, 
+# it is necessary to tell this script that it is so. 
+
+
+if [ $# -eq 0 ]; then
+
+    # Maybe data comes as stream
+    pipe=$(io::is_pipe)
+
+    # If data stream true    
+    if [ $pipe -eq 0 ]; then
+        #Then capture data
+        file=$(io::stream_to_tmp_file)
+        cat ${file} | BBfile::multiple_fasta_to_singles "$@"
+        exit 1
+    else
+        # DO NOT FORGET to quote the variables.
+        feedback::help  "$helpDesc" "$helpUsage"
+        exit 0
+    fi
+
+fi
+
+
+# ........................................................................
+#
+#               JUST RUN
+# Notice that we reach this point ONLY IF data does not come as a STREAM.
+# ........................................................................
+BBfile::multiple_fasta_to_singles "$@" 

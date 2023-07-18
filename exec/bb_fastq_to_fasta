@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# Retrieves general quality statistics from a FASTQ file
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+#
+
+source $BIOBASH_NATIVE_LIB_PATH/BBfile.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source $BASHUTILITY_LIB_PATH/file.sh;
+
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc="Formats FASTQ file into a FASTA file."
+helpUsage="bb_fastq_to_fasta -i <FASTQ file> [options]
+Options:
+    -i | --input (Mandatory) path to fastq file.
+    -o | --output (Optional. Default STDOUT) name for output file. If ".gz" extension addedd then it is compressed.
+    -j | --jobs Number of CPU cores to use.
+
+Examples:
+If a second (optional) argument is given (a string containing the desired name for FASTA output file)
+STDOUT is then redirected to a file. If the string has a ".gz" extension, the output is also compressed.
+
+Converts the file.fastq (compressed or not). Outputs the result to STDOUT (your screen).
+BBfile_fastq_to_fasta -i ./file.fastq[.gz]
+
+
+Converts the file.fastq (compressed or not). Outputs the result to file: file.fa (compressed or not accordingly).
+BBfile_fastq_to_fasta "./file.fastq[.gz]" --output  file.fa[.gz]
+"
+
+
+# Maybe data comes as stream
+pipe=$(io::is_pipe)   
+if [ $pipe -eq 0 ]; then
+    file=$(io::stream_to_tmp_file)
+    cat "${file}" | BBfile::fastq_to_fasta "$@"
+    exit 1
+fi
+
+# ........................................................................
+#
+#               JUST RUN
+# Notice that we reach this point ONLY IF data does not comes from a FILE.
+# ........................................................................
+# Do we have arguments?
+if [ $# -eq 0 ]; then
+    # DO NOT FORGET to quote the variables.
+    feedback::help  "$helpDesc" "$helpUsage"
+    exit 0
+else
+    BBfile::fastq_to_fasta "$@"
+    exit 0
+fi

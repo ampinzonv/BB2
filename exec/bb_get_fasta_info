@@ -79,26 +79,36 @@ KY560197.1	CGAGAAGTTGGAACCCTACACCGGAAATATCAGAGAGTCCACCCAGCAGAAGCTGG ....
 #
 # ........................................................................
 # If not arguments are passed show help
-# DO NOT FORGET to quote the variables.
+
+#               CHECK DATA STREAM
+# Since BBfile:::multiple_fasta_to_singles supports data stream, 
+# it is necessary to tell this script that it is so. 
+
+
 if [ $# -eq 0 ]; then
-    # DO NOT FORGET to quote the variables.
-	feedback::help  "$helpDesc" "$helpUsage"
-    exit 0
+
+    # Maybe data comes as stream
+    pipe=$(io::is_pipe)
+
+    # If data stream true    
+    if [ $pipe -eq 0 ]; then
+        #Then capture data
+        file=$(io::stream_to_tmp_file)
+        cat "${file}" | BBSeq::get_fasta_components "$@"
+        exit 1
+    else
+        # DO NOT FORGET to quote the variables.
+        feedback::help  "$helpDesc" "$helpUsage"
+        exit 0
+    fi
+
 fi
+
 
 # ........................................................................
 #
 #               JUST RUN
-#
+# Notice that we reach this point ONLY IF data does not come as a STREAM.
 # ........................................................................
-pipe=$(io::is_pipe)
 
-# "1" means __IT IS NOT__ a pipe.
-if [ "${pipe}" -eq 1 ]; then
-    BBSeq::get_fasta_components "$@"
-else
-
-    data=$(io::get_data_stream)
-    echo "${data}" | BBSeq::get_fasta_components "$@"
-
-fi
+BBSeq::get_fasta_components "$@"

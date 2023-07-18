@@ -1,3 +1,9 @@
+2023-07-18
+* bb_fastq_to_fasta added.
+* bb_get_fastq_quality added.
+* bb_multiple_fasta_to_singles added.
+* Fixed minor issues in some core functions.
+
 2023-06-14
 * bb_get_fasta_info added.
 * Reported issues #8 and #9 in: https://github.com/ampinzonv/BB2/issues

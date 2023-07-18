@@ -259,6 +259,7 @@ BBfile::is_fastq(){
 #
 # @arg -i/--input (Mandatory) path to fastq file.
 # @arg -o/--output (Optional. Default STDOUT) name for output file. If ".gz" extension addedd then it is compressed.
+# @arg -j/--jobs Number of CPU cores to use.
 # 
 # @exitcode 0  On succes
 # @exitcode 1  On failure
@@ -270,10 +271,12 @@ BBfile::fastq_to_fasta(){
     local -a VALID_FLAG_OPTIONS=( )
     local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output -j/--jobs)
     local COMMAND_NAME="BBfile::fastq_to_fasta"
+    local file pipe outFile jobs 
 
 
-
+    
     pipe=$(io::is_pipe)
+    
     # "1" means __IT IS NOT__ a pipe.
     if [ "${pipe}" -eq 1 ]; then
     
@@ -306,6 +309,7 @@ BBfile::fastq_to_fasta(){
         #-----------------------------------------------------------
         if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"  
             # RUN #
+            
             $BIOBASH_BIN_OS/seqkit fq2fa $file $outFile $jobs
             exit 0
 
@@ -323,14 +327,23 @@ BBfile::fastq_to_fasta(){
         fi
 
     else
+    
+        
         # If we are here it means we are dealing with data stream.
 
-
-        local -a VALID_KEYVAL_OPTIONS=(-o/--output -j/--jobs)
+        # The following was commented since it does not make sense, this var was already
+        # declared at the beginning of the function, nevertheles I keep it here as reference.
+        # When uncommented it creates a conflict when the functions is called via STDIN without
+        # any other argument, because in that case -i/--input is a not valid option.
+        # local -a VALID_KEYVAL_OPTIONS=(-o/--output -j/--jobs)
+        
         process_optargs "$@" || exit 1
+        
 
 
-        file=$(io::get_data_stream)
+        #file=$(io::get_data_stream)
+        file=$(io::stream_to_tmp_file)
+
         #Check if we have a second parameter. Note that seqkit output option is also "-o"
         if   is_in '-o'      "${!OPTIONS[@]}"; then outFile="-o ${OPTIONS[-o]}"
         elif is_in '--output' "${!OPTIONS[@]}"; then outFile="-o ${OPTIONS[--output]}"
@@ -347,8 +360,12 @@ BBfile::fastq_to_fasta(){
             jobs=" -j $(os::default_number_of_cores)"
         fi
         
-        # RUN #
-        echo $file | $BIOBASH_BIN_OS/seqkit fq2fa $outFile $jobs
+        # RUN 
+        # This was a possible better option to avoid the overhead of writing to a file but
+        #there are issues with this option and callinf this function froma  script via STDIN.
+        #echo $file | $BIOBASH_BIN_OS/seqkit fq2fa $outFile $jobs
+
+        $BIOBASH_BIN_OS/seqkit fq2fa ${file} ${outFile} ${jobs}
         exit 0
         
     fi

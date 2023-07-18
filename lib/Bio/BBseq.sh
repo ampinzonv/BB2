@@ -48,6 +48,14 @@ BBSeq::get_fasta_components(){
     local -a VALID_KEYVAL_OPTIONS=( -i/--input )
     local COMMAND_NAME="BBSeq::get_fasta_components"
 
+    local pipe
+    local file
+    local jobs
+    local BIN
+    local sequence
+    local seqID
+    local header
+
     # Perform the processing to populate the OPTIONS and ARGS arrays.
     process_optargs "$@" || exit 1
 
