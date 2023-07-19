@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# This script generates a genome Index using the BioBASH library.
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+#
+
+source "$BIOBASH_NATIVE_LIB_PATH/BBfile.sh";
+source "$BASHUTILITY_LIB_PATH/feedback.sh";
+
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc="Creates a consensus sequence from an assembly file in BAM, SAM or CRAM format."
+helpUsage=" bb_get_assembly_from_consensus -i <aligment_file[.bam, sam,cram]> [options]
+If -o/--output is not defined, output file will be named after input file with 
+".fasta" extension and the "_consensus" prefix which is the default output format.
+
+Options:
+-i | --input   (Mandatory) path to compressed file.
+-o | --output  (Optional) path to output file.
+-q | --fastq   (Optional) Output format. FASTA if not defined.
+
+Examples:
+ Creates a consensus file in fasta format, named after the input file.
+  BBfile::get_assembly_consensus -i file.bam[sam, cram]
+  #Output
+  file_consensus.fasta
+
+ Creates a consensus file in FASTQ format with the name "organism.fastq"
+  BBfile::get_assembly_consensus -i file.bam[sam, cram] -o organism.fastq --fastq
+  #Output
+  organism.fastq
+
+ Creates a consensus file in FASTA format with the name "organism"
+  BBfile::get_assembly_consensus -i file.bam[sam, cram] -o organism.fasta
+  #Output
+  organism.fasta
+
+"
+
+# ........................................................................
+#
+#               CHECK IF EMPTY DISPLAY HELP
+#
+# ........................................................................
+# If not arguments are passed show help
+# DO NOT FORGET to quote the variables.
+if [ $# -eq 0 ]; then
+    # DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+    exit 0
+fi
+
+# ........................................................................
+#
+#               JUST RUN
+#
+# ........................................................................
+$(BBfile::get_assembly_consensus "$@")

@@ -20,7 +20,7 @@
 file::make_temp_file() {
     declare temp_file
     type -p mktemp &> /dev/null && { temp_file="$(mktemp -u)" || temp_file="${PWD}/$((RANDOM * 2)).LOG"; }
-    trap 'rm -f "${temp_file}"' EXIT
+    #trap 'rm -f "${temp_file}"' EXIT
     printf "%s" "${temp_file}"
 }
 

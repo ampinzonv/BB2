@@ -320,3 +320,4 @@ BBformat::sam_to_bam(){
     fi
 
 }
+

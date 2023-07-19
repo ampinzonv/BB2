@@ -204,6 +204,7 @@ cp -r ./lib "$BIOBASH_HOME"
 cp -r ./bin "$BIOBASH_HOME"
 cp -r ./unitesting "$BIOBASH_HOME"
 cp -r ./testdata "$BIOBASH_HOME"
+cp ./version "$BIOBASH_HOME"
 cp exec/bb_* "$BIOBASH_HOME" #These are all the actual BB scripts.
 
 

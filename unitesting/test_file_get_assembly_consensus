@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+#Tests  BBfile::uncompress
+
+
+# shellcheck source=/dev/null # to ignore the errorbash-language-server
+source $BIOBASH_NATIVE_LIB_PATH/BBfile.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source $BASHUTILITY_LIB_PATH/file.sh;
+source ./unit_testing_common.sh
+
+
+testData="$BIOBASH_HOME/testdata/toy.bam"
+# Uncomment for testing on real data
+#testData="/Users/andres/Dev/repo/sandbox/sorted.bam"
+
+
+# -------------------------------------------------------------------
+#
+# -------------------------------------------------------------------
+
+#Arrange
+expected="<GGGGJJJJ1MQQ!TT!TTT4QMMMMMJJJJJJJG<"
+tmpFile=$(file::make_temp_file) 
+
+
+
+#Act
+BBfile::get_assembly_consensus -i "${testData}" -o "${tmpFile}" --fastq
+result=$(cat "${tmpFile}" | tail -n 1)
+
+
+#Assert
+unit_test_header
+unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
+unit_test_footer

@@ -34,6 +34,7 @@ echo $(fgcolor blue " Running BB::File tests.") $(fgcolor end)
 ./test_file_fastq_to_fasta
 ./test_file_multiple_fasta_to_singles
 ./test_file_uncompress
+./test_file_get_assembly_consensus
 
 #--------------------------------------------------------------------
 #   BB::SEQ TESTS

@@ -572,3 +572,135 @@ BBfile::guess_sequence_type(){
 
 true 
 }
+
+
+# @description 
+# Creates a consensus sequence from an assembly  in BAM, SAM or CRAM format.
+# For this it uses SAMTOOLS consensus. Particularly the default GAP5 bayesian
+# algorithm.
+# If -o/--output is not defined, output file will be named after input file with 
+# ".fasta" extension and the "_consensus" prefix which is the default output format.
+#
+# @example
+#  Creates a consensus file in fasta format, named after the input file.
+#   BBfile::get_assembly_consensus -i file.bam[sam, cram]
+#   #Output
+#   file_consensus.fasta
+#
+#  Creates a consensus file in FASTQ format with the name "organism"
+#   BBfile::get_assembly_consensus -i file.bam[sam, cram] -o organism.fastq --fastq
+#   #Output
+#   organism.fastq
+#
+#  Creates a consensus file in FASTA format with the name "organism"
+#   BBfile::get_assembly_consensus -i file.bam[sam, cram] -o organism.fasta
+#   #Output
+#   organism.fasta
+#
+# @arg -i/--input   (Mandatory) path to compressed file.
+# @arg -o/--output  (Optional) path to output file.
+# @arg -q/--fastq   (Optional) Output format. FASTA if not defined.
+#
+# @exitcode 0  on success
+# @exitcode 1  on failure
+BBfile::get_assembly_consensus(){
+
+# For now I considere that send to STDIN a huge file like a BAM file is not good idea
+# so we won't support that in this script.
+
+# Initialise the necessary variables that will be checked / populated by process_optargs
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=( -q/--fastq )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input -o/--output )
+    local COMMAND_NAME="BBfile::get_assembly_consensus"
+    local inFile outFile outFileType 
+
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    process_optargs "$@" || exit 1
+
+    # .................................................................
+    #
+    # Check if INPUT is defined
+    #
+    # .................................................................
+    # Check input file (REQUIRED!)
+    if   is_in '-i'      "${!OPTIONS[@]}"; then 
+        inFile="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then 
+        inFile="${OPTIONS[--input]}"
+    else
+        feedback::sayfrom "$COMMAND_NAME: Input file required." "error"
+        echo ""
+        exit  1
+    fi
+
+    # .................................................................
+    #
+    # Check if FASTQ OUTPUT is defined
+    #
+    # ..................................................................
+    if is_in '-q' "${!OPTIONS[@]}" || is_in '--fastq' "${!OPTIONS[@]}";then
+
+        outFileType="fq"
+
+    else
+
+        outFileType="fa"
+    fi
+
+    # echo "TYPE: $outFileType"
+    # exit 0
+
+    # .................................................................
+    #
+    # Check if OUTPUT is defined and name outFile accordingly.
+    #
+    # ..................................................................
+    if   is_in '-o'      "${!OPTIONS[@]}"; then
+
+        outFile="${OPTIONS[-o]}"
+
+    elif is_in '--output' "${!OPTIONS[@]}"; then 
+
+        outFile="${OPTIONS[--output]}"
+
+    else
+        #To this point there is no output defined. Meaning that we HAVE TO
+        # GIVE NAME to the consensus file after the input file.
+        # Nevertheless we have two options: wether outfileType is FA or FQ.
+        # And this dependes on the outFileType variable.
+        inBaseName=$(file::basename "${inFile}")
+
+        if [ "${outFileType}" == "fq" ]; then
+
+            outFile=$(echo "${inBaseName}_consensus.fastq")
+
+        else
+        # Should be "fa"
+            outFile=$(echo "${inBaseName}_consensus.fasta")
+        fi
+    fi
+
+    # .................................................................
+    #
+    #                               JUST RUN
+    #
+    # ..................................................................
+
+    if [ "${outFileType}" == "fa" ]; then
+
+        $BIOBASH_BIN_OS/bbsamtools/bin/samtools consensus  -a --show-ins no "${inFile}" -o "${outFile}"
+
+
+    elif [ "${outFileType}" == "fq" ]; then
+
+        $BIOBASH_BIN_OS/bbsamtools/bin/samtools consensus  -f fastq "${inFile}" -o "${outFile}"
+        
+
+    else
+        feedback::sayfrom "$COMMAND_NAME. Unable to run not "fq" or "fa" outFileType defined." "error"
+        exit 1
+    fi
+
+}
