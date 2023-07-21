@@ -69,4 +69,4 @@ fi
 #               JUST RUN
 #
 # ........................................................................
-$(BBfile::get_assembly_consensus "$@")
+BBfile::get_assembly_consensus "$@"

@@ -1,3 +1,11 @@
+2023-07-21
+* Fixed bug in get_assembly_consensus that prevented BBfile::get_assembly_consensus from showing
+the appropriate error message if input file was not defined.
+* Fixed bug in bb_convert_sam_to_bam that prevented BBformat::sam_to_bam from showing
+the appropriate error message if input file was not defined.
+* bb_convert_sam_to_bam re-named to bb_sam_to_bam.
+* BBdb::make_blast_db initiated.
+
 2023-07-19
 * BBFile::get_assembly_consensus implemented.
 * test_file_get_assembly_consensus implemented.
