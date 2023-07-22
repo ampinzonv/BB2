@@ -6,28 +6,31 @@
 # shellcheck source=/dev/null # to ignore the errorbash-language-server
 source $BIOBASH_NATIVE_LIB_PATH/BBdb.sh
 source $BASHUTILITY_LIB_PATH/feedback.sh;
+source $BASHUTILITY_LIB_PATH/string.sh;
 source ./unit_testing_common.sh
 
 testData="$BIOBASH_HOME/testdata/apoe_mul.fasta"
-BBdb::make_blast_db -i "${testData}"
+
 
 
 #Arrange.
-expected="SO:unsorted"
+# Number of files created inside the directory
+expected=11
 
-# # Act
-# # Create a temporary directory to hold results
-# dir=$(file::make_temp_dir "BB_" "false")
-# samFile="${dir}/bbsam.sam"
-
-# BBalign::map_reads_to_genome --input "${testData}" -x /Users/andres/Dev/repo/BB2/testdata/ --jobs 2 -o ${samFile}
-# exit
-
-# result=$(head -n 1 "${samFile}" | awk '{print $3}')
+# Act
+# Create a temporary directory to hold results
+name=$(string::random)
+BBdb::make_blast_db -i "${testData}" --rename "my blast database"  -o ${name}  -t N
 
 
 
-# #Assert
-# unit_test_header
-# unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
-# unit_test_footer
+result=$(ls -l ${name} | wc -l | awk '{print $1}')
+
+
+#Assert
+unit_test_header
+unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
+unit_test_footer
+
+#Clean up 
+rm -Rf "${name}"

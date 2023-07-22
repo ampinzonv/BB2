@@ -17,15 +17,15 @@ source $BASHUTILITY_LIB_PATH/file.sh
 # @arg $2 Type of message (warn, error, msg or success).
 feedback::sayfrom(){
 
-  if [ $2 = "error" ]; then
+  if [ "{$2}" = "error" ]; then
     color="red"
     preset="[Error] "
-  elif [ $2 = "warn" ]; then 
+  elif [ "{$2}" = "warn" ]; then 
     color="lightyellow" 
     preset="[Warn] "
-  elif [ $2 = "msg" ]; then 
+  elif [ "{$2}" = "msg" ]; then 
     color="blue"
-  elif [ $2 = "success" ]; then 
+  elif [ "{$2}" = "success" ]; then 
     color="green"
   else
     color="darkgray"
@@ -50,13 +50,13 @@ echo  $(fgcolor $color  "${preset} $1") $(fgcolor end)
 feedback::say()
 {
 
-if [ $2 = "error" ]; then
+if [ "{$2}" = "error" ]; then
   color="magenta"
-elif [ $2 = "warn" ]; then 
+elif [ "{$2}" = "warn" ]; then 
   color="lightyellow" 
-elif [ $2 = "msg" ]; then 
+elif [ "{$2}" = "msg" ]; then 
   color="blue"
-elif [ $2 = "success" ]; then 
+elif [ "{$2}" = "success" ]; then 
   color="green"
  else
    color="gray"

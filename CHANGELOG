@@ -1,3 +1,9 @@
+2023-07-22
+* BBdb::make_blast_db implemented.
+* BBdb::make_blast_db unit testing implemented.
+* Changed the order of execution of unit testing tests. 
+* blastp, blastn, blastx and makeblastdb binaries added to $BIOBASH_BIN_OS path in OSX.
+
 2023-07-21
 * Fixed bug in get_assembly_consensus that prevented BBfile::get_assembly_consensus from showing
 the appropriate error message if input file was not defined.
