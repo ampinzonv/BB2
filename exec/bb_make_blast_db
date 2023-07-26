@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# Creates a NCBI's formatted database.
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+# 
+
+source $BIOBASH_NATIVE_LIB_PATH/BBdb.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source $BASHUTILITY_LIB_PATH/file.sh;
+
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc="Creates a NCBI's BLAST formated database."
+helpUsage="bb_make_blast_db -i <FASTA file> [options]
+ 
+ Creates a directory containing all the files that make up the BLAST database.
+ The (optional) argument '-o or --output', is used to  name this folder and files.
+ By default they are named after the input file.
+
+Options:
+
+-i | --input  (mandatory) path to a FASTA file.
+-t | --type   (mandatory) Database type: nucleotide (N/n) or protein (P/p). Default: N.
+-r | --rname  (optional) Database name. Default: same as input file.
+-o | --output (optional) Base name for the database directory and files. Defaults to same name as input file.
+
+Example 1:
+Create a BLAST formatted database of type Protein. Outputs a directory named 'myFile/' and
+a database files named 'myFile.[ndb,nhr,nin etc.]' iside the directory. The database is also titled 'myFile'.
+
+    bb_make_blast_db -i myFile.fasta -t P
+
+Example 2:
+Create a BLAST formatted database of type Nucleotide. Output directory and files are named 'myDatabase'.
+Database title is 'Microbiome Database'.
+
+    bb_make_blast_db -i myFile.fasta -t n -o myDatabase -r 'Microbiome Database'
+
+"
+
+# ........................................................................
+#
+#               CHECK IF EMPTY DISPLAY HELP
+#
+# ........................................................................
+# If not arguments are passed show help
+# DO NOT FORGET to quote the variables.
+if [ $# -eq 0 ]; then
+    # DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+    exit 0
+fi
+
+# ........................................................................
+#
+#               JUST RUN
+#
+# ........................................................................
+BBdb::make_blast_db "$@"

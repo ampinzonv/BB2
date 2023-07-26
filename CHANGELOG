@@ -1,3 +1,7 @@
+2023-07-26
+* Readme file minor changes.
+* Polishing bb_make_blast_db.
+
 2023-07-22
 * BBdb::make_blast_db implemented.
 * BBdb::make_blast_db unit testing implemented.

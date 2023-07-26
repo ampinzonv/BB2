@@ -29,7 +29,6 @@ source $BASHUTILITY_LIB_PATH/string.sh;
 # @exitcode 0  On success 
 # @exitcode 1  On failure
 BBdb::make_blast_db(){
-
 # Initialise the necessary variables that will be checked / populated by process_optargs
     local -A OPTIONS=()
     local -a ARGS=()
@@ -49,6 +48,14 @@ BBdb::make_blast_db(){
         elif is_in '--input' "${!OPTIONS[@]}"; then inFile="${OPTIONS[--input]}"
         else
             feedback::sayfrom "${COMMAND_NAME}: Input file required." "error"
+            echo
+            exit  1
+    fi
+
+    #check if file exists
+    local exist=$(file::file_exists "${inFile}")
+    if [ "${exist}" = 1 ]; then
+    feedback::sayfrom "${COMMAND_NAME}: Input file '${inFile}' not found." "error"
             echo
             exit  1
     fi
