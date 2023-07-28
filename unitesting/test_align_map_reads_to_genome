@@ -20,7 +20,7 @@ expected="SO:unsorted"
 dir=$(file::make_temp_dir "BB_" "false")
 samFile="${dir}/bbsam.sam"
 
-BBalign::map_reads_to_genome --input "${testData}" -x /Users/andres/Dev/repo/BB2/testdata/ --jobs 2 -o ${samFile}
+BBalign::map_reads_to_genome --input "${testData}" -x $BIOBASH_HOME/testdata/ --jobs 2 -o ${samFile}
 exit
 
 result=$(head -n 1 "${samFile}" | awk '{print $3}')

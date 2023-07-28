@@ -11,8 +11,8 @@
 BIOBASH_HOME=/home/apinzon/Dev/repo/BB2
 BIOBASH_LIB=/home/apinzon/Dev/repo/BB2/lib 
 BIOBASH_BIN=/home/apinzon/Dev/repo/BB2/bin
-BIOBASH_OS=osx
-BIOBASH_BIN_OS=/home/apinzon/Dev/repo/BB2/bin/osx/64
+BIOBASH_OS=linux
+BIOBASH_BIN_OS=/home/apinzon/Dev/repo/BB2/bin/linux/64
 BIOBASH_BIN_ALL=/home/apinzon/Dev/repo/BB2/bin/all
 
 SHML_LIB=/home/apinzon/Dev/repo/BB2/lib/shml/shml.sh
@@ -39,6 +39,6 @@ export BIOBASH_CORES
 export BIOBASH_EXEC
 
 
-export PATH=/home/apinzon/Dev/repo/BB2:/home/apinzon/Dev/repo/BB2/bin/osx:/home/apinzon/Dev/repo/BB2/bin:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/Applications/0.1/bin/osx:/home/apinzon/BB/biobash-0.1:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/Applications/0.1/bin/osx:/home/apinzon/BB/biobash-0.1:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/Applications/0.1/bin/osx:/home/apinzon/Applications/0.1:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/Applications/0.1/bin/osx:/home/apinzon/Applications/0.1/bin/osx:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+export PATH=/home/apinzon/Dev/repo/BB2:/home/apinzon/Dev/repo/BB2/bin/linux:/home/apinzon/Dev/repo/BB2/bin:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/BB/biobash-0.1:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/BB/biobash-0.1:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/Applications/0.1:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/Applications/0.1/bin/linux:/home/apinzon/Applications/0.1/bin/linux:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 

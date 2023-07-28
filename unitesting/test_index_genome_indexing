@@ -17,7 +17,7 @@ expected=1679
 # Create a temporary directory to hold results
 dir=$(file::make_temp_dir "BB_" "false")
 
-$(BBindex::genome_indexing -i $testData --jobs 2 --output "${dir}")
+$(BBindex::genome_indexing -i $testData --jobs 2 --output "${dir}" -m 7)
 
 result=$(tail -n 1 ${dir}/ref/genome/1/info.txt | awk '{print $5}')
 

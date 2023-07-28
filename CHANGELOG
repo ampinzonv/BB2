@@ -1,3 +1,8 @@
+2023-07-28
+* First serious testing on Linux machine.
+* test_format_sam_to_bam: gzcat was changed by "gunzip -c" in line 34. Test file was changed from toy.sam to small.sam. This due to the fact that linux complains about gzcat not installed. Willing that OSX accepts this change.
+* bashrc_linux modified to reflect Linux paths.
+
 2023-07-26
 * Readme file minor changes.
 * Polishing bb_make_blast_db.

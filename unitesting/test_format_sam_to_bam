@@ -7,14 +7,15 @@ source $BIOBASH_NATIVE_LIB_PATH/BBformat.sh
 source $BASHUTILITY_LIB_PATH/feedback.sh;
 source ./unit_testing_common.sh
 
-testData="${BIOBASH_HOME}/testdata/toy.sam"
+testData="${BIOBASH_HOME}/testdata/small.sam"
 #testData="/Users/andres/Dev/repo/sandbox/sam2bam/bbsam.sam"
 
 
 #Arrange.
 #This expected is for bbsam.bam which is NOT in the testdata directory given its size.
 #expected="SO:unsorted"
-expected="LN:40"
+#expected="LN:40"
+expected="SO:coordinate"
 
 # Act
 # Create a temporary directory to hold results
@@ -29,7 +30,9 @@ BBformat::sam_to_bam --input "${testData}" -o ${bamFile}
 # This result is for the bbsam.sam file.
 #result=$(head -n 1 "${testData}" | awk '{print $3}')
 
-result=$(gzcat ${bamFile} | head -n 2 | awk '{print $3}' | sed -E '/^[[:blank:]]*$/d')
+#result=$(gunzip -c ${bamFile} | head -n 2 | awk '{print $3}' | sed -E '/^[[:blank:]]*$/d')
+result=$(gunzip -c ${bamFile} | head -n 2 | awk '{print $3}' | sed -E '/^[[:blank:]]*$/d' | head -n 1)
+
 
 
 #Assert
