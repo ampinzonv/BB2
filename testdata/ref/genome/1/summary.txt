@@ -1,5 +1,5 @@
 #Summary
-#Generated on	Wed May 31 09:34:22 COT 2023
+#Generated on	Sat Jul 29 15:55:44 COT 2023
 #Version	5
 chroms	1
 bases	17687
@@ -10,4 +10,4 @@ scaffolds	1
 interpad	300
 source	/Users/andres/Dev/repo/BB2/testdata/hepatitis_delta_virus.fa
 bytes	1783
-last modified	1685217281000
+last modified	1688667523428

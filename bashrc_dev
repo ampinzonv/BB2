@@ -1,0 +1,78 @@
+
+#                          - BIOBASH BASHRC FILE FOR DEVELOPMENT -
+#
+# This file was created to be sourced while developing BIOBASH.
+# Since usually there is not installation when developing BIOBASH, sourcing this
+# file will allow to set all necessary variables to have BIOBASH running as if it were installed.
+# Actually, all variables in this file are the same variables that are set during BIOBASH
+# installation.
+#
+
+
+#....................................................................
+#
+# Routine to detect the OS
+#
+#....................................................................
+uname=$(command -v uname)
+case $("${uname}" | tr '[:upper:]' '[:lower:]') in
+    linux*)
+        os="linux"
+        ;;
+    darwin*)
+        os="osx"
+        ;;
+    msys* | cygwin* | mingw* | nt | win*)
+        # or possible 'bash on windows'
+        os="windows"
+        ;;
+    *)
+        return 1
+        ;;
+esac
+
+#....................................................................
+#
+# Probably you'll want to modify these two lines.
+#
+#....................................................................
+BIOBASH_HOME="${HOME}/Dev/repo/BB2"
+BIOBASH_CORES=2
+
+
+#....................................................................
+#
+# ¡¡¡DO NOT TOUCH BELOW UNLESS YOU KNOW WHAT UR DOING!!!
+#
+#....................................................................
+BIOBASH_OS=${os}
+
+BIOBASH_LIB=$BIOBASH_HOME/lib 
+BIOBASH_BIN=$BIOBASH_HOME/bin
+BIOBASH_BIN_OS="$BIOBASH_HOME/bin/${os}/64"
+BIOBASH_BIN_ALL=$BIOBASH_HOME/bin/all
+
+SHML_LIB=$BIOBASH_HOME/lib/shml/shml.sh
+BASHUTILITY_LIB_PATH=$BIOBASH_HOME/lib/bb_utility
+BASHUTILITY_LIB=$BIOBASH_HOME/lib/bbutility.sh
+BIOBASH_NATIVE_LIB_PATH=$BIOBASH_HOME/lib/Bio
+BIOBASH_NATIVE_LIB=$BIOBASH_HOME/lib/biobash.sh
+BIOBASH_EXEC=$BIOBASH_HOME/exec
+
+
+export BIOBASH_HOME
+export BIOBASH_LIB
+export BIOBASH_BIN
+export BIOBASH_OS
+export BIOBASH_BIN_OS
+export BIOBASH_BIN_ALL
+export SHML_LIB
+export BASHUTILITY_LIB_PATH
+export BASHUTILITY_LIB
+export BIOBASH_NATIVE_LIB_PATH
+export BIOBASH_NATIVE_LIB
+export BIOBASH_CORES
+export BIOBASH_EXEC
+
+
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin

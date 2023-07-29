@@ -172,7 +172,10 @@ os::default_number_of_cores() {
 
 
     #...Otherwise let the following untouched.
-    cores=1 # Comment if changed above.
+    #cores=1 # Comment if changed above.
+
+    # Now I think that by default it is better to use all available cores.
+    cores=$(echo -n "$BIOBASH_CORES")
 
     
     printf "${cores}"
@@ -187,13 +190,18 @@ os::default_number_of_cores() {
 # @exitcode 1  On failure
 os::show_system_memory(){
 
+    local m c mg t
     #Check which OS are we working on
     if [ "${BIOBASH_OS}" == "osx" ];then
         m=$(sysctl hw.memsize | awk '{print $2}')
     fi
 
     if [ "${BIOBASH_OS}" == "linux" ];then
-        m=$(cat /proc/meminfo | head -n 1 | awk '{print $2}')
+        #What we have here is memory in kylobytes
+        t=$(cat /proc/meminfo | head -n 1 | awk '{print $2}')
+        
+        #Express this in bytes
+        m=$(echo "${t}*1024" | bc)
     fi
 
     # If empty $1, show memory in bytes.

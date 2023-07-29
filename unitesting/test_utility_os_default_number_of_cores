@@ -8,7 +8,7 @@ source $BASHUTILITY_LIB_PATH/os.sh;
 source ./unit_testing_common.sh
 
 #Arrange
-expected=$(echo "${BIOBASH_CORES}/2" | bc)
+expected=$(echo -n "${BIOBASH_CORES}")
 #echo $expected
 
 #Act

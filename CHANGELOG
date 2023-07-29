@@ -1,3 +1,11 @@
+2023-07-29
+* bashrc_osx y bashrc_linux replaced by a unified bashrc_dev file.
+* Corrected bug in test_format_sam_to_bam that was given different results in OSX and Linux machines.
+* Added Linux NCBI-BLAST+ binaries version 2.14.0.
+*  Fixed bug in os::show_system_memory that prevented correct memory assesment in Linux systems.
+* Added test_db_make_blast_db
+* FIXED LINUX COMPATIBILITY SO FAR.
+
 2023-07-28
 * First serious testing on Linux machine.
 * test_format_sam_to_bam: gzcat was changed by "gunzip -c" in line 34. Test file was changed from toy.sam to small.sam. This due to the fact that linux complains about gzcat not installed. Willing that OSX accepts this change.

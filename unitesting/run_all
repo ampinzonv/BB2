@@ -51,6 +51,13 @@ echo ""
 echo $(fgcolor blue " Running BB::Index tests.") $(fgcolor end)
 ./test_index_genome_indexing
 
+#--------------------------------------------------------------------
+#   BB::DB TESTS
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " Running BB::DB tests.") $(fgcolor end)
+./test_db_make_blast_db
+
 
 #--------------------------------------------------------------------
 #       BB::ALIGN TESTS
