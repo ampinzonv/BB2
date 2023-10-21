@@ -245,3 +245,106 @@ BBalign::map_reads_to_genome(){
     ${COMMAND}
 
 }
+
+# @brief Runs the NCBI-BLAST implementation.
+# @description
+# This function runs  any of the following BLAST algorithms: blastn (and its variants such as megablast), blastp or blastx.
+#
+#
+# INPUT: 
+# Although there are several options, this function requires only 2 inputs. 1) A valid fasta file. 2) A blast formatted database.
+#  
+# For blastx it is important to note that it is possible to selectan appropriate genetic code for translation, using the "-c/--code" option.
+# Please visit the following link for details:
+# Genetic codes: https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=cgencodes
+#
+#
+# OUTPUT:
+# @example
+#
+# @arg  -i/--input     (required) path to fasta.
+# @arg  -d/--database  (required) Path to BLAST formatted query database.
+# @arg  -j/--jobs      (optional) Number of CPU cores to use (default: use all available cores).
+# @arg  -o/--output    (optional) Name for results file.
+# @arg  -f/--format    (optional) Format of  results file. It can be anything from 0 to 18. Defaults to 6 (Tabular).
+# @arg  -h/--header    (optional) [flag] Print header line in results file.
+# @arg  -s/--strand    (optional) Strand to search on. It can be minus, plus or both (default).
+# @arg  -v/--value    (optional) Expected value. Defaults to 1E-3 (Note that differs from the value of 10 in NCBI-BLAST).
+# @arg  -c/--code      (optional) In blastx, genetic code to use for DNA translation (See documentation for details). defaul: 1 (standard code).
+# @arg  -a/--algorithm (optional) Blast type (algorithm): blastn (and its variants such as megablast), blastp or blastx only supported. Default: blastn).
+# @arg  -t/--targets   (optional) Max number of target sequences (Any integer value >5). Default 250.
+
+
+BBalign::run_blast(){
+
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=(  -h/--header )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input -j/--jobs -o/--output -s/--strand -d/--database  -c/--code -a/--algorithm -f/--format -t/--targets -v/--evalue )
+    local COMMAND_NAME="${FUNCNAME[0]}"
+
+    local query db header type
+
+    # ...............................................................
+    #
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    #
+    # ...............................................................
+    process_optargs "$@" || exit 1
+
+
+    
+    # ...............................................................
+    #
+    #                       Check FLAGS
+    #
+    # ...............................................................
+    if is_in '-h' "${!OPTIONS[@]}" || is_in '--header' "${!OPTIONS[@]}"
+        then
+        header=true
+    fi
+    # ...............................................................
+    #
+    #                       CHECK OPTIONS
+    # This function DOES NOT ACCEPT data from pipelines (stream of data)
+    # so it requires a file. This is a characteristic of BLAST.
+    #
+    # ...............................................................
+    #INPUT FILE
+    if   is_in '-i'      "${!OPTIONS[@]}"; then query="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then query="${OPTIONS[--input]}"
+    else
+        feedback::sayfrom "${COMMAND_NAME}: Input file required." "error"
+        echo
+        exit  1
+    fi
+
+    #TARGET DATABASE
+    if   is_in '-d'      "${!OPTIONS[@]}"; then db="${OPTIONS[-d]}"
+    elif is_in '--database' "${!OPTIONS[@]}"; then db="${OPTIONS[--database]}"
+    else
+        feedback::sayfrom "${COMMAND_NAME}: Input file required." "error"
+        echo
+        exit  1
+    fi
+
+    #BLAST
+    if   is_in '-a'      "${!OPTIONS[@]}"; then alg="${OPTIONS[-a]}"
+    elif is_in '--algorithm' "${!OPTIONS[@]}"; then alg="${OPTIONS[--algorithm]}"
+    else
+        alg="blastn"
+    fi
+
+    # ...............................................................
+    #
+    #                         CREATE AND RUN THE COMMAND
+    #
+    # ...............................................................
+
+    echo "$BIOBASH_BIN_OS/blast/${alg} -query ${query} -db ${db}"
+
+    if [[ ${header} = "true" ]];then
+        echo "I will also put a header"
+    fi
+
+}

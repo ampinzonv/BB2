@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-#Tests  BBalign::map_reads_to_genome
+#Tests  BBalign::run_blast
 
 # shellcheck source=/dev/null # to ignore the errorbash-language-server
 source $BIOBASH_NATIVE_LIB_PATH/BBalign.sh
 source $BASHUTILITY_LIB_PATH/feedback.sh;
 source ./unit_testing_common.sh
 
-testData="$BIOBASH_HOME/testdata/hepatitis_virus_raw_reads1.fq.gz,$BIOBASH_HOME/testdata/hepatitis_virus_raw_reads2.fq.gz"
-#testData="$BIOBASH_HOME/testdata/hepatitis_virus_raw_reads.fq.gz"
+query="$BIOBASH_HOME/testdata/hepatitis_virus_raw_reads.fq.gz"
+target="some_db"
 
 
 #Arrange.
@@ -16,13 +16,15 @@ expected="SO:unsorted"
 
 # Act
 # Create a temporary directory to hold results
-dir=$(file::make_temp_dir "BB_" "false")
-samFile="${dir}/bbsam.sam"
+#dir=$(file::make_temp_dir "BB_" "false")
+#samFile="${dir}/bbsam.sam"
 
-BBalign::map_reads_to_genome --input "${testData}" -x $BIOBASH_HOME/testdata/ --jobs 2 -o ${samFile}
+#BBalign::map_reads_to_genome --input "${testData}" -x $BIOBASH_HOME/testdata/ --jobs 2 -o ${samFile}
 
-
+BBalign::run_blast --input ${query} -d ${target} --header
+exit 0
 result=$(head -n 1 "${samFile}" | awk '{print $3}')
+
 
 
 

@@ -130,7 +130,8 @@ BBdb::make_blast_db(){
     # ...................................................................................
     #
     #  RUN
-    #
+    # Note that -parse_seqids is used by default. This is necessary if in the future we want to use "blast_formatter"
+    # to parse BLAST output: https://www.ncbi.nlm.nih.gov/books/NBK569843/ 
     # ...................................................................................
     mkdir $outFile
     $BIOBASH_BIN_OS/blast/makeblastdb -dbtype "${dbType}" -in "${inFile}" -title "${dbName}" -out "${outFile}/${outFile}" -parse_seqids

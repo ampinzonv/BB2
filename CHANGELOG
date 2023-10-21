@@ -1,3 +1,8 @@
+2023-10-21
+* Created the BBalign::run_blast function backbone.
+* Created test_align_run_blast backbone.
+* Found a bug in PROCESS_OPTARGS that shows an error if the option "-e" is used in the list of arguments.
+
 2023-07-29
 * bashrc_osx y bashrc_linux replaced by a unified bashrc_dev file.
 * Corrected bug in test_format_sam_to_bam that was given different results in OSX and Linux machines.
