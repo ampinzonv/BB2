@@ -21,7 +21,7 @@ expected="SO:unsorted"
 
 #BBalign::map_reads_to_genome --input "${testData}" -x $BIOBASH_HOME/testdata/ --jobs 2 -o ${samFile}
 
-BBalign::run_blast --input ${query} -d ${target} --header
+BBalign::run_blast --input ${query} -d ${target} --header -o nombre_de_salida --jobs 34 -f 8 -a blastx
 exit 0
 result=$(head -n 1 "${samFile}" | awk '{print $3}')
 

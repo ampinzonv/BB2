@@ -265,11 +265,11 @@ BBalign::map_reads_to_genome(){
 # @arg  -i/--input     (required) path to fasta.
 # @arg  -d/--database  (required) Path to BLAST formatted query database.
 # @arg  -j/--jobs      (optional) Number of CPU cores to use (default: use all available cores).
-# @arg  -o/--output    (optional) Name for results file.
+# @arg  -o/--output    (optional) Name for results file. Default same as input file.
 # @arg  -f/--format    (optional) Format of  results file. It can be anything from 0 to 18. Defaults to 6 (Tabular).
-# @arg  -h/--header    (optional) [flag] Print header line in results file.
+# @arg  -h/--header    (optional) [flag] Print header line in results file. Only works when -f/--format is 6.
 # @arg  -s/--strand    (optional) Strand to search on. It can be minus, plus or both (default).
-# @arg  -v/--value    (optional) Expected value. Defaults to 1E-3 (Note that differs from the value of 10 in NCBI-BLAST).
+# @arg  -v/--value     (optional) Expected value. Defaults to 1E-3 (Note that differs from the value of 10 in NCBI-BLAST).
 # @arg  -c/--code      (optional) In blastx, genetic code to use for DNA translation (See documentation for details). defaul: 1 (standard code).
 # @arg  -a/--algorithm (optional) Blast type (algorithm): blastn (and its variants such as megablast), blastp or blastx only supported. Default: blastn).
 # @arg  -t/--targets   (optional) Max number of target sequences (Any integer value >5). Default 250.
@@ -283,7 +283,7 @@ BBalign::run_blast(){
     local -a VALID_KEYVAL_OPTIONS=( -i/--input -j/--jobs -o/--output -s/--strand -d/--database  -c/--code -a/--algorithm -f/--format -t/--targets -v/--evalue )
     local COMMAND_NAME="${FUNCNAME[0]}"
 
-    local query db header type
+    local queryFile db header alg jobs mem output strand code format targets evalue
 
     # ...............................................................
     #
@@ -311,10 +311,10 @@ BBalign::run_blast(){
     #
     # ...............................................................
     #INPUT FILE
-    if   is_in '-i'      "${!OPTIONS[@]}"; then query="${OPTIONS[-i]}"
-    elif is_in '--input' "${!OPTIONS[@]}"; then query="${OPTIONS[--input]}"
+    if   is_in '-i'      "${!OPTIONS[@]}"; then queryFile="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then queryFile="${OPTIONS[--input]}"
     else
-        feedback::sayfrom "${COMMAND_NAME}: Input file required." "error"
+        feedback::sayfrom "${COMMAND_NAME}: Input file (-i/--input option) required." "error"
         echo
         exit  1
     fi
@@ -323,17 +323,85 @@ BBalign::run_blast(){
     if   is_in '-d'      "${!OPTIONS[@]}"; then db="${OPTIONS[-d]}"
     elif is_in '--database' "${!OPTIONS[@]}"; then db="${OPTIONS[--database]}"
     else
-        feedback::sayfrom "${COMMAND_NAME}: Input file required." "error"
+        feedback::sayfrom "${COMMAND_NAME}: Target database (-d/--database option) required." "error"
         echo
         exit  1
     fi
 
-    #BLAST
+    #BLAST ALGORITHM
     if   is_in '-a'      "${!OPTIONS[@]}"; then alg="${OPTIONS[-a]}"
     elif is_in '--algorithm' "${!OPTIONS[@]}"; then alg="${OPTIONS[--algorithm]}"
     else
         alg="blastn"
     fi
+
+    #JOBS
+    if   is_in '-j'      "${!OPTIONS[@]}"; then jobs="${OPTIONS[-j]} "
+    elif is_in '--jobs' "${!OPTIONS[@]}"; then jobs="${OPTIONS[--jobs]} "
+    else
+        #use defaults
+        # NOTE: BB default number of cores is alla vailable
+        jobs="$(os::default_number_of_cores)"
+    fi
+
+    #OUTPUT
+    if   is_in '-o'      "${!OPTIONS[@]}"; then output="${OPTIONS[-o]} "
+    elif is_in '--output' "${!OPTIONS[@]}"; then output="${OPTIONS[--output]} "
+    else
+        #use defaults
+        output="$(file::basename ${queryFile})"
+    fi
+
+    #STRAND
+    if   is_in '-s'      "${!OPTIONS[@]}"; then strand="${OPTIONS[-o]} "
+    elif is_in '--strand' "${!OPTIONS[@]}"; then strand="${OPTIONS[--output]} "
+    else
+        #use defaults
+        strand="both"
+    fi
+
+
+    #FORMAT
+    if   is_in '-f'      "${!OPTIONS[@]}"; then format="${OPTIONS[-f]} "
+    elif is_in '--format' "${!OPTIONS[@]}"; then format="${OPTIONS[--format]} "
+    else
+        #use defaults
+        format=6
+    fi
+
+    #TARGETS
+    if   is_in '-t'      "${!OPTIONS[@]}"; then format="${OPTIONS[-t]} "
+    elif is_in '--targets' "${!OPTIONS[@]}"; then format="${OPTIONS[--targets]} "
+    else
+        #use defaults
+        targets=250
+    fi
+
+    #EVALUE
+    if   is_in '-v'      "${!OPTIONS[@]}"; then format="${OPTIONS[-v]} "
+    elif is_in '--evalue' "${!OPTIONS[@]}"; then format="${OPTIONS[--evalue]} "
+    else
+        #use defaults
+        evalue="1E-3"
+    fi
+
+    #CODE. Only works is blastx is used.
+    if [[ "${alg}" == "blastx" ]];then
+        if   is_in '-c'      "${!OPTIONS[@]}"; then code="${OPTIONS[-c]} "
+        elif is_in '--code' "${!OPTIONS[@]}"; then code="${OPTIONS[--code]} "
+        else
+            #use defaults
+            code=1
+            
+        fi 
+        # Create the whole key/value to pass to command line
+        code=$(echo " -query_gencode ${code} ")
+    
+    else
+        # Otherwise output nothing since we will no need this in other blast algorithms.
+        code=""
+    fi
+
 
     # ...............................................................
     #
@@ -341,9 +409,26 @@ BBalign::run_blast(){
     #
     # ...............................................................
 
-    echo "$BIOBASH_BIN_OS/blast/${alg} -query ${query} -db ${db}"
+    echo "$BIOBASH_BIN_OS/blast/${alg}\
+    -query ${queryFile} \
+    -db ${db}\
+    -num_threads ${jobs}\
+    -out ${output}\
+    -strand ${strand}\
+    -outfmt ${format}\
+    -targets ${targets}\
+    -evalue ${evalue}\
+    ${code}"
 
-    if [[ ${header} = "true" ]];then
+
+    #TODO: add header line if -header is TRUE. Possible solutions:
+    # https://stackoverflow.com/questions/9533679/how-to-insert-a-text-at-the-beginning-of-a-file
+
+    #TODO: check that we will not overwrite existing files.
+
+    #Should we add a header to output file?
+    if [[ "${header}" == "true" && ${format} -eq 6 ]];then
+    #if [[ ${format} -eq 6 ]];then
         echo "I will also put a header"
     fi
 
