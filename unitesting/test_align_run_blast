@@ -7,8 +7,8 @@ source $BIOBASH_NATIVE_LIB_PATH/BBalign.sh
 source $BASHUTILITY_LIB_PATH/feedback.sh;
 source ./unit_testing_common.sh
 
-query="$BIOBASH_HOME/testdata/hepatitis_virus_raw_reads.fq.gz"
-target="some_db"
+query="$BIOBASH_HOME/testdata/hepatitis_delta_virus_fragments.fa"
+target="$BIOBASH_HOME/testdata/testblastdb/testblastdb"
 
 
 #Arrange.
@@ -21,7 +21,8 @@ expected="SO:unsorted"
 
 #BBalign::map_reads_to_genome --input "${testData}" -x $BIOBASH_HOME/testdata/ --jobs 2 -o ${samFile}
 
-BBalign::run_blast --input ${query} -d ${target} --header -o nombre_de_salida --jobs 34 -f 8 -a blastx
+BBalign::run_blast --input ${query} -d ${target} --header -o nombre_de_salida -f 6 -a blastn
+echo ""
 exit 0
 result=$(head -n 1 "${samFile}" | awk '{print $3}')
 

@@ -269,11 +269,13 @@ BBalign::map_reads_to_genome(){
 # @arg  -f/--format    (optional) Format of  results file. It can be anything from 0 to 18. Defaults to 6 (Tabular).
 # @arg  -h/--header    (optional) [flag] Print header line in results file. Only works when -f/--format is 6.
 # @arg  -s/--strand    (optional) Strand to search on. It can be minus, plus or both (default).
-# @arg  -v/--value     (optional) Expected value. Defaults to 1E-3 (Note that differs from the value of 10 in NCBI-BLAST).
+# @arg  -e/--evalue    (optional) Expected value. Defaults to 1E-3 (Note that differs from the value of 10 in NCBI-BLAST).
 # @arg  -c/--code      (optional) In blastx, genetic code to use for DNA translation (See documentation for details). defaul: 1 (standard code).
 # @arg  -a/--algorithm (optional) Blast type (algorithm): blastn (and its variants such as megablast), blastp or blastx only supported. Default: blastn).
 # @arg  -t/--targets   (optional) Max number of target sequences (Any integer value >5). Default 250.
 
+# TODO: blast overwrites outputfile, check that this wont happen.
+# TODO: Create nucleotide and protein databases for blastx testing.
 
 BBalign::run_blast(){
 
@@ -291,8 +293,6 @@ BBalign::run_blast(){
     #
     # ...............................................................
     process_optargs "$@" || exit 1
-
-
     
     # ...............................................................
     #
@@ -301,7 +301,7 @@ BBalign::run_blast(){
     # ...............................................................
     if is_in '-h' "${!OPTIONS[@]}" || is_in '--header' "${!OPTIONS[@]}"
         then
-        header=true
+        header="true"
     fi
     # ...............................................................
     #
@@ -317,6 +317,14 @@ BBalign::run_blast(){
         feedback::sayfrom "${COMMAND_NAME}: Input file (-i/--input option) required." "error"
         echo
         exit  1
+    fi
+
+    #OUTPUT
+    if   is_in '-o'      "${!OPTIONS[@]}"; then output="${OPTIONS[-o]} "
+    elif is_in '--output' "${!OPTIONS[@]}"; then output="${OPTIONS[--output]} "
+    else
+        #use defaults
+        output="$(file::basename ${queryFile})"
     fi
 
     #TARGET DATABASE
@@ -378,7 +386,7 @@ BBalign::run_blast(){
     fi
 
     #EVALUE
-    if   is_in '-v'      "${!OPTIONS[@]}"; then format="${OPTIONS[-v]} "
+    if   is_in '-e'      "${!OPTIONS[@]}"; then format="${OPTIONS[-v]} "
     elif is_in '--evalue' "${!OPTIONS[@]}"; then format="${OPTIONS[--evalue]} "
     else
         #use defaults
@@ -416,7 +424,7 @@ BBalign::run_blast(){
     -out ${output}\
     -strand ${strand}\
     -outfmt ${format}\
-    -targets ${targets}\
+    -max_target_seqs ${targets}\
     -evalue ${evalue}\
     ${code}"
 

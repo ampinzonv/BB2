@@ -29,3 +29,9 @@ BIOBASH_BIN_OS/seqkit split2 -p 2 ../BB2/testdata/hepatitis_virus_raw_reads.fq.g
 SARS-CoV2 whole genome sequence. Deprecated, for testing better use hepatitis_delta_virus.fa
 since it is smaller. Keep it here for backward compatibility with some BB testing.
 
+* testblastdb
+BLAST database created with the hepatitis_delta_virus genome using bb_make_blast_db.
+
+* hepatitis_delta_virus_fragments
+Are two random subsequences take fromthe hepatitis_delta_virus genome in this same folder.
+Is mainly used for testing blast.
