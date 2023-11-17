@@ -65,6 +65,7 @@ echo $(fgcolor blue " Running BB::DB tests.") $(fgcolor end)
 echo ""
 echo $(fgcolor blue " Running BB::align tests.") $(fgcolor end)
 ./test_align_map_reads_to_genome
+./test_align_run_blast
 
 
 #--------------------------------------------------------------------

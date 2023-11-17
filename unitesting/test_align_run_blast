@@ -12,22 +12,19 @@ target="$BIOBASH_HOME/testdata/testblastdb/testblastdb"
 
 
 #Arrange.
-expected="SO:unsorted"
+expected="qseqid"
 
 # Act
-# Create a temporary directory to hold results
-#dir=$(file::make_temp_dir "BB_" "false")
-#samFile="${dir}/bbsam.sam"
-
-#BBalign::map_reads_to_genome --input "${testData}" -x $BIOBASH_HOME/testdata/ --jobs 2 -o ${samFile}
-
-BBalign::run_blast --input ${query} -d ${target} --header -o nombre_de_salida -f 6 -a blastn
-echo ""
-exit 0
-result=$(head -n 1 "${samFile}" | awk '{print $3}')
+# Create a temporary file to hold results
+tmpFile=$(file::make_temp_file)
 
 
+# Uncomment for debugging: 
+# echo ${tmpFile}
+BBalign::run_blast --input ${query} -d ${target} --header -o ${tmpFile} -f 6 -a blastn
 
+
+result=$(head -n 1 "${tmpFile}" | awk '{print $1}')
 
 #Assert
 unit_test_header

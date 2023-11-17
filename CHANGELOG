@@ -1,5 +1,10 @@
+2023-11-17
+* BBalign::run_blast now supports header when output format is 6.
+* Fixed bug that prevented BBalign:run_blast from running in Linux machines.
+* test_align_run_blast completed.
+
 2023-10-25
-* Now evalue can take the keys: -e/--evalue (previous bug was created for the use of a double --headerin command line).
+* Now evalue can take the keys: -e/--evalue (previous bug was created for the use of a double --header in command line).
 * testblastdb added.
 
 2023-10-21

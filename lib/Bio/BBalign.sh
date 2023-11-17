@@ -277,6 +277,7 @@ BBalign::map_reads_to_genome(){
 # TODO: blast overwrites outputfile, check that this wont happen.
 # TODO: Create nucleotide and protein databases for blastx testing.
 
+
 BBalign::run_blast(){
 
     local -A OPTIONS=()
@@ -393,7 +394,7 @@ BBalign::run_blast(){
         evalue="1E-3"
     fi
 
-    #CODE. Only works is blastx is used.
+    #CODE. Only works if blastx is used.
     if [[ "${alg}" == "blastx" ]];then
         if   is_in '-c'      "${!OPTIONS[@]}"; then code="${OPTIONS[-c]} "
         elif is_in '--code' "${!OPTIONS[@]}"; then code="${OPTIONS[--code]} "
@@ -417,7 +418,7 @@ BBalign::run_blast(){
     #
     # ...............................................................
 
-    echo "$BIOBASH_BIN_OS/blast/${alg}\
+    local runblast=$(echo "$BIOBASH_BIN_OS/blast/${alg}\
     -query ${queryFile} \
     -db ${db}\
     -num_threads ${jobs}\
@@ -426,18 +427,29 @@ BBalign::run_blast(){
     -outfmt ${format}\
     -max_target_seqs ${targets}\
     -evalue ${evalue}\
-    ${code}"
+    ${code}")
 
+    #Actually run
+    ${runblast}
 
-    #TODO: add header line if -header is TRUE. Possible solutions:
-    # https://stackoverflow.com/questions/9533679/how-to-insert-a-text-at-the-beginning-of-a-file
-
-    #TODO: check that we will not overwrite existing files.
+    
 
     #Should we add a header to output file?
     if [[ "${header}" == "true" && ${format} -eq 6 ]];then
-    #if [[ ${format} -eq 6 ]];then
-        echo "I will also put a header"
+
+        # Ahead, a creepy workaround to have sed working on linux as well as in OSX machines.
+        local os=$(os::detect_os)
+
+        # If OSX
+        if [[ "${os}" == "mac" ]];then    
+            # Note that the double quoting after the "-i" is necessary for OSX compatibility.
+            sed -i '' '1s/^/qseqid sseqid  pident  length  mismatch    gapopen qstart  qend    sstart  send    evalue  bitscore\n/' ${output}
+        fi
+        
+        # If LINUX
+        if [[ "${os}" == "linux" ]];then
+            sed -i '1s/^/qseqid sseqid  pident  length  mismatch    gapopen qstart  qend    sstart  send    evalue  bitscore\n/' ${output}
+        fi
     fi
 
 }
