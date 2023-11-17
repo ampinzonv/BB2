@@ -1,2 +1,0 @@
-qseqid sseqid  pident  length  mismatch    gapopen qstart  qend    sstart  send    evalue  bitscore
-fragment1	NC_076107.1	100.000	81	0	0	1	81	339	419	5.14e-41	150

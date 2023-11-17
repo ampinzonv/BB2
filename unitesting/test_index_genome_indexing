@@ -18,7 +18,7 @@ expected=1679
 dir=$(file::make_temp_dir "BB_" "false")
 
 #Use all available memeory in system, so we ommited the "-m/--memory" option
-$(BBindex::genome_indexing -i $testData --jobs 2 --output "${dir}")
+$(BBindex::genome_indexing -i $testData --jobs 2 --output "${dir}")  > /dev/null 2>&1
 
 result=$(tail -n 1 ${dir}/ref/genome/1/info.txt | awk '{print $5}')
 

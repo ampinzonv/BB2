@@ -20,7 +20,7 @@ expected=11
 # Act
 # Create a temporary directory to hold results
 name=$(string::random)
-BBdb::make_blast_db -i "${testData}" --rename "my blast database"  -o ${name}  -t N
+BBdb::make_blast_db -i "${testData}" --rename "my blast database"  -o ${name}  -t N > /dev/null 2>&1
 
 
 
