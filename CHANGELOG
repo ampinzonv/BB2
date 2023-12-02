@@ -1,3 +1,6 @@
+2023-12-2
+* Dummy commit 
+
 2023-11-17
 * BBalign::run_blast now supports header when output format is 6.
 * Fixed bug that prevented BBalign:run_blast from running in Linux machines.
@@ -36,7 +39,7 @@
 2023-07-22
 * BBdb::make_blast_db implemented.
 * BBdb::make_blast_db unit testing implemented.
-* Changed the order of execution of unit testing tests. 
+* Changed the order of execution of unit testing tests.
 * blastp, blastn, blastx and makeblastdb binaries added to $BIOBASH_BIN_OS path in OSX.
 
 2023-07-21
@@ -99,7 +102,7 @@ the appropriate error message if input file was not defined.
 
 2023-05-25
 * New "all" folder created for holding software agnostic from OS (ej. bbmap).
-* setup_environment modified to reflect this changes. 
+* setup_environment modified to reflect this changes.
 * New BIOBASH_EXEC var added to hold BB final user scripts.
 * BIOBASH_BIN var now points to $BIOBASH_HOME/bin
 * BBmap binaries added to BIOBASH_BIN/all folder
@@ -126,7 +129,7 @@ the appropriate error message if input file was not defined.
 
 2023-04-05
 * Fixed a bug in os::default_number_of_cores testing that failed during testing. Even division by 3 was generating "0". Tests expected "1".
-* bb_uninstall_biobash moved to root dir, soit can be used for install and uninstallation. 
+* bb_uninstall_biobash moved to root dir, soit can be used for install and uninstallation.
 * Implemented support for input from STDIN in BBfile::is_fasta and BBfile::is_multiple.
 * Fixed issue #6 which counted all ">" in fasta input  when only 2 were needed.
 
@@ -151,18 +154,18 @@ the appropriate error message if input file was not defined.
 * Install script updated to reflect new paths. Tested on OSX.
 * Install script now copies unitesting and testdata folders.
 * Installation/unistallation and unit testing in OSX and Linux/Ubuntu successful.
-* Released the 0.2.0 version of BioBASH.  
+* Released the 0.2.0 version of BioBASH.
 
 
 2023-03-27
 * BBFile::get_fasta_components completely imnplemented.
-* Implemented third party "process_optargs" lib to parse CLI arguments. 
+* Implemented third party "process_optargs" lib to parse CLI arguments.
 
 2023-03-21
 *Initiated BBFile::get_fasta_components
 
 2023-03-21
-* Implemented a function to create random strings: string::random 
+* Implemented a function to create random strings: string::random
 * Implemented BBfile::uncompress to uncompress gzipped files (usaully fats or fastq files).
 
 2023-03-21
@@ -222,7 +225,7 @@ the appropriate error message if input file was not defined.
 
 2023_01-30
 * Installation was modified to check for cpucores and cpu architecture.
-* Appropriate installation directories created for different architectures. 
+* Appropriate installation directories created for different architectures.
 * Seqkit replaces Seqtk.
 * "Seqkit stast" replaces "seqcounts" from EMBOSS in bb_count_seqs.
 * "Seqkit stast" replaces "infoseq" from EMBOSS in bb_sequence_info.
@@ -280,12 +283,12 @@ the appropriate error message if input file was not defined.
 * A new version of BB  with this changes released today.
 
 2022-10-28
-* io.sh is updated. input_is_empty was moved to "script_has_args". 
+* io.sh is updated. input_is_empty was moved to "script_has_args".
 * input_is_file_or_pipe was moved to "input_is_pipe".  so Each function now evaluates a specific script state.
 
 2022-10-26
 * Input validation now is implemented in a new library called io.sh.
-* Created two functions: input_is_empty and input_is_file_or_pipe. 
+* Created two functions: input_is_empty and input_is_file_or_pipe.
 
 2022-09-15
 * Functional input validation of STDIN/STDOUT (issue #3 in GitHub). Although not yet fully implemented. It partially works on bb_get_fasta_headers but has to be implemented as function.
@@ -321,7 +324,7 @@ the appropriate error message if input file was not defined.
 
 2022-05-08
 * New BIOBASH_OS variable added in setup_environment. Replaces BIOBASH_OS_osx/linux vars.
-* bb_get_fasta_headers is used as started ponit to create a "model" script forfuther dev. 
+* bb_get_fasta_headers is used as started ponit to create a "model" script forfuther dev.
 
 2023-03-07
 * sequence_info changed to file_info. It better reflects what it does: operate over a single/multiple file.
@@ -337,7 +340,7 @@ validations as to be considered "stable".
 * Created a tag with this version of BioBash.
 
 2023-03-05
-* installbiobash script was modified, so it performs basic install now. 
+* installbiobash script was modified, so it performs basic install now.
 
 2021-12-15
 * Stripped template bashrc. Left only strictly neccesary variables.
