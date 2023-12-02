@@ -418,33 +418,38 @@ BBalign::run_blast(){
     #
     # ...............................................................
 
-    local runblast=$(echo "$BIOBASH_BIN_OS/blast/${alg}\
-    -query ${queryFile} \
-    -db ${db}\
-    -num_threads ${jobs}\
-    -out ${output}\
-    -strand ${strand}\
-    -outfmt ${format}\
-    -max_target_seqs ${targets}\
-    -evalue ${evalue}\
-    ${code}")
+    
 
 
-    # SOOO dirty peace of code!
+    # SOOO dirty peace of code! This can be greatly improved. Just a quick fix because
+    # blastp does not allow the "-strand" option. That is the only difference between both
+    # command lines below.
     if [[ "${alg}" == "blastp" ]];then
 
-    local runblast=$(echo "$BIOBASH_BIN_OS/blast/${alg}\
-    -query ${queryFile} \
-    -db ${db}\
-    -num_threads ${jobs}\
-    -out ${output}\
-    -outfmt ${format}\
-    -max_target_seqs ${targets}\
-    -evalue ${evalue}\
-    ${code}")
+        local runblast=$(echo "$BIOBASH_BIN_OS/blast/${alg}\
+        -query ${queryFile} \
+        -db ${db}\
+        -num_threads ${jobs}\
+        -out ${output}\
+        -outfmt ${format}\
+        -max_target_seqs ${targets}\
+        -evalue ${evalue}\
+        ${code}")
 
+    else
 
-    fi
+        local runblast=$(echo "$BIOBASH_BIN_OS/blast/${alg}\
+        -query ${queryFile} \
+        -db ${db}\
+        -num_threads ${jobs}\
+        -out ${output}\
+        -strand ${strand}\
+        -outfmt ${format}\
+        -max_target_seqs ${targets}\
+        -evalue ${evalue}\
+        ${code}")
+
+     fi
 
     #Actually run
     ${runblast}
