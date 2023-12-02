@@ -1,0 +1,24 @@
+{
+  "version": "1.2",
+  "dbname": "blastdbProt",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "hepavirus",
+  "number-of-letters": 34,
+  "number-of-sequences": 2,
+  "last-updated": "2023-12-02T16:06:00",
+  "number-of-volumes": 1,
+  "bytes-total": 49525,
+  "bytes-to-cache": 149,
+  "files": [
+    "blastdbProt.pdb",
+    "blastdbProt.phr",
+    "blastdbProt.pin",
+    "blastdbProt.pog",
+    "blastdbProt.pos",
+    "blastdbProt.pot",
+    "blastdbProt.psq",
+    "blastdbProt.ptf",
+    "blastdbProt.pto"
+  ]
+}

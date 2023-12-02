@@ -9,7 +9,7 @@ source $BASHUTILITY_LIB_PATH/io.sh
 source $BIOBASH_LIB/process_optargs.sh;
 
 # @file BioBash Alignments
-# @brief 
+# @brief
 #   Functions to handle sequence Alignments
 #
 # @description
@@ -17,7 +17,7 @@ source $BIOBASH_LIB/process_optargs.sh;
 
 # @brief Maps Fastq reads to reference genome.
 # @description
-# INPUT: 
+# INPUT:
 # This function takes a SE or PE fastq file and maps it to a reference genome.
 # The PE file can be interleaved or separated into forward and reverse files.
 # If PE files are provided as two separate fastq files the complete path to both files must be
@@ -39,9 +39,9 @@ source $BIOBASH_LIB/process_optargs.sh;
 # If a path to a valid index is not provided, it will search for a index dir in local dir. If not found it will
 # exit with errors.
 # (use the BBindex::genome_indexing function in BioBash to create a valid index).
-# 
+#
 
-# 
+#
 # OUTPUT:
 # A SAM file is written to the path provided with the -o/--output option. If the ".gz" extension is also used, the output file
 # will be then compressed accordingly using GZIP. If -o/--output not provided the name of the first input file will be used as base name
@@ -55,7 +55,7 @@ source $BIOBASH_LIB/process_optargs.sh;
 #
 # The following example will use a SE (or interleaved) fastq file and output a raw (not compressed) SAM file. The index will be created
 # on memory before running the actual mapping.
-# 
+#
 # $(BBalign::map_reads_to_genome -i reads.fq -m 64 --jobs 10 --output "results/align.sam")
 #
 # @arg  -i/--input    (required) path to fastq file(s). Comma separated if PE in different files.
@@ -64,10 +64,10 @@ source $BIOBASH_LIB/process_optargs.sh;
 # @arg  -m/--memory   (optional) Amount of memory to be used IN GB FORMAT (default: all available memory).
 # @arg  -x/--index    (required) Path to index directory.
 BBalign::map_reads_to_genome(){
-    
+
     # ...............................................................
     #
-    # Initialise the necessary variables that will be checked / populated 
+    # Initialise the necessary variables that will be checked / populated
     # by process_optargs.
     #
     # ...............................................................
@@ -107,13 +107,13 @@ BBalign::map_reads_to_genome(){
     fi
 
     # If comma separated, split string into forward and reverse
-    if [[ $fastq =~ "," ]];then 
+    if [[ $fastq =~ "," ]];then
         # We will need this variable to know which command to create ...later.
         twoFiles=true
 
         array=( $(string::split "${fastq}" ",") )
-        fastq="${array[0]}" 
-        fastq2="${array[1]}" 
+        fastq="${array[0]}"
+        fastq2="${array[1]}"
 
         # From: https://github.com/BioInfoTools/BBMap/blob/master/docs/UsageGuide.txt
         reads="in1=${fastq} in2=${fastq2}"
@@ -145,17 +145,17 @@ BBalign::map_reads_to_genome(){
     #To this point we have an $output name, wether based on input or used provided.
     # Check that file does not exist in local dir.
     go=$(file::file_exists "${output}")
-    
+
     # if exists, warn and quit.
     if [[ "${go}" -eq 0 ]];then
         feedback::sayfrom "File \"${output}\" already exists in destination folder.\n
         I am not allowed to overwrite this kind of files. Please rename/move file or change output file name. Bye!." "Error"
         exit 1
     fi
-    
+
     # Prepare output name to be used in command (out=reads.sam.gz)
     output="out=${output}"
-    
+
 
     # ...............................................................
     #
@@ -166,7 +166,7 @@ BBalign::map_reads_to_genome(){
     # you index but not both. That is why BB options here differ from the ones that
     # are allowed in BBMap. It means that in this function we are NOT ALLOWED to index just map.
     # ...............................................................
-    
+
     # If provided we have an index in "path"
     if   is_in '-x'      "${!OPTIONS[@]}"; then idx="${OPTIONS[-x]}"
     elif is_in '--index' "${!OPTIONS[@]}"; then idx="${OPTIONS[--index]}"
@@ -178,7 +178,7 @@ BBalign::map_reads_to_genome(){
     # Let's check that "ref" directory exists in provided path.
     go=$(file::file_exists "${idx}/ref")
     if [[ "${go}" -eq 0 ]];then
-        
+
         idx="path=${idx}"
 
     else
@@ -193,7 +193,7 @@ BBalign::map_reads_to_genome(){
     #                         CHECK FOR OTHER OPTIONALS
     #
     # ...............................................................
-    
+
     #--Jobs
     if   is_in '-j'      "${!OPTIONS[@]}"; then jobs="${OPTIONS[-j]} "
     elif is_in '--jobs' "${!OPTIONS[@]}"; then jobs="${OPTIONS[--jobs]} "
@@ -218,16 +218,16 @@ BBalign::map_reads_to_genome(){
     #
     #                         CREATE AND RUN THE COMMAND
     #
-    # These are the possibilities 
+    # These are the possibilities
     # from: https://github.com/BioInfoTools/BBMap/blob/master/docs/guides/BBMapGuide.txt
     #
-    # BBMap must index a reference before mapping to it, which is relatively fast.  By default, it will write 
-    # this index to disk so that it can be loaded more quickly next time, but this can be suppressed with the "nodisk" flag.  
-    # The index is written to the location /ref/.  In other words, if you run BBMap from the location /bob/work/, 
-    # then the directory /bob/work/ref/ will be created and an index written to it; if there is already an index at 
-    # that location which matches the reference you are using, the existing index will be loaded.  
+    # BBMap must index a reference before mapping to it, which is relatively fast.  By default, it will write
+    # this index to disk so that it can be loaded more quickly next time, but this can be suppressed with the "nodisk" flag.
+    # The index is written to the location /ref/.  In other words, if you run BBMap from the location /bob/work/,
+    # then the directory /bob/work/ref/ will be created and an index written to it; if there is already an index at
+    # that location which matches the reference you are using, the existing index will be loaded.
     # If it does not match, a new index will be written.  For example, if you do these steps in order:
-    
+
     # 1) "bbmap.sh in=reads.fq" will look for an index in /ref/, not find anything, and so will quit without mapping.
     # 2) "bbmap.sh in=reads.fq ref=A.fa nodisk" will generate an index in memory and write nothing to disk.
     # 3) "bbmap.sh in=reads.fq ref=A.fa" will generate an index and write it to /ref/.
@@ -251,9 +251,9 @@ BBalign::map_reads_to_genome(){
 # This function runs  any of the following BLAST algorithms: blastn (and its variants such as megablast), blastp or blastx.
 #
 #
-# INPUT: 
+# INPUT:
 # Although there are several options, this function requires only 2 inputs. 1) A valid fasta file. 2) A blast formatted database.
-#  
+#
 # For blastx it is important to note that it is possible to selectan appropriate genetic code for translation, using the "-c/--code" option.
 # Please visit the following link for details:
 # Genetic codes: https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=cgencodes
@@ -294,7 +294,7 @@ BBalign::run_blast(){
     #
     # ...............................................................
     process_optargs "$@" || exit 1
-    
+
     # ...............................................................
     #
     #                       Check FLAGS
@@ -401,11 +401,11 @@ BBalign::run_blast(){
         else
             #use defaults
             code=1
-            
-        fi 
+
+        fi
         # Create the whole key/value to pass to command line
         code=$(echo " -query_gencode ${code} ")
-    
+
     else
         # Otherwise output nothing since we will no need this in other blast algorithms.
         code=""
@@ -429,10 +429,27 @@ BBalign::run_blast(){
     -evalue ${evalue}\
     ${code}")
 
+
+    # SOOO dirty peace of code!
+    if [[ "${alg}" == "blastp" ]];then
+
+    local runblast=$(echo "$BIOBASH_BIN_OS/blast/${alg}\
+    -query ${queryFile} \
+    -db ${db}\
+    -num_threads ${jobs}\
+    -out ${output}\
+    -outfmt ${format}\
+    -max_target_seqs ${targets}\
+    -evalue ${evalue}\
+    ${code}")
+
+
+    fi
+
     #Actually run
     ${runblast}
 
-    
+
 
     #Should we add a header to output file?
     if [[ "${header}" == "true" && ${format} -eq 6 ]];then
@@ -441,11 +458,11 @@ BBalign::run_blast(){
         local os=$(os::detect_os)
 
         # If OSX
-        if [[ "${os}" == "mac" ]];then    
+        if [[ "${os}" == "mac" ]];then
             # Note that the double quoting after the "-i" is necessary for OSX compatibility.
             sed -i '' '1s/^/qseqid sseqid  pident  length  mismatch    gapopen qstart  qend    sstart  send    evalue  bitscore\n/' ${output}
         fi
-        
+
         # If LINUX
         if [[ "${os}" == "linux" ]];then
             sed -i '1s/^/qseqid sseqid  pident  length  mismatch    gapopen qstart  qend    sstart  send    evalue  bitscore\n/' ${output}

@@ -32,6 +32,11 @@ since it is smaller. Keep it here for backward compatibility with some BB testin
 * testblastdb
 BLAST database created with the hepatitis_delta_virus genome using bb_make_blast_db.
 
+
+* BlastdbProt
+BLAST database created with the hepatitis_delta_virus genome using bb_make_blast_db, PREVIOUSLY translated
+into proteins using "seqkit translate".
+
 * hepatitis_delta_virus_fragments
 Are two random subsequences take fromthe hepatitis_delta_virus genome in this same folder.
 Is mainly used for testing blast.

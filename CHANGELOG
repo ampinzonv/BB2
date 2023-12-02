@@ -1,5 +1,8 @@
 2023-12-2
-* Dummy commit 
+* Test blast protein database created.
+* test_align_run_blast moved to test_align_run_blastn.
+* test_align_run_blastx created.
+* test_align_run_blastp.
 
 2023-11-17
 * BBalign::run_blast now supports header when output format is 6.

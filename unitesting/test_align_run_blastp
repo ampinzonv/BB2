@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+#Tests  BBalign::run_blastp
+
+# shellcheck source=/dev/null # to ignore the errorbash-language-server
+source $BIOBASH_NATIVE_LIB_PATH/BBalign.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source ./unit_testing_common.sh
+
+query="$BIOBASH_HOME/testdata/hepavirus.faa"
+target="$BIOBASH_HOME/testdata/blastdbProt/blastdbProt"
+
+
+#Arrange.
+expected="fragment3"
+
+# Act
+# Create a temporary file to hold results
+tmpFile=$(file::make_temp_file)
+
+
+# Uncomment for debugging: 
+# echo ${tmpFile}
+BBalign::run_blast --input ${query} -d ${target} --header -o ${tmpFile} -f 6 -a blastp
+
+result=$(tail -n 1 "${tmpFile}" | awk '{print $1}')
+
+#Assert
+unit_test_header
+unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
+unit_test_footer
