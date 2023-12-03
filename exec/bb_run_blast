@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# Runs local NCBI-BLAST
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+#
+
+source $BIOBASH_NATIVE_LIB_PATH/BBalign.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc=" Performs a NCBI-BLAST (blastn, blastp or blastx)."
+helpUsage="bb_run_blast -i <FASTA file> [options]
+
+This program performs a blastp, blastn or blastx search.
+
+OPTIONS
+
+-i | --input     (required) path to fasta.
+-d | --database  (required) Path to BLAST formatted query database.
+-j | --jobs      (optional) Number of CPU cores to use (default: use all available cores).
+-o | --output    (optional) Name for results file. Default same as input file (plus .blast.out extension) in local dir.
+-f | --format    (optional) Format of  results file. It can be anything from 0 to 18. Defaults to 6 (Tabular).
+-h | --header    (optional) [flag] Print header line in results file. Only works when -f/--format is 6.
+-s | --strand    (optional) Strand to search on. It can be minus, plus or both (default). Do not work on blastx.
+-e | --evalue    (optional) Expected value. Defaults to 1E-3 (Note that differs from the value of 10 in NCBI-BLAST).
+-c | --code      (optional) In blastx, genetic code to use for DNA translation (See documentation for details). defaul: 1 (standard code).
+-a | --algorithm (optional) Blast type (algorithm): blastn (and its variants such as megablast), blastp or blastx only supported. Default: blastn).
+-t | --targets   (optional) Max number of target sequences (Any integer value >5). Default 250.
+
+
+GENETIC CODES
+This program follows and supports the same standard coding of NCBI-BLAST's blastx. So set them according to this:
+
+1. The Standard Code
+2. The Vertebrate Mitochondrial Code
+3. The Yeast Mitochondrial Code
+4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+5. The Invertebrate Mitochondrial Code
+6. The Ciliate, Dasycladacean and Hexamita Nuclear Code
+9. The Echinoderm and Flatworm Mitochondrial Code
+10. The Euplotid Nuclear Code
+11. The Bacterial, Archaeal and Plant Plastid Code
+12. The Alternative Yeast Nuclear Code
+13. The Ascidian Mitochondrial Code
+14. The Alternative Flatworm Mitochondrial Code
+15. Blepharisma Nuclear Code
+16. Chlorophycean Mitochondrial Code
+21. Trematode Mitochondrial Code
+22. Scenedesmus obliquus Mitochondrial Code
+23. Thraustochytrium Mitochondrial Code
+24. Rhabdopleuridae Mitochondrial Code
+25. Candidate Division SR1 and Gracilibacteria Code
+26. Pachysolen tannophilus Nuclear Code
+27. Karyorelict Nuclear Code
+28. Condylostoma Nuclear Code
+29. Mesodinium Nuclear Code
+30. Peritrich Nuclear Code
+31. Blastocrithidia Nuclear Code
+33. Cephalodiscidae Mitochondrial UAA-Tyr Code
+
+Further information on genetic codes: https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=cgencodes
+
+
+OUTPUT FORMAT
+Output formats in NCBI-BLAST can be quiet complex. The default output format in BioBash is what NCBI's names as "6" (Tabular),
+but you can use any of the established options:
+
+    0 = Pairwise,
+     1 = Query-anchored showing identities,
+     2 = Query-anchored no identities,
+     3 = Flat query-anchored showing identities,
+     4 = Flat query-anchored no identities,
+     5 = BLAST XML,
+     6 = Tabular,
+     7 = Tabular with comment lines,
+     8 = Seqalign (Text ASN.1),
+     9 = Seqalign (Binary ASN.1),
+    10 = Comma-separated values,
+    11 = BLAST archive (ASN.1),
+    12 = Seqalign (JSON),
+    13 = Multiple-file BLAST JSON,
+    14 = Multiple-file BLAST XML2,
+    15 = Single-file BLAST JSON,
+    16 = Single-file BLAST XML2,
+    17 = Sequence Alignment/Map (SAM),
+    18 = Organism Report
+
+EXAMPLES
+
+1) Run blastn and append columns header to the output. Name output file as "myOutput". 
+
+    bb_run_blast --input file.fasta -d myDatbase --header -o myOutput -f 6 -a blastn
+
+2) Run blastp and do not append columns header to the output. Name output as input file's name (file.fasta.out).
+
+    bb_run_blast --input file.fasta -d myDatabase -f 6 -a blastp
+"
+
+# ........................................................................
+#
+#               CHECK IF EMPTY DISPLAY HELP
+#
+# ........................................................................
+# If not arguments are passed show help
+# DO NOT FORGET to quote the variables.
+if [ $# -eq 0 ]; then
+    # DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+    exit 0
+fi
+
+# ........................................................................
+#
+#               JUST RUN
+#
+# ........................................................................
+$(BBalign::run_blast "$@")

@@ -1,3 +1,7 @@
+2023-12-3
+* Implemented bb_run_blast executable. tested on OSX.
+* Now bb_run_blast appends "*.blast.out" to default output file.
+
 2023-12-2
 * Test blast protein database created.
 * test_align_run_blast moved to test_align_run_blastn.

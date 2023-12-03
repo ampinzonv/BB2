@@ -265,17 +265,16 @@ BBalign::map_reads_to_genome(){
 # @arg  -i/--input     (required) path to fasta.
 # @arg  -d/--database  (required) Path to BLAST formatted query database.
 # @arg  -j/--jobs      (optional) Number of CPU cores to use (default: use all available cores).
-# @arg  -o/--output    (optional) Name for results file. Default same as input file.
+# @arg  -o/--output    (optional) Name for results file. Default same as input file but outputs to local dir.
 # @arg  -f/--format    (optional) Format of  results file. It can be anything from 0 to 18. Defaults to 6 (Tabular).
 # @arg  -h/--header    (optional) [flag] Print header line in results file. Only works when -f/--format is 6.
-# @arg  -s/--strand    (optional) Strand to search on. It can be minus, plus or both (default).
+# @arg  -s/--strand    (optional) Strand to search on. It can be minus, plus or both (default). Do not work on blastx.
 # @arg  -e/--evalue    (optional) Expected value. Defaults to 1E-3 (Note that differs from the value of 10 in NCBI-BLAST).
 # @arg  -c/--code      (optional) In blastx, genetic code to use for DNA translation (See documentation for details). defaul: 1 (standard code).
 # @arg  -a/--algorithm (optional) Blast type (algorithm): blastn (and its variants such as megablast), blastp or blastx only supported. Default: blastn).
 # @arg  -t/--targets   (optional) Max number of target sequences (Any integer value >5). Default 250.
 
-# TODO: blast overwrites outputfile, check that this wont happen.
-# TODO: Create nucleotide and protein databases for blastx testing.
+
 
 
 BBalign::run_blast(){
@@ -325,7 +324,8 @@ BBalign::run_blast(){
     elif is_in '--output' "${!OPTIONS[@]}"; then output="${OPTIONS[--output]} "
     else
         #use defaults
-        output="$(file::basename ${queryFile})"
+        output_a="$(file::basename ${queryFile})"
+        output=$(echo -n "${output_a}.blast.out")
     fi
 
     #TARGET DATABASE
@@ -353,13 +353,6 @@ BBalign::run_blast(){
         jobs="$(os::default_number_of_cores)"
     fi
 
-    #OUTPUT
-    if   is_in '-o'      "${!OPTIONS[@]}"; then output="${OPTIONS[-o]} "
-    elif is_in '--output' "${!OPTIONS[@]}"; then output="${OPTIONS[--output]} "
-    else
-        #use defaults
-        output="$(file::basename ${queryFile})"
-    fi
 
     #STRAND
     if   is_in '-s'      "${!OPTIONS[@]}"; then strand="${OPTIONS[-o]} "
