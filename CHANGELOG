@@ -1,6 +1,8 @@
 2023-12-3
 * Implemented bb_run_blast executable. tested on OSX.
 * Now bb_run_blast appends "*.blast.out" to default output file.
+* Tested on Elementary OS 7.1
+* Released as  0.2.1 version.
 
 2023-12-2
 * Test blast protein database created.
