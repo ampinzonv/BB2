@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# Shows BioBASH Installed programs
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+#
+
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source $SHML_LIB
+
+
+
+echo $(fgcolor red " ===========================") $(fgcolor end)
+echo $(fgcolor blue " BioBASH INSTALLED UTILITIES") $(fgcolor end)
+echo $(fgcolor red " ===========================") $(fgcolor end)
+
+#--------------------------------------------------------------------
+#   BB::FILE
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " FILE MANIPULATION") $(fgcolor end)
+echo " bb_multiple_fasta_to_singles
+ bb_get_assembly_consensus"
+
+#--------------------------------------------------------------------
+#   BB::SEQ TESTS
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " SEQUENCE INFO") $(fgcolor end)
+
+echo " bb_get_fasta_info
+ bb_get_fastq_quality"
+
+#--------------------------------------------------------------------
+#   BB::INDEX TESTS
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " INDEXING") $(fgcolor end)
+
+echo " bb_index_genome"
+
+#--------------------------------------------------------------------
+#   BB::DB TESTS
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " DATABASE CREATION AND MANIPULATION") $(fgcolor end)
+
+echo " bb_make_blast_db"
+
+
+#--------------------------------------------------------------------
+#       BB::ALIGN TESTS
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " ALIGNMNENT") $(fgcolor end)
+
+echo " bb_map_reads_to_genome
+ bb_run_blast"
+
+
+#--------------------------------------------------------------------
+#       BB::FORMAT TESTS
+#--------------------------------------------------------------------
+echo ""
+echo $(fgcolor blue " SEQUENCE FORMAT") $(fgcolor end)
+
+echo " bb_sam_to_bam
+ bb_fastq_to_fasta"
+
+
+#Some output formatting
+echo ""
+
+

@@ -1,3 +1,7 @@
+2023-12-5
+* Fixed a small bug that showed the previous 0.2.0 version instead of 0.2.1.
+* Started the implementation of "bb_programs" (still completely manual).
+
 2023-12-3
 * Implemented bb_run_blast executable. tested on OSX.
 * Now bb_run_blast appends "*.blast.out" to default output file.
