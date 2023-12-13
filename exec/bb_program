@@ -62,7 +62,7 @@ echo " bb_make_blast_db"
 #       BB::ALIGN TESTS
 #--------------------------------------------------------------------
 echo ""
-echo $(fgcolor blue " ALIGNMNENT") $(fgcolor end)
+echo $(fgcolor blue " ALIGNMENT") $(fgcolor end)
 
 echo " bb_map_reads_to_genome
  bb_run_blast"
