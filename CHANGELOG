@@ -1,3 +1,10 @@
+2024-15-5
+* Cleaned up all OSX specific binaries.
+* Started a new "onlylinux" branch.
+* Unitesting succesful on Lubuntu 24.0.
+* Oficially initiated a BB version that only supports Linux.
+* OSX support deprecated from now on.
+
 2023-12-5
 * Fixed a small bug that showed the previous 0.2.0 version instead of 0.2.1.
 * Started the implementation of "bb_programs" (still completely manual).
