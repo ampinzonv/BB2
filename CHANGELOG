@@ -1,4 +1,7 @@
-2024-15-5
+2024-15-05
+* Added BBSeq::extract_fasta_entry basic funvtion.
+
+2024-15-05
 * Cleaned up all OSX specific binaries.
 * Started a new "onlylinux" branch.
 * Unitesting succesful on Lubuntu 24.0.
