@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+#Tests  BBSeq::extract_fasta_entry
+
+
+# shellcheck source=/dev/null # to ignore the errorbash-language-server
+source $BIOBASH_NATIVE_LIB_PATH/BBseq.sh
+source $BASHUTILITY_LIB_PATH/feedback.sh;
+source $BASHUTILITY_LIB_PATH/file.sh;
+source ./unit_testing_common.sh
+
+testData="$BIOBASH_HOME/testdata/apoe_mul.fasta"
+testID="KY560197.1-3"
+idsFile="$BIOBASH_HOME/testdata/apoe_ids.lst"
+
+result=$(BBSeq::extract_fasta_entry --input ${testData} -l ${idsFile})
+#result=$(BBSeq::extract_fasta_entry --input ${testData} -d ${testID})
+
+echo "${result}"

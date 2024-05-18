@@ -406,6 +406,9 @@ BBSeq::extract_fasta_entry(){
     local -a VALID_KEYVAL_OPTIONS=( -i/--input -d/--id -l/--list )
     local COMMAND_NAME="${FUNCNAME[0]}"
 
+    local idsFile
+    local id
+
     # Perform the processing to populate the OPTIONS and ARGS arrays.
     process_optargs "$@" || exit 1
 
@@ -421,28 +424,79 @@ BBSeq::extract_fasta_entry(){
     #Check if wether a list (-l) or a ID were also passed to this function.
     # List overrrides a single ID.
 
-    if   is_in '-l'      "${!OPTIONS[@]}"; then ids="${OPTIONS[-l]}"
-    elif is_in '--list' "${!OPTIONS[@]}"; then ids="${OPTIONS[--list]}"
+    # Let's think that by default we will receive a file with IDs.
+    
+    if   is_in '-l'      "${!OPTIONS[@]}"; then idsFile="${OPTIONS[-l]}"
+    elif is_in '--list' "${!OPTIONS[@]}"; then idsFile="${OPTIONS[--list]}"
     else
     # Meaning that a list was not passed. So we then expect a single ID.
         
         if   is_in '-d'      "${!OPTIONS[@]}"; then id="${OPTIONS[-d]}"
         elif is_in '--id' "${!OPTIONS[@]}"; then id="${OPTIONS[--id]}"
         else
+            # If we are here something went wrong...
+            
             feedback::sayfrom "${COMMAND_NAME}: Single ID (-d/--id) or a list of IDs (l/--list) required." "error"
             echo
             exit  1
         fi
     fi
 
-# If we reached this point means that wether a ID or a list of IDs have been
-# passed along with an input file.
-if test -z "${id}";then
-    true
+echo 
+# If we do not have IDS file then we will create a temporary file with the incoming ID. So we can use the same 
+# code for both situations (while read line; do...)
+if [[ -z "${idsFile}" ]];then
+    local idsFile=$(file::make_temp_file)
+    echo "${id}" > ${idsFile} 
 fi
 
+# This piece of code is necessary because "read" ommits the last line if the file does not ends with
+# a new line character. So if the last line is an ID without new line it will not be used at all!!!!!
+# THis is a weird POSIX behavior. Explained here:
+# https://stackoverflow.com/questions/12916352/shell-script-read-missing-last-line
+while read line || [ -n "$line" ];
+do
+        # Search pattern.If not present quit.
+        #-n: line number of match
+        #-w: expression is searched as a word
+        header=$(grep -nw ${line} ${file})
 
+        #The ID is not present in the file.
+        if [ -z "$header" ]; then
+            feedback::sayfrom "${COMMAND_NAME}: Sequence ID ${line} not found." "error"
+            echo ""
+            exit 1
+        fi
 
+        # Anchor finds the row number of the sequence to extract, it comes in the form:
+        # line_number:fasta_header from the grep search above.
+        # 120:>Prodigal Gene 2 # 2901 # 3311 # 1 is extracted with "cut"	
+                    
+        anchor=$(echo "$header" | cut -d ':' -f1)
+
+        #restore fasta header, taking out the line number and dots.
+        header=$(echo "$header" | sed -e 's/'$anchor'://')
+        
+        # To this point "Anchor" holds the line number where the ID was found.
+        #It is necessary to sum 1 to anchor because when evaluated if ">" is present
+        #there will be no output, since anchor has the ">" character
+        anchor=$((anchor+1))
+
+        printf "${header}\n"
+        sed -n "$anchor"',$p' ${file} | 
+        while read l; do
+                
+            #read/buffer until you find a ">" character
+            #if regexp present then isNewSeq = 1
+            isNewSeq=$(echo "$l" | grep -c '>')
+            if [ $isNewSeq -lt 1 ]; then
+                printf "${l}\n"	
+            else
+                exit 0
+            fi
+        done 
+
+done < ${idsFile}
 
 }
 
