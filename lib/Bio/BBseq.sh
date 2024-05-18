@@ -382,4 +382,67 @@ BBSeq::get_fastq_quality(){
     exit 0
 }
 
-    
+# @Description Given a list of sequence IDs, this function extracts a sequence or group of sequences from a
+# multiple fasta file.
+#
+# @Example
+#   Extract a group of sequences from a multiple fasta file: multiple.fa,
+#   using a list of IDs (one ID per line)
+#   BBSeq::extract_fasta_entry --input multiple.fa -l ids.txt 
+#
+#   Extract sequence with ID KYX346.1 from a multiple fasta file (multiple.fa).
+#   BBSeq::extract_fasta_entry --input multiple.fasta -d  KYX346.1
+# @arg -i/--input   (required) path to multiple fasta file
+# @arg -d/--id      (Optional if -l/--list is provided) ID of sequence to be extracted. 
+# @arg -l/--list    (Optional if -d/--id is provided) Text file with list of IDs to be extracted (one ID per line).
+# 
+# Nothe that -l/--list overrides -d/--id if both options are present.
+
+BBSeq::extract_fasta_entry(){
+
+    local -A OPTIONS=()
+    local -a ARGS=()
+    local -a VALID_FLAG_OPTIONS=()
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input -d/--id -l/--list )
+    local COMMAND_NAME="${FUNCNAME[0]}"
+
+    # Perform the processing to populate the OPTIONS and ARGS arrays.
+    process_optargs "$@" || exit 1
+
+
+    if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
+    elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
+    else
+        feedback::sayfrom "${COMMAND_NAME}: Input file required." "error"
+        echo
+        exit  1
+    fi
+
+    #Check if wether a list (-l) or a ID were also passed to this function.
+    # List overrrides a single ID.
+
+    if   is_in '-l'      "${!OPTIONS[@]}"; then ids="${OPTIONS[-l]}"
+    elif is_in '--list' "${!OPTIONS[@]}"; then ids="${OPTIONS[--list]}"
+    else
+    # Meaning that a list was not passed. So we then expect a single ID.
+        
+        if   is_in '-d'      "${!OPTIONS[@]}"; then id="${OPTIONS[-d]}"
+        elif is_in '--id' "${!OPTIONS[@]}"; then id="${OPTIONS[--id]}"
+        else
+            feedback::sayfrom "${COMMAND_NAME}: Single ID (-d/--id) or a list of IDs (l/--list) required." "error"
+            echo
+            exit  1
+        fi
+    fi
+
+# If we reached this point means that wether a ID or a list of IDs have been
+# passed along with an input file.
+if test -z "${id}";then
+    true
+fi
+
+
+
+
+}
+
