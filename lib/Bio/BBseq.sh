@@ -403,15 +403,20 @@ BBSeq::extract_fasta_entry(){
     local -A OPTIONS=()
     local -a ARGS=()
     local -a VALID_FLAG_OPTIONS=()
-    local -a VALID_KEYVAL_OPTIONS=( -i/--input -d/--id -l/--list )
+    local -a VALID_KEYVAL_OPTIONS=( -i/--input -d/--id -l/--list -o/--output )
     local COMMAND_NAME="${FUNCNAME[0]}"
 
     local idsFile
     local id
+    local file
+    local outFile
 
     # Perform the processing to populate the OPTIONS and ARGS arrays.
     process_optargs "$@" || exit 1
 
+    #.....................................................................
+    # CHECK FASTA INPUT FILE
+    #.....................................................................
 
     if   is_in '-i'      "${!OPTIONS[@]}"; then file="${OPTIONS[-i]}"
     elif is_in '--input' "${!OPTIONS[@]}"; then file="${OPTIONS[--input]}"
@@ -421,9 +426,9 @@ BBSeq::extract_fasta_entry(){
         exit  1
     fi
 
-    #Check if wether a list (-l) or a ID were also passed to this function.
-    # List overrrides a single ID.
-
+    #.....................................................................
+    # CHECK ID or LIST OF IDs
+    #.....................................................................
     # Let's think that by default we will receive a file with IDs.
     
     if   is_in '-l'      "${!OPTIONS[@]}"; then idsFile="${OPTIONS[-l]}"
@@ -449,6 +454,30 @@ if [[ -z "${idsFile}" ]];then
     local idsFile=$(file::make_temp_file)
     echo "${id}" > ${idsFile} 
 fi
+
+
+#.....................................................................
+# CHECK IF OUTPUT WAS DEFINED
+#.....................................................................
+if   is_in '-o'      "${!OPTIONS[@]}"; then outFile="${OPTIONS[-o]}"
+elif is_in '--output' "${!OPTIONS[@]}"; then outFile="${OPTIONS[--output]}"
+else
+echo ""
+fi
+
+# Let's apply the 1st Asimov's law of robotics.
+local fileExists=$(file::file_exists ${outFile})
+if [[ "${fileExists}" == "0" ]]; then
+
+    feedback::sayfrom "${COMMAND_NAME}: FIle '${outFile}' exists. Please re-name or remove it." "error"
+    echo ""
+    exit 1
+fi
+
+
+#.....................................................................
+# ACTUAL CODE FOR SEQEUNCE EXTRACTION BEGINS HERE
+#.....................................................................
 
 # This piece of code is necessary because "read" ommits the last line if the file does not ends with
 # a new line character. So if the last line is an ID without new line it will not be used at all!!!!!
@@ -482,19 +511,41 @@ do
         #there will be no output, since anchor has the ">" character
         anchor=$((anchor+1))
 
-        printf "${header}\n"
+
+        #                     .........
+        # This is pretty much where the output starts
+        # By default the otput is STDOUT unless the -o/--output option was declared
+        if [[ -z ${outFile} ]];then
+            printf "${header}\n"
+        else
+            printf "${header}\n" >> ${outFile}
+        fi
+
+
+        #Let's initialize isNewSeq
+        local isNewSeq=0
+
+        # This instructs sed to trim everything from begining of the file up to the anchor.
         sed -n "$anchor"',$p' ${file} | 
         while read l; do
-                
+        
+            #echo "Reading line: ${l}" 
             #read/buffer until you find a ">" character
             #if regexp present then isNewSeq = 1
-            isNewSeq=$(echo "$l" | grep -c '>')
-            if [ $isNewSeq -lt 1 ]; then
-                printf "${l}\n"	
-            else
-                exit 0
+            isNewSeq=$(echo "${l}" | grep -c '>')
+            
+            if [[ ${isNewSeq} -eq 1 ]];then
+                exit 1
             fi
-        done 
+
+            if [ ${isNewSeq} -eq 0 ]; then
+                if [[ -z ${outFile} ]]; then
+                    printf "${l}\n"
+                else
+                    printf "${l}\n" >> ${outFile}
+                fi
+            fi
+    done 
 
 done < ${idsFile}
 

@@ -252,7 +252,7 @@ file::contains_text() {
 # @arg $1 string relative or absolute path to file/directory.
 #
 # @exitcode 0  If file exists.
-# @exitcode 1  If file doe not exist.
+# @exitcode 1  If file does not exist.
 # @exitcode 2 If missing arguments.
 file::file_exists() {
 
