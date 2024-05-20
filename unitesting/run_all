@@ -43,6 +43,7 @@ echo ""
 echo $(fgcolor blue " Running BB::Seq tests.") $(fgcolor end)
 ./test_seq_get_fasta_components
 ./test_seq_get_fastq_quality
+./test_seq_extract_fasta_entry
 
 #--------------------------------------------------------------------
 #   BB::INDEX TESTS

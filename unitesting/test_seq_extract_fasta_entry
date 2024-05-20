@@ -10,19 +10,20 @@ source $BASHUTILITY_LIB_PATH/file.sh;
 source ./unit_testing_common.sh
 
 testData="$BIOBASH_HOME/testdata/apoe_mul.fasta"
-testID="KY560197.1-1"
+testID="KY560197.1-4"
 idsFile="$BIOBASH_HOME/testdata/apoe_ids.lst"
 outFile=$(file::make_temp_file)
 
 expected="ATCTTNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 
 
-result=$(BBSeq::extract_fasta_entry --input ${testData} -l ${idsFile} -o ${outFile} | tail ${outFile})
+result=$(BBSeq::extract_fasta_entry --input ${testData} -d ${testID} | tail -n 1)
+
 #result=$(BBSeq::extract_fasta_entry --input ${testData} -d ${testID})
+#echo "Result: ${result}"
 
 
 #Assert
 unit_test_header
 unit_test_spacer $(echo -n "${0}")  $(eval_outcome "${result}" "${expected}")
 unit_test_footer
-#echo "${result}"

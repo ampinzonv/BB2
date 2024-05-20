@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+#
+#                  .:: BioBASH ::.
+# 
+# DESCRIPTION:
+# Extracts one or more fasta entries from a multiple fasta file.
+#
+# AUTHOR:
+# Andrés Pinzón (ampinzonv@unal.edu.co)
+# Bioinformatics and Systems Biology Laboratory [http://gibbs.unal.edu.co/]  
+# Institute for Genetics  [https://genetica.unal.edu.co]
+# National University of Colombia [https://unal.edu.co]
+#
+# COPYRIGHT:
+# Please refer to https://github.com/ampinzonv/BB2/blob/main/LICENSE
+#
+
+source "$BIOBASH_NATIVE_LIB_PATH/BBseq.sh";
+source "$BASHUTILITY_LIB_PATH/feedback.sh";
+
+# ........................................................................
+#
+#    HELP VARS
+#
+# ........................................................................
+helpDesc="Extracts one or multiple FASTA sequences from a multiple fasta file."
+helpUsage="bb_extract_fasta_entry  [options]
+
+Options:
+
+-i | --input  <file>   (required) path to a multiple FASTA file.
+-o | --output [string] (optional) Output file to save (If missing outputs to STDOUT).
+-l | --list   <file>   (optional if ID provided) Text file with a list of IDs of sequences to extract.
+-d | --id     [string] (optional if a list of IDs provided) ID of sequence to extract.
+
+Examples:
+
+1)Extract sequence with ID KY560197.1-4 from multiple.fasta. Output to STDOUT.
+
+    bb_extract_fasta_entry -i multiple.fasta -d KY560197.1-4
+
+2)Extract sequence with ID KY560197.1-4 from multiple.fasta. Output to file KY560197.fa.
+
+    bb_extract_fasta_entry -i multiple.fasta -d KY560197.1-4 -o KY560197.fa
+
+3) Extract sequences with IDs from the IDs list file (one ID por file): listOfIds.txt. Output to extracted.fa.
+
+    bb_extarct_fasta_entry -i multiple.fasta -l listOfIds.txt --output extracted.fa
+"
+# ........................................................................
+#
+#               CHECK IF EMPTY DISPLAY HELP
+#
+# ........................................................................
+# If not arguments are passed show help
+# DO NOT FORGET to quote the variables.
+if [ $# -eq 0 ]; then
+    # DO NOT FORGET to quote the variables.
+	feedback::help  "$helpDesc" "$helpUsage"
+    exit 0
+fi
+
+# ........................................................................
+#
+#               JUST RUN
+#
+# ........................................................................
+BBSeq::extract_fasta_entry "$@"
