@@ -16,11 +16,16 @@ source lib/shml/shml.sh
 
 
 echo "
-Before running BioBash installation I must check that some software dependencies are met.
-These are basic components that BioBash needs for its functionality. If any of them
-is missing this installation will be stopped.
-This is a safe procedure that  WILL NOT compromise any of your files, installed programs or your system integrity. 
+$(fgcolor gray)
+  Before running BioBash installation I must check that some software 
+  dependencies are met.
+  These are basic components that BioBash needs for its functionality. 
+  If any of them is missing this installation will be stopped.$(fgcolor end)
 
+  $(fgcolor white)This is a safe procedure $(fgcolor end) $(fgcolor gray)that will not compromise any of your files 
+  installed programs or your system integrity. $(fgcolor end)
+
+$(fgcolor gray '...............................................................') $(fgcolor end) 
 "
 #soft=('zcat' 'wget' 'unzip' 'gzip' 'gnuplot' 'xargs' 'embossversion')
 soft=('zcat' 'wget' 'unzip' 'gzip' 'xargs' 'bc' 'java')
@@ -37,13 +42,8 @@ done
 
 if [[ $continue == "n" ]]; then
     
-    echo "
-    Thank you for your interest in BioBash.
-    Nothing done. Quitting installation.
-    
-    Bye!
-    
-    "
+  echo "
+  $(fgcolor yellow)Software dependencies checking stopped. Nothing done.$(fgcolor end)"
     exit 0
     
 elif [[ $continue == "y" ]];then
@@ -52,7 +52,7 @@ elif [[ $continue == "y" ]];then
     
 else
 
-    echo "ERROR: Installation can not proceed. Unknown reason."
+    echo "$(fgcolor red) ERROR: Installation can not proceed. Unknown reason.$(fgcolor end)"
     exit 1
 fi
 
@@ -60,7 +60,8 @@ fi
 #              Start actual check
 ###########################################################
 echo "Checking external dependencies ( $(color red)$(icon xmark)$(color end) Not installed. $(color green)$(icon check)$(color end) Installed.)"
-echo "$(hr)"
+#echo "$(hr)"
+echo ""
 
 notInstalled=0
 for i in "${soft[@]}"; do
@@ -86,16 +87,19 @@ done
 #If at least one pre-requisite is not met. Inform user and stop installation.
 if [[ $notInstalled == 1 ]];then
 	
-  	echo "
-  	Some software dependencies necessary to install BioBash were not found. 
-  	Please make sure that all programs marked with '$(color red)$(icon xmark)$(color end) ' are correctly installed
-  	before installing BioBash.
+  echo "
+  $(fgcolor red)
+  Some software dependencies necessary to install BioBash were not found. $(fgcolor end)
+  Please make sure that all programs marked with '$(color red)$(icon xmark)$(color end) ' are correctly installed
+  before installing BioBash. 
   	"
 	exit 1
 else
-	echo "
-	All dependencies were met. Continue installation.
+	echo "$(fgcolor green)
+  All BioBASH dependencies were met. Continue installation. $(fgcolor end)
+
 	"
+
 	#This file is a "flag" for main script, so it can continue the installation.
 	touch depend_ok
 

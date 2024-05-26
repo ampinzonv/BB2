@@ -45,7 +45,7 @@ Examples:
 
 3) Extract sequences with IDs from the IDs list file (one ID por file): listOfIds.txt. Output to extracted.fa.
 
-    bb_extarct_fasta_entry -i multiple.fasta -l listOfIds.txt --output extracted.fa
+    bb_extract_fasta_entry -i multiple.fasta -l listOfIds.txt --output extracted.fa
 "
 # ........................................................................
 #

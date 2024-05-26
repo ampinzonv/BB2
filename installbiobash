@@ -17,7 +17,7 @@ source lib/bb_utility/file.sh
 
 # Reads user input to define installation directory. Returns real path to dir.
 function define_install_dir() {
-    read -p "Install in (/usr/local): " dir
+    read -p " Install in (/usr/local): " dir
 
     #If user hitted ENTER, $dir comes empty, so use default install dir.
     #Otherwise use user provided path.
@@ -33,19 +33,23 @@ function define_install_dir() {
     return=$(file::full_path "${dir}")
     
     #Return value
-    echo "$return"
+    echo -n "$return"
 }
 
 
 
 
 # Some propaganda/user feedback.
+v=$(cat version)
 echo "
-
-$(fgcolor green '                 = BIOBASH INSTALLER =') $(fgcolor end)       
-$(fgcolor green '         Bioinformatics and Systems Biology Laboratory') $(fgcolor end)
-$(fgcolor green '   Institute for Genetics -  National University of Colombia') $(fgcolor end)
+$(fgcolor gray '...............................................................') $(fgcolor end) 
+$(a bold)$(fgcolor lightblue '                   BIOBASH INSTALLER') $(fgcolor end)  $(a end)
+$(fgcolor lightblue '      Bioinformatics and Systems Biology Laboratory') $(fgcolor end)
+$(fgcolor lightblue '  Institute for Genetics - National University of Colombia') $(fgcolor end)
+$(fgcolor lightblue '                 https://gibbs.unal.edu.co') $(fgcolor end)
 "
+
+
 
 #----------------------------------------------------------------------------
 #
@@ -58,7 +62,7 @@ $(fgcolor green '   Institute for Genetics -  National University of Colombia') 
 #otherwise (file doesn`t exist) there are dependencies to be met. Stop installation.
 if [[ ! -e depend_ok ]];then
 	
-	echo "Quitting installation of BioBash.
+	echo "$(fgcolor yellow)  Quitting installation of BioBash.$(fgcolor end)
 	"
 	exit 1
 fi
@@ -76,21 +80,23 @@ rm depend_ok
 #
 #-----------------------------------------------------------------------------
 
-# We are assuming a standard installation on a Linux/OSX Machine (at least
+# We are assuming a standard installation on a Linux Machine (at least
 # for now). This is the default directory for installation.
 default="/usr/local"
 
 
-echo " Initiating BioBash installation."
+echo " $(fgcolor lightblue) $(a bold)SELECT THE INSTALLATION DIRECTORY$(a end).$(fgcolor end)"
 echo "$(hr)"
 
-echo  "
-The installation directory is the place where all BioBash related files will be stored,
-including libraries and binaries. By default BioBash will be installed in '$default' directory,
-nevertheless you need write permissions on that folder. Alternatively you can define  a
-path to another installation directory.
-Hit ENTER to use the default installation directory ($default) or provide a
-valid installation path:
+echo  "$(fgcolor gray)
+ The installation directory is the place where all BioBash related 
+ files will be stored, including libraries and binaries. By default 
+ BioBash will be installed in '$default' directory, nevertheless you 
+ need write permissions on that folder. Alternatively you can define a
+ path to another installation directory.$(fgcolor end)
+ 
+ Hit ENTER to use the default installation directory ($default) or 
+ provide a valid installation path:
 "
 
 installDir="$(define_install_dir)"
@@ -102,7 +108,7 @@ installDir="$(define_install_dir)"
 if [ ! -d "${installDir}" ];then
     
  
-	echo "$installDir does not exist. Please make sure it is a valid directory.
+	echo "$(fgcolor red)$installDir does not exist. Please make sure it is a valid directory.$(fgcolor end)
 	"
 	exit 1
 
@@ -128,11 +134,19 @@ BBVERSION=$(cat version)
 BIOBASH_HOME=$(echo "$installDir/biobash-$BBVERSION")
 
 #User feedback
+
 echo "
-$(hr)
+$(fgcolor green)I am ready to install BioBash version $BBVERSION in $BIOBASH_HOME.$(fgcolor end)
 "
 echo "
-Everything looks ok and I am ready to install BioBash version $BBVERSION in $BIOBASH_HOME.
+$(fgcolor lightblue) $(a bold)INSTALL BIOBASH IN ${BIOBASH_HOME} $(a end)$(fgcolor end)
+$(hr)
+$(fgcolor gray)
+ We have now all necessary information to install BioBASH in this machine.
+ The ${BIOBASH_HOME} folder will be the root of this 
+ installation and all necessary scripts, dependencies 
+ and executables will be installed there.
+$(fgcolor end)
 "
 
 #Flow control. Answer should be "y" or "n"
