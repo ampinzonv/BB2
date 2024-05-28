@@ -7,13 +7,13 @@ source lib/shml/shml.sh
 
 #Check that $HOME var is not empty. "-z" means IT IS EMPTY.
 if [[ -z "${HOME}" ]];then
-	echo "The HOME variable is empty (that's weird!). Please fix this issue before installing BioBash."
+	echo "$(fgcolor red)The HOME variable is empty (that's weird!). Please fix this issue before installing BioBash.$(fgcolor end)"
 	exit 1
 fi
 
 #Check that $HOME var is writable (one never knows).
 if [ ! -w "${HOME}" ];then
-	echo "I can not write to HOME: ${HOME}. Please make sure you have the right permissions."
+	echo "$(fgcolor red)I can not write to HOME: ${HOME}. Please make sure you have the right permissions.$(fgcolor end)"
 	exit 1
 fi
 
@@ -22,8 +22,9 @@ fi
 # ----- check that  ~/.bashrc file exists ---------
 
 if [[ ! -e "${HOME}/.bashrc" ]];then
-	echo "bashrc file is not present, so I will create one for you. This is safe and will not affect your
-	system performance or configuration.
+	echo "
+	$(fgcolor green) bashrc file is not present, so I will create one for you. This is safe and will not affect your
+	system performance or configuration.$(fgcolor end)
 	"
 	#Flow control. Answer should be "y" or "n"
 	continue=0
@@ -34,16 +35,16 @@ if [[ ! -e "${HOME}/.bashrc" ]];then
 
 	if [[ $continue == "n" ]]; then
 	    echo "
-	    Thank you for your interest in BioBash.
-	    Nothing done. Quitting installation.
+		$(fgcolor green)
+	    Thank you for your interest in BioBash. Nothing done. Quitting installation.
     
 	    Bye!
-    
+		$(fgcolor end)
 	    "
 	    exit 0
     
 	elif [[ $continue == "y" ]];then
-		echo "Creating a brand new .bashrc file just for you!"
+		echo "$(fgcolor green)Creating a brand new .bashrc file just for you!$(fgcolor end)"
 		touch "${HOME}"/.bashrc 
 		echo "#This file was automatically created by BioBash" >> "${HOME}"/.bashrc
 	else
@@ -65,13 +66,21 @@ fi
 
 mod=$(grep -c "BIOBASH_HOME" "${HOME}"/.bashrc)
 if [[ $mod -gt 0 ]];then
-	echo " 
+	echo " $(fgcolor red)
 	$(emoji x) [ERROR]: The BIOBASH_HOME variable is present in your .bashrc file.
-	This can be due to a previous BioBash installation. Since appending a new set of variables
-	along with the old ones can create a conflict in your system, $(attribute bold 'INSTALLATION WILL BE STOPPED') $(attribute end).
-	Please fix your .bashrc file by erasing the whole BioBash section and re-try this installation.
+	This is due wether to a previous or an actual BioBash installation in
+	your system.
+	Since appending a new set of variables along with the old ones can create
+	a conflict in your system, $(attribute bold 'INSTALLATION WILL BE STOPPED') $(attribute end).
+	$(fgcolor end)
+
+	$(fgcolor white) Nevertheless this can be fixed easily. Please fix your .bashrc file by taking 
+	any of the following actions:
+
+	1. Erasing the whole BioBash section from the ~/.bashrcfile.
+	2. Running the bb_unistall_biobash utility.
+	$(fgcolor end)
 	"
-	
 	exit 1
 fi
 
@@ -80,11 +89,12 @@ fi
 rightNow=$(date +%m-%d-%Y)
 
 echo "
-$(emoji bell) [NOTICE!] In order to function properly, BioBash requires to modify your $HOME/.bashrc file.
-Basically I will append some variables at the end and will not modify your pre-existent
-configuration.
-Nevertheless I will also create a backup of your actual .bashrc file in the same place where your actual
-.bashrc file is. This file will be named: .bashrc_BB.backup.${rightNow}
+$(emoji bell) $(fgcolor yellow)[NOTICE]$(fgcolor end) $(fgcolor gray) In order to function properly, BioBash requires to modify 
+  your $HOME/.bashrc file. Basically I will append some variables at 
+  the end of the file and $(fgcolor end) $(fgcolor yellow)WILL NOT AFFECT$(fgcolor end) $(fgcolor gray)your actual configuration.
+  Nevertheless I will also create a backup of your actual .bashrc file in 
+  the same place where your actual.bashrc file is. This file will be 
+  named: .bashrc_BB.backup.${rightNow} $(fgcolor end)
 "
 #Flow control. Answer should be "y" or "n"
 continue=0
@@ -95,19 +105,20 @@ done
 
 if [[ $continue == "n" ]]; then
 	echo "
-	Thank you for your interest in BioBash.
+	$(fgcolor green)Thank you for your interest in BioBash.
 	Nothing done. Quitting installation.
     
 	Bye!
+	$(fgcolor end)
     "
 	exit 0
     
 elif [[ $continue == "y" ]];then
-	echo "Creating back up."
+	echo -n "$(fgcolor green) Creating a back up for your bashrc file. $(fgcolor end)"
 	cp "$HOME"/.bashrc "$HOME"/.bashrc_BB.backup."${rightNow}"
-	echo "Done."
+	echo "$(fgcolor green)...Done!$(fgcolor end)"
 else
-	 echo "ERROR: Installation can not proceed. Unknown reason."
+	 echo "$(fgcolor yellow){ERROR}: Installation can not proceed. Unknown reason.$(fgcolor end)"
 	 exit 1
 fi
 
@@ -116,24 +127,28 @@ fi
 #
 # Depending on the OS we are installing we will need to adapt
 # the routes to pre-installed binaries and other stuff
+#
+# THIS ROUTINE IS DEPRECATED!
+# I will keep here just "in case" we want to support OSX again?!
+#By now this should always default to Linux.
 #--------------------------------------------------------
 if [ "$(uname)" == "Darwin" ]; then
     OS="osx"
-    echo "OSX Darwin detected."
+    echo "$(fgcolor green) Adapting paths for OSX Darwin.$(fgcolor end)"
 elif [ "$(uname)" == "Linux" ];then
     OS="linux"
-    echo "Linux OS detected."
+    echo "$(fgcolor green) Adapting paths for Linux OS.$(fgcolor end)"
 else
-    echo "
-    Impossible to detect the operating system you are installing BioBash on.
-	Please manually select your operating system.:
+    echo " $(fgcolor red)
+     Impossible to detect the operating system you are installing BioBash on.
+	 Please select your operating system.:$(fgcolor end)
     "
     
     myos=0
     
     until [ $myos  == "Linux" ] || [ $myos == "OSX" ]
     do
-        read -p 'Please select between: Linux or OSX: ' continue
+        read -p ' Please select between: Linux or OSX: ' continue
     done
     
 	#BE CAREFUL here with Linux (capital L) and linux.
@@ -146,7 +161,7 @@ else
         OS="osx"
 
     else
-        echo "[ERROR] Unable to detect which Operating System we are working on. Quitting"
+        echo "$(fgcolor red)[ERROR] Unable to detect which Operating System we are working on. Quitting$(fgcolor end)"
         exit 1
     fi
     
@@ -170,7 +185,7 @@ elif [[ $OS == "osx" ]];then
 	arch=$(getconf LONG_BIT)
 
 else
-    echo "[ERROR] Unable to detect which Operating System we are working on. Quitting"
+    echo "$(fgcolor red) [ERROR] Unable to detect which Operating System we are working on. Quitting$(fgcolor end)"
     exit 1
 fi
 
@@ -180,9 +195,9 @@ if [ -n "$numCores" ] && [ "$numCores" -eq "$numCores" ] 2>/dev/null; then
 	true
 else
 
-	echo "[WARNING] Unable to determine the number of CPU cores in the systems. Defaulting to 1.
+	echo "$(fgcolor yellow)[WARNING] Unable to determine the number of CPU cores in the systems. Defaulting to 1.
 	This is not harmful but in some cases will slow down some routines that benefit from 
-	multi-core architectures."
+	multi-core architectures.$(fgcolor end)"
 
 	numCores=1
 fi
@@ -193,9 +208,9 @@ if [ -n "$arch" ] && [ "$arch" -eq "$arch" ] 2>/dev/null; then
 	true
 else
 
-	echo "[WARNING] Unable to determine the architechture of your system. Defaulting to 32bits.
+	echo "$(fgcolor yellow)[WARNING] Unable to determine the architechture of your system. Defaulting to 32bits.
 	This is not harmful but in some cases will slow down BioBash because 32 bits versions of
-	pre-installed software will be used."
+	pre-installed software will be used.$(fgcolor end)"
 	
 	arch=32
 fi
@@ -206,6 +221,9 @@ fi
 #--------------------------------------------------------
 #This $1 variable comes from installbiobash script. Basically it is the installDir path +
 # biobash version, converted into a directory.
+echo "$(fgcolor green) Adding BIOBASH variables to bashrc file. $(fgcolor end)
+"
+
 BIOBASH_HOME=$1
 
 BIOBASH_LIB="$BIOBASH_HOME/lib" # Holds all BB libraries including "Bio"

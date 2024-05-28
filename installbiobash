@@ -158,25 +158,33 @@ done
 
 if [[ $continue == "n" ]]; then
     
-    echo "
-    Thank you for your interest in BioBash.
-    Nothing done. Quitting installation.
+    echo "$(fgcolor green)
+    Leaving BioBash Installation. Nothing done. 
     
     Bye!
-    
+    $(fgcolor end)
     "
     exit 0
     
 elif [[ $continue == "y" ]];then
-    echo ""
+
+    echo "
+    $(fgcolor lightblue)$(a bold) STARTING BioBASH INSTALLATION $(a end) $(fgcolor end)
+    $(hr)"
+    
 else
-    echo "ERROR: Installation can not proceed. Unknown reason."
+    echo "$(fgcolor red)
+    ERROR: Installation can not proceed. Unknown reason.
+    $(fgcolor end)"
     exit 1
 fi
 
 
+
 #Create BIOBASH directory. The "-p" option is useful when re-trying the installation multiple times,
 #so if the directory was created before it won't complain because directory already exists.
+echo "$(fgcolor green) Creating BioBASH home in: ${BIOBASH_HOME}$(fgcolor end)"
+
 mkdir -p "$BIOBASH_HOME"
 
 
@@ -188,13 +196,16 @@ mkdir -p "$BIOBASH_HOME"
 # 
 #----------------------------------------------------------------------------
 #Note that we are sending the $BIOBASH_HOME variable to the script!!!
+echo "$(fgcolor green) Setting up the environment$(fgcolor end)"
 ./setup_environment.sh "$BIOBASH_HOME"
 
 #If environment setup was succesful it creates a "flag" file: environ_ok
 #otherwise (file doesn`t exist) there were errors. Stop installation.
 if [[ ! -e environ_ok ]];then
 	
-	echo "Quitting installation of BioBash.
+	echo "$(fgcolor red) [ERROR] UNABLE TO PERFORM INSTALLATION. 
+    Please check previous messages for possible reasons.
+    Quitting installation of BioBash.$(fgcolor end)
 	"
 	exit 1
 fi
@@ -212,6 +223,8 @@ rm environ_ok
 #            This routine copies libraries and stuff in BIOBASH_HOME
 # 
 #----------------------------------------------------------------------------
+echo "$(fgcolor green) Copying binaries and executables in $BIOBASH_HOME $(fgcolor end)
+"
 
 # Future version needs a better selection of what to install.
 cp -r ./lib "$BIOBASH_HOME"
@@ -230,19 +243,25 @@ cp exec/bb_* "$BIOBASH_HOME" #These are all the actual BB scripts.
 source ~/.bashrc
 
 echo "
+$(fgcolor lightblue)
 $(emoji thumbsup) [BIOBASH WAS INSTALLED SUCCESFULLY!]
+$(fgcolor end)
 
-$(attribute bold) You can start using BioBash$(attribute end) if something seems not be working please update your environment with the following command:
+$(attribute bold) You can start using BioBash right now! $(attribute end)
+ Nevertheless it is possible that you will need to inform your shell  that BioBASH was installed.
+ So, please  update your environment with the following command:
 
    > source ~/.bashrc
    
-   Alternatively you can open a new terminal or logout and login from your account.
-   
-   $(attribute bold)Thank you for installing BIOBASH $(attribute end)
-   
+ Alternatively you can open a new terminal or logout and login from your account.
+
+$(attribute bold) Thank you for installing BIOBASH $(attribute end)
+
+$(fgcolor lightblue)
            Bioinformatics and Systems Biology Laboratory
     Institute for Genetics - National University of Colombia
                     Bogota - Colombia
+$(fgcolor end)
 "
-exit 0
 
+exit 0
